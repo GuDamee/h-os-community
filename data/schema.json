@@ -1,0 +1,71 @@
+{
+  "synthetic": true,
+  "dataset": "team",
+  "note": "Field contract for the team JSON. Not loaded by the desk.",
+  "files": {
+    "users.json": {
+      "required": [
+        "id",
+        "name",
+        "role",
+        "preferences",
+        "year",
+        "interests_text"
+      ],
+      "types": {
+        "id": "string",
+        "name": "string",
+        "role": "student",
+        "preferences": "string[] (3-6)",
+        "year": "integer",
+        "interests_text": "string"
+      }
+    },
+    "events.json": {
+      "required": [
+        "id",
+        "title",
+        "description",
+        "tags",
+        "location",
+        "start",
+        "end",
+        "capacity",
+        "source_id"
+      ],
+      "types": {
+        "id": "string",
+        "title": "string",
+        "description": "string",
+        "tags": "string[] (2-5)",
+        "location": {
+          "building": "string",
+          "lat": "number (optional)",
+          "lng": "number (optional)"
+        },
+        "start": "ISO 8601 local datetime",
+        "end": "ISO 8601 local datetime",
+        "capacity": "integer",
+        "source_id": "string"
+      }
+    },
+    "emails.json": {
+      "required": [
+        "id",
+        "from",
+        "to",
+        "subject",
+        "body",
+        "related_event_id"
+      ],
+      "types": {
+        "id": "string",
+        "from": "string",
+        "to": "string",
+        "subject": "string",
+        "body": "string",
+        "related_event_id": "string"
+      }
+    }
+  }
+}

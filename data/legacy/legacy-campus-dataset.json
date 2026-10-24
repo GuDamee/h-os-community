@@ -1,0 +1,965 @@
+{
+  "metadata": {
+    "name": "H-FARM campus assistant — DEMO sintetica",
+    "as_of": "2026-10-24T13:24:00+02:00",
+    "timezone": "Europe/Rome",
+    "synthetic": true
+  },
+  "interests": [
+    {
+      "id": "I01",
+      "label": "AI e tecnologia"
+    },
+    {
+      "id": "I02",
+      "label": "Startup e business"
+    },
+    {
+      "id": "I03",
+      "label": "Sport e movimento"
+    },
+    {
+      "id": "I04",
+      "label": "Musica"
+    },
+    {
+      "id": "I05",
+      "label": "Cinema e creatività"
+    },
+    {
+      "id": "I06",
+      "label": "Gaming"
+    },
+    {
+      "id": "I07",
+      "label": "Sostenibilità"
+    },
+    {
+      "id": "I08",
+      "label": "Culture e nuove amicizie"
+    }
+  ],
+  "organizers": [
+    {
+      "id": "O01",
+      "name": "Student Life — ruolo simulato",
+      "role": "Coordinamento attività extracurricolari"
+    },
+    {
+      "id": "O02",
+      "name": "Student Office — ruolo simulato",
+      "role": "Accoglienza e orientamento"
+    },
+    {
+      "id": "O03",
+      "name": "Prof.ssa Ada Demo",
+      "role": "Docente fittizia: laboratori tecnologia e impresa"
+    }
+  ],
+  "clubs": [
+    {
+      "id": "C01",
+      "name": "Neural Makers Demo",
+      "interest_ids": [
+        "I01"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a ai e tecnologia. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C02",
+      "name": "Pitch Garage Demo",
+      "interest_ids": [
+        "I02"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a startup e business. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C03",
+      "name": "Move Together Demo",
+      "interest_ids": [
+        "I03"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a sport e movimento. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C04",
+      "name": "Sound Lab Demo",
+      "interest_ids": [
+        "I04"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a musica. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C05",
+      "name": "Frame Factory Demo",
+      "interest_ids": [
+        "I05"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a cinema e creatività. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C06",
+      "name": "Co-op Arena Demo",
+      "interest_ids": [
+        "I06"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a gaming. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C07",
+      "name": "Circular Crew Demo",
+      "interest_ids": [
+        "I07"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a sostenibilità. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    },
+    {
+      "id": "C08",
+      "name": "Culture Mixer Demo",
+      "interest_ids": [
+        "I08"
+      ],
+      "owner_id": "O01",
+      "description": "Club fittizio dedicato a culture e nuove amicizie. Aperto ai principianti; iscrizione simulata gratuita.",
+      "synthetic": true
+    }
+  ],
+  "events": [
+    {
+      "id": "E000",
+      "title": "Jam pilota — incontro concluso",
+      "description": "Porta uno strumento oppure partecipa come ascoltatore.",
+      "club_id": "C04",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I04",
+        "I08"
+      ],
+      "start": "2026-10-22T18:00:00+02:00",
+      "end": "2026-10-22T19:00:00+02:00",
+      "registration_deadline": "2026-10-22T16:00:00+02:00",
+      "location": "Spazio Demo 4 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 9,
+      "status": "completed",
+      "registration_mode": "closed",
+      "document_ids": [
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E001",
+      "title": "AI per un campus più sostenibile",
+      "description": "Costruisci in gruppo un prototipo che aiuti a ridurre gli sprechi.",
+      "club_id": "C01",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I01",
+        "I07"
+      ],
+      "start": "2026-10-26T17:00:00+01:00",
+      "end": "2026-10-26T18:00:00+01:00",
+      "registration_deadline": "2026-10-26T15:00:00+01:00",
+      "location": "Spazio Demo 1 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 6,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D001",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E002",
+      "title": "Pitch your passion",
+      "description": "Presenta una tua idea in 90 secondi e ricevi suggerimenti pratici.",
+      "club_id": "C02",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I02",
+        "I08"
+      ],
+      "start": "2026-10-26T19:00:00+01:00",
+      "end": "2026-10-26T20:00:00+01:00",
+      "registration_deadline": "2026-10-26T17:00:00+01:00",
+      "location": "Spazio Demo 2 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 7,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D002",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E003",
+      "title": "Sport senza esperienza",
+      "description": "Prova giochi di squadra con gruppi misti e attività per principianti.",
+      "club_id": "C03",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I03",
+        "I08"
+      ],
+      "start": "2026-10-27T17:00:00+01:00",
+      "end": "2026-10-27T18:00:00+01:00",
+      "registration_deadline": "2026-10-27T15:00:00+01:00",
+      "location": "Spazio Demo 3 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 8,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D003",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E004",
+      "title": "Jam di benvenuto",
+      "description": "Porta uno strumento oppure partecipa come ascoltatore.",
+      "club_id": "C04",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I04",
+        "I08"
+      ],
+      "start": "2026-10-27T19:00:00+01:00",
+      "end": "2026-10-27T20:00:00+01:00",
+      "registration_deadline": "2026-10-27T17:00:00+01:00",
+      "location": "Spazio Demo 4 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 9,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D004",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E005",
+      "title": "Cinema e intelligenza artificiale",
+      "description": "Visione di cortometraggi e discussione su creatività e AI.",
+      "club_id": "C05",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I05",
+        "I01"
+      ],
+      "start": "2026-10-28T17:00:00+01:00",
+      "end": "2026-10-28T18:00:00+01:00",
+      "registration_deadline": "2026-10-28T15:00:00+01:00",
+      "location": "Spazio Demo 1 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 10,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D005",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E006",
+      "title": "Co-op game night",
+      "description": "Sfide cooperative con squadre formate sul posto.",
+      "club_id": "C06",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I06",
+        "I08"
+      ],
+      "start": "2026-10-28T19:00:00+01:00",
+      "end": "2026-10-28T20:00:00+01:00",
+      "registration_deadline": "2026-10-28T17:00:00+01:00",
+      "location": "Spazio Demo 2 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 11,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D006",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E007",
+      "title": "Swap & repair",
+      "description": "Scambia piccoli oggetti e impara a ripararli insieme al club.",
+      "club_id": "C07",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I07",
+        "I05"
+      ],
+      "start": "2026-10-29T17:00:00+01:00",
+      "end": "2026-10-29T18:00:00+01:00",
+      "registration_deadline": "2026-10-29T15:00:00+01:00",
+      "location": "Spazio Demo 3 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 12,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D007",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E008",
+      "title": "Language café",
+      "description": "Conversazioni informali in italiano e inglese, senza requisito di livello.",
+      "club_id": "C08",
+      "organizer_id": "O02",
+      "interest_ids": [
+        "I08"
+      ],
+      "start": "2026-10-29T19:00:00+01:00",
+      "end": "2026-10-29T20:00:00+01:00",
+      "registration_deadline": "2026-10-29T17:00:00+01:00",
+      "location": "Spazio Demo 4 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 13,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D008",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E009",
+      "title": "Build a game with AI",
+      "description": "Progetta un semplice gioco e confronta idee con altri studenti.",
+      "club_id": "C06",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I06",
+        "I01"
+      ],
+      "start": "2026-10-30T17:00:00+01:00",
+      "end": "2026-10-30T18:00:00+01:00",
+      "registration_deadline": "2026-10-30T15:00:00+01:00",
+      "location": "Spazio Demo 1 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 20,
+      "status": "scheduled",
+      "registration_mode": "waitlist",
+      "document_ids": [
+        "D009",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E010",
+      "title": "Startup circolari",
+      "description": "Sviluppa una proposta di impresa che riutilizzi risorse.",
+      "club_id": "C02",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I02",
+        "I07"
+      ],
+      "start": "2026-10-30T19:00:00+01:00",
+      "end": "2026-10-30T20:00:00+01:00",
+      "registration_deadline": "2026-10-30T17:00:00+01:00",
+      "location": "Spazio Demo 2 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 15,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D010",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E011",
+      "title": "Run & connect",
+      "description": "Camminata o corsa leggera con punto di incontro condiviso.",
+      "club_id": "C03",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I03",
+        "I08"
+      ],
+      "start": "2026-10-31T17:00:00+01:00",
+      "end": "2026-10-31T18:00:00+01:00",
+      "registration_deadline": "2026-10-31T15:00:00+01:00",
+      "location": "Spazio Demo 3 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 6,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D011",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E012",
+      "title": "Soundtrack studio",
+      "description": "Crea una breve colonna sonora per un video del club.",
+      "club_id": "C04",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I04",
+        "I05"
+      ],
+      "start": "2026-10-31T19:00:00+01:00",
+      "end": "2026-10-31T20:00:00+01:00",
+      "registration_deadline": "2026-10-31T17:00:00+01:00",
+      "location": "Spazio Demo 4 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 7,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D012",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E013",
+      "title": "Campus photo walk",
+      "description": "Racconta il campus attraverso fotografie scattate con il telefono.",
+      "club_id": "C05",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I05",
+        "I08"
+      ],
+      "start": "2026-11-01T17:00:00+01:00",
+      "end": "2026-11-01T18:00:00+01:00",
+      "registration_deadline": "2026-11-01T15:00:00+01:00",
+      "location": "Spazio Demo 1 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 8,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D013",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E014",
+      "title": "Green challenge",
+      "description": "Attività di gruppo e quiz per progettare abitudini più sostenibili.",
+      "club_id": "C07",
+      "organizer_id": "O01",
+      "interest_ids": [
+        "I07",
+        "I03"
+      ],
+      "start": "2026-11-01T19:00:00+01:00",
+      "end": "2026-11-01T20:00:00+01:00",
+      "registration_deadline": "2026-11-01T17:00:00+01:00",
+      "location": "Spazio Demo 2 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 9,
+      "status": "cancelled",
+      "registration_mode": "closed",
+      "document_ids": [
+        "D014",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E015",
+      "title": "Meet your campus community",
+      "description": "Incontra studenti di altri percorsi e presenta i tuoi interessi.",
+      "club_id": "C08",
+      "organizer_id": "O02",
+      "interest_ids": [
+        "I08",
+        "I02"
+      ],
+      "start": "2026-11-02T17:00:00+01:00",
+      "end": "2026-11-02T18:00:00+01:00",
+      "registration_deadline": "2026-11-02T15:00:00+01:00",
+      "location": "Spazio Demo 3 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 10,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D015",
+        "D100"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "E016",
+      "title": "AI music playground",
+      "description": "Esplora strumenti creativi e discuti il ruolo umano nella musica.",
+      "club_id": "C01",
+      "organizer_id": "O03",
+      "interest_ids": [
+        "I01",
+        "I04"
+      ],
+      "start": "2026-11-02T19:00:00+01:00",
+      "end": "2026-11-02T20:00:00+01:00",
+      "registration_deadline": "2026-11-02T17:00:00+01:00",
+      "location": "Spazio Demo 4 — luogo fittizio",
+      "language": "IT/EN",
+      "level": "beginner",
+      "cost_eur": 0,
+      "capacity": 20,
+      "registered_count": 11,
+      "status": "scheduled",
+      "registration_mode": "open",
+      "document_ids": [
+        "D016",
+        "D100"
+      ],
+      "synthetic": true
+    }
+  ],
+  "posts": [
+    {
+      "id": "P001",
+      "type": "event_announcement",
+      "event_id": "E001",
+      "author_id": "O03",
+      "published_at": "2026-10-20T10:00:00+02:00",
+      "body": "Costruisci in gruppo un prototipo che aiuti a ridurre gli sprechi.",
+      "synthetic": true
+    },
+    {
+      "id": "P002",
+      "type": "event_announcement",
+      "event_id": "E002",
+      "author_id": "O03",
+      "published_at": "2026-10-20T10:00:00+02:00",
+      "body": "Presenta una tua idea in 90 secondi e ricevi suggerimenti pratici.",
+      "synthetic": true
+    },
+    {
+      "id": "P003",
+      "type": "event_announcement",
+      "event_id": "E003",
+      "author_id": "O01",
+      "published_at": "2026-10-20T10:00:00+02:00",
+      "body": "Prova giochi di squadra con gruppi misti e attività per principianti.",
+      "synthetic": true
+    },
+    {
+      "id": "P004",
+      "type": "event_announcement",
+      "event_id": "E004",
+      "author_id": "O01",
+      "published_at": "2026-10-20T10:00:00+02:00",
+      "body": "Porta uno strumento oppure partecipa come ascoltatore.",
+      "synthetic": true
+    },
+    {
+      "id": "P005",
+      "type": "event_announcement",
+      "event_id": "E005",
+      "author_id": "O03",
+      "published_at": "2026-10-21T10:00:00+02:00",
+      "body": "Visione di cortometraggi e discussione su creatività e AI.",
+      "synthetic": true
+    },
+    {
+      "id": "P006",
+      "type": "event_announcement",
+      "event_id": "E006",
+      "author_id": "O01",
+      "published_at": "2026-10-21T10:00:00+02:00",
+      "body": "Sfide cooperative con squadre formate sul posto.",
+      "synthetic": true
+    },
+    {
+      "id": "P007",
+      "type": "event_announcement",
+      "event_id": "E007",
+      "author_id": "O01",
+      "published_at": "2026-10-21T10:00:00+02:00",
+      "body": "Scambia piccoli oggetti e impara a ripararli insieme al club.",
+      "synthetic": true
+    },
+    {
+      "id": "P008",
+      "type": "event_announcement",
+      "event_id": "E008",
+      "author_id": "O02",
+      "published_at": "2026-10-21T10:00:00+02:00",
+      "body": "Conversazioni informali in italiano e inglese, senza requisito di livello.",
+      "synthetic": true
+    },
+    {
+      "id": "P009",
+      "type": "event_announcement",
+      "event_id": "E009",
+      "author_id": "O03",
+      "published_at": "2026-10-22T10:00:00+02:00",
+      "body": "Progetta un semplice gioco e confronta idee con altri studenti.",
+      "synthetic": true
+    },
+    {
+      "id": "P010",
+      "type": "event_announcement",
+      "event_id": "E010",
+      "author_id": "O03",
+      "published_at": "2026-10-22T10:00:00+02:00",
+      "body": "Sviluppa una proposta di impresa che riutilizzi risorse.",
+      "synthetic": true
+    },
+    {
+      "id": "P011",
+      "type": "event_announcement",
+      "event_id": "E011",
+      "author_id": "O01",
+      "published_at": "2026-10-22T10:00:00+02:00",
+      "body": "Camminata o corsa leggera con punto di incontro condiviso.",
+      "synthetic": true
+    },
+    {
+      "id": "P012",
+      "type": "event_announcement",
+      "event_id": "E012",
+      "author_id": "O01",
+      "published_at": "2026-10-22T10:00:00+02:00",
+      "body": "Crea una breve colonna sonora per un video del club.",
+      "synthetic": true
+    },
+    {
+      "id": "P013",
+      "type": "event_announcement",
+      "event_id": "E013",
+      "author_id": "O01",
+      "published_at": "2026-10-23T10:00:00+02:00",
+      "body": "Racconta il campus attraverso fotografie scattate con il telefono.",
+      "synthetic": true
+    },
+    {
+      "id": "P014",
+      "type": "event_announcement",
+      "event_id": "E014",
+      "author_id": "O01",
+      "published_at": "2026-10-23T10:00:00+02:00",
+      "body": "Attività di gruppo e quiz per progettare abitudini più sostenibili.",
+      "synthetic": true
+    },
+    {
+      "id": "P015",
+      "type": "event_announcement",
+      "event_id": "E015",
+      "author_id": "O02",
+      "published_at": "2026-10-23T10:00:00+02:00",
+      "body": "Incontra studenti di altri percorsi e presenta i tuoi interessi.",
+      "synthetic": true
+    },
+    {
+      "id": "P016",
+      "type": "event_announcement",
+      "event_id": "E016",
+      "author_id": "O03",
+      "published_at": "2026-10-23T10:00:00+02:00",
+      "body": "Esplora strumenti creativi e discuti il ruolo umano nella musica.",
+      "synthetic": true
+    }
+  ],
+  "profiles": [
+    {
+      "id": "U01",
+      "name": "Alex Demo",
+      "liked_interest_ids": [
+        "I01",
+        "I06"
+      ],
+      "disliked_interest_ids": [
+        "I03"
+      ]
+    },
+    {
+      "id": "U02",
+      "name": "Bea Demo",
+      "liked_interest_ids": [
+        "I04",
+        "I05",
+        "I08"
+      ],
+      "disliked_interest_ids": []
+    },
+    {
+      "id": "U03",
+      "name": "Chris Demo",
+      "liked_interest_ids": [
+        "I02",
+        "I07"
+      ],
+      "disliked_interest_ids": []
+    },
+    {
+      "id": "U04",
+      "name": "Dani Demo",
+      "liked_interest_ids": [],
+      "disliked_interest_ids": []
+    }
+  ],
+  "reviews": [
+    {
+      "id": "R01",
+      "event_id": "E000",
+      "user_id": "U02",
+      "rating": 4,
+      "body": "Facile conoscere altri studenti. Avrei lasciato più tempo per suonare.",
+      "created_at": "2026-10-23T10:00:00+02:00",
+      "synthetic": true
+    }
+  ],
+  "documents": [
+    {
+      "id": "D001",
+      "event_ids": [
+        "E001"
+      ],
+      "path": "documents/D001.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D002",
+      "event_ids": [
+        "E002"
+      ],
+      "path": "documents/D002.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D003",
+      "event_ids": [
+        "E003"
+      ],
+      "path": "documents/D003.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D004",
+      "event_ids": [
+        "E004"
+      ],
+      "path": "documents/D004.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D005",
+      "event_ids": [
+        "E005"
+      ],
+      "path": "documents/D005.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D006",
+      "event_ids": [
+        "E006"
+      ],
+      "path": "documents/D006.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D007",
+      "event_ids": [
+        "E007"
+      ],
+      "path": "documents/D007.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D008",
+      "event_ids": [
+        "E008"
+      ],
+      "path": "documents/D008.md",
+      "version": 1,
+      "owner_id": "O02",
+      "synthetic": true
+    },
+    {
+      "id": "D009",
+      "event_ids": [
+        "E009"
+      ],
+      "path": "documents/D009.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D010",
+      "event_ids": [
+        "E010"
+      ],
+      "path": "documents/D010.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D011",
+      "event_ids": [
+        "E011"
+      ],
+      "path": "documents/D011.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D012",
+      "event_ids": [
+        "E012"
+      ],
+      "path": "documents/D012.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D013",
+      "event_ids": [
+        "E013"
+      ],
+      "path": "documents/D013.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D014",
+      "event_ids": [
+        "E014"
+      ],
+      "path": "documents/D014.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    },
+    {
+      "id": "D015",
+      "event_ids": [
+        "E015"
+      ],
+      "path": "documents/D015.md",
+      "version": 1,
+      "owner_id": "O02",
+      "synthetic": true
+    },
+    {
+      "id": "D016",
+      "event_ids": [
+        "E016"
+      ],
+      "path": "documents/D016.md",
+      "version": 1,
+      "owner_id": "O03",
+      "synthetic": true
+    },
+    {
+      "id": "D100",
+      "event_ids": [],
+      "path": "documents/D100.md",
+      "version": 1,
+      "owner_id": "O01",
+      "synthetic": true
+    }
+  ]
+}

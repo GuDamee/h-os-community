@@ -1,0 +1,534 @@
+[
+  {
+    "id": "usr-001",
+    "name": "Alex Rossi",
+    "role": "student",
+    "preferences": [
+      "cinema",
+      "finanza",
+      "gaming",
+      "programmazione"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano cinema, finanza, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-002",
+    "name": "Andrea Rossi",
+    "role": "student",
+    "preferences": [
+      "data-science",
+      "gaming",
+      "networking",
+      "running"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano data-science, gaming, networking e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-003",
+    "name": "Sam Rossi",
+    "role": "student",
+    "preferences": [
+      "finanza",
+      "musica",
+      "running"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano finanza, musica, running e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-004",
+    "name": "Nico Rossi",
+    "role": "student",
+    "preferences": [
+      "basket",
+      "design",
+      "networking",
+      "running",
+      "sport"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano basket, design, networking e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-005",
+    "name": "Luca Rossi",
+    "role": "student",
+    "preferences": [
+      "cinema",
+      "fotografia",
+      "gaming",
+      "imprenditoria",
+      "musica",
+      "teatro"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano cinema, fotografia, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-006",
+    "name": "Mia Rossi",
+    "role": "student",
+    "preferences": [
+      "cybersecurity",
+      "data-science",
+      "fitness"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano cybersecurity, data-science, fitness e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-007",
+    "name": "Noa Rossi",
+    "role": "student",
+    "preferences": [
+      "cybersecurity",
+      "fotografia",
+      "programmazione",
+      "teatro"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano cybersecurity, fotografia, programmazione e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-008",
+    "name": "Eli Rossi",
+    "role": "student",
+    "preferences": [
+      "cinema",
+      "musica",
+      "startup"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano cinema, musica, startup e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-009",
+    "name": "Ari Rossi",
+    "role": "student",
+    "preferences": [
+      "UX-UI",
+      "data-science",
+      "sport"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano UX-UI, data-science, sport e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-010",
+    "name": "Leo Rossi",
+    "role": "student",
+    "preferences": [
+      "ambiente",
+      "basket",
+      "data-science",
+      "finanza",
+      "robotica",
+      "startup"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano ambiente, basket, data-science e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-011",
+    "name": "Teo Rossi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "ambiente",
+      "arte",
+      "data-science",
+      "design",
+      "teatro"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano AI, ambiente, arte e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-012",
+    "name": "Sasha Rossi",
+    "role": "student",
+    "preferences": [
+      "cinema",
+      "fitness",
+      "programmazione"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano cinema, fitness, programmazione e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-013",
+    "name": "Vale Rossi",
+    "role": "student",
+    "preferences": [
+      "calcio",
+      "data-science",
+      "design",
+      "gaming"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano calcio, data-science, design e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-014",
+    "name": "Dani Rossi",
+    "role": "student",
+    "preferences": [
+      "ambiente",
+      "fitness",
+      "fotografia",
+      "marketing"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano ambiente, fitness, fotografia e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-015",
+    "name": "Rene Rossi",
+    "role": "student",
+    "preferences": [
+      "arte",
+      "cinema",
+      "finanza"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano arte, cinema, finanza e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-016",
+    "name": "Chris Rossi",
+    "role": "student",
+    "preferences": [
+      "cybersecurity",
+      "data-science",
+      "sostenibilita",
+      "startup"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano cybersecurity, data-science, sostenibilita e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-017",
+    "name": "Toni Rossi",
+    "role": "student",
+    "preferences": [
+      "cinema",
+      "finanza",
+      "fitness",
+      "fotografia",
+      "marketing",
+      "startup"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano cinema, finanza, fitness e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-018",
+    "name": "Ema Rossi",
+    "role": "student",
+    "preferences": [
+      "cybersecurity",
+      "gaming",
+      "networking",
+      "sostenibilita"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano cybersecurity, gaming, networking e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-019",
+    "name": "Gio Rossi",
+    "role": "student",
+    "preferences": [
+      "arte",
+      "basket",
+      "design",
+      "gaming",
+      "programmazione",
+      "running"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano arte, basket, design e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-020",
+    "name": "Robin Rossi",
+    "role": "student",
+    "preferences": [
+      "calcio",
+      "cybersecurity",
+      "gaming",
+      "running",
+      "sport"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano calcio, cybersecurity, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-021",
+    "name": "Alex Bianchi",
+    "role": "student",
+    "preferences": [
+      "finanza",
+      "fotografia",
+      "sport",
+      "startup",
+      "teatro"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano finanza, fotografia, sport e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-022",
+    "name": "Andrea Bianchi",
+    "role": "student",
+    "preferences": [
+      "UX-UI",
+      "arte",
+      "gaming",
+      "networking",
+      "robotica"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano UX-UI, arte, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-023",
+    "name": "Sam Bianchi",
+    "role": "student",
+    "preferences": [
+      "UX-UI",
+      "gaming",
+      "programmazione"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano UX-UI, gaming, programmazione e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-024",
+    "name": "Nico Bianchi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "ambiente",
+      "calcio",
+      "networking",
+      "programmazione",
+      "running"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano AI, ambiente, calcio e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-025",
+    "name": "Luca Bianchi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "cinema",
+      "fitness",
+      "fotografia",
+      "robotica",
+      "teatro"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano AI, cinema, fitness e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-026",
+    "name": "Mia Bianchi",
+    "role": "student",
+    "preferences": [
+      "ambiente",
+      "arte",
+      "gaming"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano ambiente, arte, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-027",
+    "name": "Noa Bianchi",
+    "role": "student",
+    "preferences": [
+      "cybersecurity",
+      "data-science",
+      "startup"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano cybersecurity, data-science, startup e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-028",
+    "name": "Eli Bianchi",
+    "role": "student",
+    "preferences": [
+      "basket",
+      "fitness",
+      "sport"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano basket, fitness, sport e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-029",
+    "name": "Ari Bianchi",
+    "role": "student",
+    "preferences": [
+      "ambiente",
+      "fitness",
+      "gaming",
+      "running",
+      "startup",
+      "teatro"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano ambiente, fitness, gaming e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-030",
+    "name": "Leo Bianchi",
+    "role": "student",
+    "preferences": [
+      "arte",
+      "musica",
+      "robotica",
+      "teatro"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano arte, musica, robotica e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-031",
+    "name": "Teo Bianchi",
+    "role": "student",
+    "preferences": [
+      "basket",
+      "calcio",
+      "cybersecurity",
+      "fotografia",
+      "marketing",
+      "teatro"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano basket, calcio, cybersecurity e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-032",
+    "name": "Sasha Bianchi",
+    "role": "student",
+    "preferences": [
+      "ambiente",
+      "cinema",
+      "design",
+      "finanza",
+      "running",
+      "sport"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano ambiente, cinema, design e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-033",
+    "name": "Vale Bianchi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "design",
+      "robotica"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano AI, design, robotica e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-034",
+    "name": "Dani Bianchi",
+    "role": "student",
+    "preferences": [
+      "data-science",
+      "musica",
+      "sostenibilita"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano data-science, musica, sostenibilita e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-035",
+    "name": "Rene Bianchi",
+    "role": "student",
+    "preferences": [
+      "UX-UI",
+      "fotografia",
+      "networking",
+      "sostenibilita"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano UX-UI, fotografia, networking e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-036",
+    "name": "Chris Bianchi",
+    "role": "student",
+    "preferences": [
+      "arte",
+      "fitness",
+      "running"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano arte, fitness, running e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-037",
+    "name": "Toni Bianchi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "arte",
+      "marketing",
+      "musica",
+      "sostenibilita"
+    ],
+    "year": 2,
+    "interests_text": "Mi interessano AI, arte, marketing e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-038",
+    "name": "Ema Bianchi",
+    "role": "student",
+    "preferences": [
+      "data-science",
+      "finanza",
+      "imprenditoria",
+      "sostenibilita",
+      "startup"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano data-science, finanza, imprenditoria e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-039",
+    "name": "Gio Bianchi",
+    "role": "student",
+    "preferences": [
+      "calcio",
+      "data-science",
+      "fotografia",
+      "running"
+    ],
+    "year": 1,
+    "interests_text": "Mi interessano calcio, data-science, fotografia e vorrei conoscere altri studenti con passioni simili."
+  },
+  {
+    "id": "usr-040",
+    "name": "Robin Bianchi",
+    "role": "student",
+    "preferences": [
+      "AI",
+      "UX-UI",
+      "imprenditoria"
+    ],
+    "year": 3,
+    "interests_text": "Mi interessano AI, UX-UI, imprenditoria e vorrei conoscere altri studenti con passioni simili."
+  }
+]

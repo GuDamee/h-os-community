@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>H-OS · scrivania studenti</title>
+  <meta name="description" content="H-OS abbina studenti inventati agli eventi del campus e chiede a una persona prima di appendere un avviso in bacheca." />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <a class="skip" href="#mappa">Vai alla mappa</a>
+
+  <section id="screen-access" class="gate" aria-labelledby="access-title">
+    <form id="access-form" class="sheet" novalidate>
+      <ol class="steps-inline" aria-label="Percorso">
+        <li aria-current="step">1 · Accesso</li>
+        <li>2 · Preferenze</li>
+        <li>3 · Bacheca</li>
+      </ol>
+      <p class="eyebrow">Accesso locale · H-FARM</p>
+      <h1 id="access-title">Entra nella scrivania</h1>
+      <p class="lede">Nickname, email scolastica e password dell'email. Ogni link Canvas o Pronote è facoltativo e non collegato.</p>
+      <p id="gate-status" class="field-error" role="status"></p>
+      <div class="fields">
+        <label><span class="label-row">Nickname <abbr class="req" title="obbligatorio">*</abbr> <span class="flag req-word">obbligatorio</span></span>
+          <input id="nickname" name="nickname" type="text" autocomplete="off" required minlength="2" maxlength="40" placeholder="Alex" />
+          <span class="field-error" data-for="nickname"></span>
+        </label>
+        <label><span class="label-row">Email scolastica <abbr class="req" title="obbligatorio">*</abbr> <span class="flag req-word">obbligatorio</span></span>
+          <input id="email" name="email" type="text" inputmode="email" autocomplete="off" required placeholder="alex@campus.example" maxlength="120" />
+          <span class="field-error" data-for="email"></span>
+        </label>
+        <label><span class="label-row">Password <abbr class="req" title="obbligatorio">*</abbr> <span class="flag req-word">obbligatorio</span></span>
+          <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" />
+          <span class="hint">Password dell'email. Almeno 8 caratteri, con maiuscola, minuscola, numero e simbolo. Esempio di forma: HackDay!1. Non viene inviata né salvata.</span>
+          <span class="field-error" data-for="password"></span>
+        </label>
+        <label class="optional"><span class="label-row">Link Canvas <span class="flag">facoltativo</span></span>
+          <input id="canvas-link" name="canvas_link" type="text" inputmode="url" autocomplete="off" maxlength="300" placeholder="https://canvas.example/…" />
+        </label>
+        <label class="optional"><span class="label-row">Link Pronote <span class="flag">facoltativo</span></span>
+          <input id="pronote-link" name="pronote_link" type="text" inputmode="url" autocomplete="off" maxlength="300" placeholder="https://pronote.example/…" />
+        </label>
+        <label class="check">
+          <input id="terms" name="terms" type="checkbox" />
+          <span>Accetta i termini e servizi</span>
+        </label>
+        <span class="field-error" data-for="terms"></span>
+      </div>
+      <p class="terms">I termini di questa demo: i dati restano su questo browser e nel file locale dell'app. Non c'è un login Canvas, né Pronote, né un invio di email.</p>
+      <button class="solid" type="submit">Entra</button>
+    </form>
+  </section>
+
+  <section id="screen-prefs" class="gate" hidden aria-labelledby="prefs-title">
+    <div class="sheet swipe-sheet">
+      <ol class="steps-inline" aria-label="Percorso">
+        <li>1 · Accesso</li>
+        <li aria-current="step">2 · Preferenze</li>
+        <li>3 · Bacheca</li>
+      </ol>
+      <p class="eyebrow">Preferenze</p>
+      <h1 id="prefs-title">Cosa ti interessa</h1>
+      <p class="lede">Scorri la carta (↓ LIKE, ↑ DISLIKE) oppure scegli Interessa, Non interessa o Salta. Poi si apre la community.</p>
+      <div id="swipe-stage" class="swipe-stage">
+        <p class="swipe-arrow up">↑ DISLIKE</p>
+        <article id="swipe-card" class="swipe-card" tabindex="0" aria-describedby="swipe-progress">
+          <div class="swipe-mark" id="swipe-mark" aria-hidden="true"></div>
+          <div class="swipe-copy">
+            <p class="swipe-kind" id="swipe-kind">Preferenza</p>
+            <h2 id="swipe-tag">…</h2>
+            <p id="swipe-blurb" class="swipe-blurb"></p>
+          </div>
+        </article>
+        <p class="swipe-arrow down">↓ LIKE</p>
+      </div>
+      <p id="swipe-progress" class="progress-count" aria-live="polite"></p>
+      <div class="swipe-meter" aria-hidden="true"><i id="swipe-meter"></i></div>
+      <p id="swipe-counts" class="meta"></p>
+      <div class="actions center">
+        <button id="dislike-btn" class="ghost" type="button">Non interessa</button>
+        <button id="skip-btn" class="ghost" type="button">Salta</button>
+        <button id="like-btn" class="solid" type="button">Interessa</button>
+      </div>
+      <div id="pref-grid" class="pref-grid" aria-label="Preferenze in tre stati"></div>
+      <div id="pref-preview" class="pref-preview" aria-live="polite"></div>
+      <div class="actions center">
+        <button id="enter-map" class="leaf" type="button" disabled>Apri la community</button>
+        <button id="demo-likes" class="ghost" type="button">Profilo demo: cinema, finanza, gaming, programmazione</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="screen-desk" class="app" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <p class="eyebrow">Hacktoberfest · Hack Day · Treviso</p>
+        <h1>H-OS</h1>
+        <p class="tagline">Sistema operativo della comunità. Stasera, la scrivania studenti.</p>
+      </div>
+      <div class="top-meta">
+        <button id="demo-date" class="date-stack" type="button" data-action="section" data-id="calendario" aria-label="Apri il calendario" aria-pressed="false">
+          <span id="date-d">—</span>
+          <span id="date-m">—</span>
+          <span id="date-y">—</span>
+        </button>
+        <button class="head-ai" type="button" data-action="ai" aria-expanded="false" aria-controls="ai-overlay">AI Data Science</button>
+        <button class="head-gear" type="button" data-action="section" data-id="personalizzazioni" aria-label="Personalizzazioni" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 3.5v2.2M12 18.3V20.5M4.8 6.8l1.6 1.6M17.6 15.6l1.6 1.6M3.5 12h2.2M18.3 12h2.2M4.8 17.2l1.6-1.6M17.6 8.4l1.6-1.6"></path>
+          </svg>
+        </button>
+        <span class="pill" title="L'accesso è locale. Canvas e Pronote non sono collegati.">Studenti</span>
+        <span id="clock" class="pill">Orologio demo</span>
+        <span id="mode" class="pill">…</span>
+        <a class="pill link" href="/docs">API</a>
+        <div class="you-wrap">
+          <button id="you-btn" class="you" type="button" data-action="you" aria-label="Il tuo accesso">
+            <i class="face" aria-hidden="true"></i>
+          </button>
+          <div id="you-panel" class="you-panel" hidden>
+            <p id="you-name"></p>
+            <p id="you-email" class="meta"></p>
+            <p id="you-links" class="meta"></p>
+            <p class="meta">Canvas e Pronote non sono collegati. La password non è stata salvata.</p>
+            <button class="ghost" type="button" data-action="signout">Esci</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div id="error" class="error" hidden></div>
+    <div class="workspace">
+      <nav class="rail rail-wide" aria-label="Sezioni">
+        <button type="button" data-action="section" data-id="community" aria-current="true"><span class="rail-name">Bacheca</span></button>
+        <button type="button" data-action="section" data-id="mappa"><span class="rail-name">Mappa</span></button>
+        <button type="button" data-action="section" data-id="calendario"><span class="rail-name">Calendario</span></button>
+        <button type="button" data-action="section" data-id="prenotazioni"><span class="rail-name">Prenotazioni</span></button>
+        <button type="button" data-action="section" data-id="feedback"><span class="rail-name">Feedback</span></button>
+        <button type="button" data-action="section" data-id="contatti"><span class="rail-name">Contatti</span></button>
+        <button type="button" data-action="section" data-id="canvas"><span class="rail-name">Canvas</span></button>
+        <button type="button" data-action="section" data-id="pronote"><span class="rail-name">Pronote</span></button>
+        <button type="button" data-action="section" data-id="shelf"><span class="rail-name">Shelf</span></button>
+        <button type="button" data-action="section" data-id="personalizzazioni"><span class="rail-name">Personalizzazioni</span></button>
+        <button type="button" data-action="cohort"><span class="rail-name">Coorte</span></button>
+      </nav>
+      <aside id="roster" class="roster" hidden aria-label="Studenti della coorte">
+        <p class="loading">Sto leggendo le fonti…</p>
+      </aside>
+      <div class="stage">
+        <section class="view board-column" id="bacheca" data-view="community">
+          <div class="column-head">
+            <div>
+              <p class="eyebrow">Bacheca</p>
+              <h2 id="board-title">In attesa di una persona</h2>
+            </div>
+            <div class="actions">
+              <label class="formula-pick" for="formula">Formula
+                <select id="formula">
+                  <option value="jaccard">Jaccard</option>
+                  <option value="overlap">Overlap</option>
+                </select>
+              </label>
+              <button id="ask-path" class="solid" type="button" data-action="ask-suggest" data-id="Recommend an event">Chiedi un evento</button>
+              <button id="match-btn" class="solid" type="button" data-action="match">Abbina</button>
+              <button id="tick-btn" class="solid" type="button" data-action="tick">Tic dell'agente</button>
+            </div>
+          </div>
+          <div id="per-te"></div>
+          <div id="feed"></div>
+          <div id="tray"></div>
+          <div id="cork" aria-live="polite"></div>
+        </section>
+        <section class="view map-column" id="mappa" data-view="map" hidden>
+          <div class="column-head">
+            <div>
+              <p class="eyebrow">Satellite · H-FARM College</p>
+              <h2 id="map-title">Campus</h2>
+              <p id="map-zones" class="meta">La Serra · Roncade · 45.5665, 12.4305</p>
+            </div>
+          </div>
+          <div class="map-stage">
+            <div id="campus-map" class="campus-map" data-map="satellite" role="region" aria-label="Vista satellitare Esri del campus H-FARM a Roncade, La Serra."></div>
+          </div>
+          <p id="map-caption" class="caption">Esri World Imagery sul campus H-FARM, La Serra, Roncade (45.5665, 12.4305). I pin restano lo schema del dataset, non un rilievo. Nessuna chiave Google.</p>
+          <ul class="legend map-legend">
+            <li><i class="pin-dot mandatory"></i> Mandatory</li>
+            <li><i class="pin-dot student"></i> Student events</li>
+            <li><i class="pin-dot sport"></i> Sport / community</li>
+            <li><i class="pin-dot campus"></i> Campus event</li>
+          </ul>
+        </section>
+        <section class="view pad-view" id="calendario" data-view="calendar" hidden>
+          <p class="eyebrow">Calendario</p>
+          <h2>Lezioni e sera</h2>
+          <div id="calendar-body"></div>
+        </section>
+        <section class="view pad-view" id="prenotazioni" data-view="bookings" hidden aria-labelledby="book-title">
+          <p class="eyebrow">Prenotazioni</p>
+          <h2 id="book-title">Prenotazioni</h2>
+          <p>Canvas e Pronote non sono collegati. L'iscrizione H-OS è simulata e compare in agenda solo dopo Approva.</p>
+          <button class="ghost" type="button" disabled>Prenota</button>
+          <div id="booking-list"></div>
+          <div id="agenda-list"></div>
+        </section>
+        <section class="view pad-view" id="feedback" data-view="feedback" hidden>
+          <p class="eyebrow">Feedback</p>
+          <h2>Note pubbliche</h2>
+          <form id="feedback-form">
+            <label>Evento
+              <select id="feedback-event" required>
+                <option value="">Scegli un evento</option>
+              </select>
+            </label>
+            <label>Data <input id="feedback-date" type="date" required /></label>
+            <p id="feedback-subject" class="meta">Oggetto: evento · data</p>
+            <label>Voto
+              <select id="feedback-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+            </label>
+            <p class="meta">Commento ibrido: un chip e, se serve, una frase tua.</p>
+            <div id="feedback-chips" class="comment-chips">
+              <button type="button" data-action="feedback-chip" data-id="Utile" aria-pressed="false">Utile</button>
+              <button type="button" data-action="feedback-chip" data-id="Orario stretto" aria-pressed="false">Orario stretto</button>
+              <button type="button" data-action="feedback-chip" data-id="Bel gruppo" aria-pressed="false">Bel gruppo</button>
+              <button type="button" data-action="feedback-chip" data-id="Troppo pieno" aria-pressed="false">Troppo pieno</button>
+              <button type="button" data-action="feedback-chip" data-id="Da rifare" aria-pressed="false">Da rifare</button>
+            </div>
+            <label>Testo <textarea id="feedback-body" maxlength="350" placeholder="Aggiungi un dettaglio, se vuoi."></textarea></label>
+            <button class="solid" type="submit">Pubblica feedback sintetico</button>
+          </form>
+          <div id="feedback-list"></div>
+        </section>
+        <section class="view pad-view" id="contatti" data-view="contacts" hidden>
+          <p class="eyebrow">Contatti</p>
+          <h2>Sportelli simulati</h2>
+          <div id="contact-list"></div>
+        </section>
+        <section class="view pad-view" id="canvas" data-view="canvas" hidden>
+          <p class="eyebrow">Canvas</p>
+          <h2>Link Canvas</h2>
+          <p id="canvas-pane">Canvas non collegato.</p>
+        </section>
+        <section class="view pad-view" id="pronote" data-view="pronote" hidden>
+          <p class="eyebrow">Pronote</p>
+          <h2>Link Pronote</h2>
+          <p id="pronote-pane">Pronote non collegato.</p>
+        </section>
+        <section class="view pad-view" id="shelf" data-view="shelf" hidden>
+          <p class="eyebrow">Shelf</p>
+          <h2>Scaffale</h2>
+          <p>Si condivide. Il budget non è attivo: qui non si paga.</p>
+          <div id="shelf-list"></div>
+        </section>
+        <section class="view pad-view" id="personalizzazioni" data-view="settings" hidden>
+          <p class="eyebrow">Personalizzazioni</p>
+          <h2>Le tue preferenze</h2>
+          <p id="settings-summary"></p>
+          <button class="solid" type="button" data-action="prefs">Modifica preferenze</button>
+        </section>
+      </div>
+    </div>
+    <footer class="dock" id="dock"></footer>
+    <button id="ai-chip" class="ai-chip" type="button" data-action="ai" aria-expanded="false" aria-controls="ai-overlay">H-OS AI</button>
+    <section id="ai-overlay" class="ai-overlay" hidden>
+      <div class="ai-head">
+        <div>
+          <p class="eyebrow">AI Data Science</p>
+          <strong>Ragionamento sulle fonti</strong>
+          <p id="assistant-mode" class="meta">Retrieval sul dataset. Gemini è PLANNED senza chiave.</p>
+          <p id="path-hint" class="meta">Librarian (fonti) → Brain (consiglio) → Proponi → Approva → Agenda</p>
+        </div>
+        <button class="ghost" type="button" data-action="ai-close">Chiudi</button>
+      </div>
+      <div id="ai-log" class="ai-log" aria-live="polite"></div>
+      <form id="assistant-form" class="ai-form">
+        <input id="assistant-question" type="text" maxlength="500" placeholder="Recommend an event" required />
+        <button class="solid" type="submit">Chiedi</button>
+      </form>
+      <div class="suggestions">
+        <button type="button" data-action="ask-suggest" data-id="Recommend an event">Recommend an event</button>
+        <button type="button" data-action="ask-suggest" data-id="Consigliami un evento">Consigliami un evento</button>
+        <button type="button" data-action="ask-suggest" data-id="Cerco un passaggio per Treviso">Passaggio</button>
+        <button type="button" data-action="ask-suggest" data-id="Business English">Business English</button>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="source-dialog" aria-labelledby="source-title">
+    <form method="dialog"><button class="ghost" value="close">Chiudi</button></form>
+    <div id="source-body"></div>
+  </dialog>
+  <noscript>H-OS ha bisogno di JavaScript per l'accesso, le preferenze, la mappa e la bacheca. Le API restano su /docs.</noscript>
+  <script src="/static/vendor/leaflet/leaflet.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.venv
+.git
+.env
+var
+agent-tools
+__pycache__
+.pytest_cache
+*.pyc
+*.sqlite
+.cursor

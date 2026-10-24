@@ -1,0 +1,53 @@
+{
+  "synthetic": true,
+  "dataset": "timetable-seed",
+  "timezone": "Europe/Rome",
+  "note": "Class blocks are a synthetic timetable, not registrations. evening_event_ids point at Library evt-* rows and stay unregistered until a person approves.",
+  "lessons": [
+    {
+      "id": "cal-tue-business-english",
+      "source_id": "cal-tue-business-english",
+      "title": "Business English",
+      "weekday": "tue",
+      "start": "2026-10-27T14:30:00+01:00",
+      "end": "2026-10-27T18:00:00+01:00",
+      "location": "Building 1",
+      "kind": "lesson",
+      "synthetic": true
+    },
+    {
+      "id": "cal-wed-programming",
+      "source_id": "cal-wed-programming",
+      "title": "Programming",
+      "weekday": "wed",
+      "start": "2026-10-28T10:00:00+01:00",
+      "end": "2026-10-28T13:30:00+01:00",
+      "location": "Building 2",
+      "kind": "lesson",
+      "synthetic": true
+    },
+    {
+      "id": "cal-thu-programming",
+      "source_id": "cal-thu-programming",
+      "title": "Programming",
+      "weekday": "thu",
+      "start": "2026-10-29T10:00:00+01:00",
+      "end": "2026-10-29T13:30:00+01:00",
+      "location": "Building 2",
+      "kind": "lesson",
+      "synthetic": true
+    },
+    {
+      "id": "cal-fri-calculus",
+      "source_id": "cal-fri-calculus",
+      "title": "One Various Calculus",
+      "weekday": "fri",
+      "start": "2026-10-30T12:00:00+01:00",
+      "end": "2026-10-30T13:30:00+01:00",
+      "location": "Building 3",
+      "kind": "lesson",
+      "synthetic": true
+    }
+  ],
+  "evening_event_ids": ["evt-003", "evt-006"]
+}

@@ -1,0 +1,114 @@
+{
+  "synthetic": true,
+  "dataset": "team",
+  "seed": 20261024,
+  "preference_space": {
+    "tags": 25,
+    "profile_sizes": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "theoretical_profiles": 245180,
+    "note": "Theoretical profiles are the combinations of 3 to 6 distinct tags. This file materializes one cohort, not that space."
+  },
+  "emails": [
+    {
+      "id": "mail-001",
+      "from": "eventi@campus.example",
+      "to": "usr-001@students.example",
+      "subject": "Invito: Laboratorio pratico: ambiente",
+      "body": "Ciao! Ti segnaliamo Laboratorio pratico: ambiente presso La Serra. Vuoi partecipare?",
+      "related_event_id": "evt-001"
+    },
+    {
+      "id": "mail-002",
+      "from": "eventi@campus.example",
+      "to": "usr-002@students.example",
+      "subject": "Invito: Meetup studenti: UX-UI",
+      "body": "Ciao! Ti segnaliamo Meetup studenti: UX-UI presso Building 1. Vuoi partecipare?",
+      "related_event_id": "evt-002"
+    },
+    {
+      "id": "mail-003",
+      "from": "eventi@campus.example",
+      "to": "usr-003@students.example",
+      "subject": "Invito: Workshop creativo: gaming",
+      "body": "Ciao! Ti segnaliamo Workshop creativo: gaming presso Building 2. Vuoi partecipare?",
+      "related_event_id": "evt-003"
+    },
+    {
+      "id": "mail-004",
+      "from": "eventi@campus.example",
+      "to": "usr-004@students.example",
+      "subject": "Invito: Sfida a squadre: ambiente",
+      "body": "Ciao! Ti segnaliamo Sfida a squadre: ambiente presso Building 3. Vuoi partecipare?",
+      "related_event_id": "evt-004"
+    },
+    {
+      "id": "mail-005",
+      "from": "eventi@campus.example",
+      "to": "usr-005@students.example",
+      "subject": "Invito: Talk con ospiti: UX-UI",
+      "body": "Ciao! Ti segnaliamo Talk con ospiti: UX-UI presso Building 4. Vuoi partecipare?",
+      "related_event_id": "evt-005"
+    },
+    {
+      "id": "mail-006",
+      "from": "eventi@campus.example",
+      "to": "usr-006@students.example",
+      "subject": "Invito: Sessione introduttiva: data-science",
+      "body": "Ciao! Ti segnaliamo Sessione introduttiva: data-science presso Building 5. Vuoi partecipare?",
+      "related_event_id": "evt-006"
+    },
+    {
+      "id": "mail-007",
+      "from": "eventi@campus.example",
+      "to": "usr-007@students.example",
+      "subject": "Invito: Community night: imprenditoria",
+      "body": "Ciao! Ti segnaliamo Community night: imprenditoria presso La Serra. Vuoi partecipare?",
+      "related_event_id": "evt-007"
+    },
+    {
+      "id": "mail-008",
+      "from": "eventi@campus.example",
+      "to": "usr-008@students.example",
+      "subject": "Invito: Progetto collaborativo: UX-UI",
+      "body": "Ciao! Ti segnaliamo Progetto collaborativo: UX-UI presso Building 1. Vuoi partecipare?",
+      "related_event_id": "evt-008"
+    },
+    {
+      "id": "mail-009",
+      "from": "eventi@campus.example",
+      "to": "usr-009@students.example",
+      "subject": "Invito: Mini hackathon: calcio",
+      "body": "Ciao! Ti segnaliamo Mini hackathon: calcio presso Building 2. Vuoi partecipare?",
+      "related_event_id": "evt-009"
+    },
+    {
+      "id": "mail-010",
+      "from": "eventi@campus.example",
+      "to": "usr-010@students.example",
+      "subject": "Invito: Open lab: cinema",
+      "body": "Ciao! Ti segnaliamo Open lab: cinema presso Building 3. Vuoi partecipare?",
+      "related_event_id": "evt-010"
+    },
+    {
+      "id": "mail-011",
+      "from": "eventi@campus.example",
+      "to": "usr-011@students.example",
+      "subject": "Invito: Laboratorio pratico: UX-UI",
+      "body": "Ciao! Ti segnaliamo Laboratorio pratico: UX-UI presso Building 4. Vuoi partecipare?",
+      "related_event_id": "evt-011"
+    },
+    {
+      "id": "mail-012",
+      "from": "eventi@campus.example",
+      "to": "usr-012@students.example",
+      "subject": "Invito: Meetup studenti: fotografia",
+      "body": "Ciao! Ti segnaliamo Meetup studenti: fotografia presso Building 5. Vuoi partecipare?",
+      "related_event_id": "evt-012"
+    }
+  ]
+}

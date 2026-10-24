@@ -1,0 +1,133 @@
+{
+  "synthetic": true,
+  "note": "Schema sintetico ispirato all'organizzazione del campus di Roncade: scuole a nord, The Hill al centro, residenze a est, Sile a sud. Le coordinate sono nel viewBox 0 0 1000 640. Non è un rilievo.",
+  "viewBox": [0, 0, 1000, 640],
+  "places": [
+    {
+      "id": "loc-reception",
+      "name": "Reception",
+      "zone": "ingresso",
+      "label": "Reception",
+      "x": 116,
+      "y": 292,
+      "foot": {"x": 70, "y": 292, "w": 92, "h": 52, "variant": "building"}
+    },
+    {
+      "id": "loc-startup",
+      "name": "Startup Village",
+      "zone": "ovest",
+      "label": "Startup Village",
+      "x": 242,
+      "y": 158,
+      "foot": {"x": 168, "y": 158, "w": 148, "h": 76, "variant": "building"}
+    },
+    {
+      "id": "loc-college",
+      "name": "College",
+      "zone": "nord",
+      "label": "College",
+      "x": 475,
+      "y": 96,
+      "foot": {"x": 390, "y": 96, "w": 170, "h": 60, "variant": "building"}
+    },
+    {
+      "id": "loc-lab",
+      "name": "Digital Lab",
+      "zone": "nord",
+      "label": "Digital Lab",
+      "x": 632,
+      "y": 104,
+      "foot": {"x": 572, "y": 104, "w": 120, "h": 50, "variant": "building"}
+    },
+    {
+      "id": "loc-library",
+      "name": "Biblioteca",
+      "zone": "The Hill",
+      "label": "Biblioteca",
+      "x": 382,
+      "y": 248,
+      "foot": {"x": 308, "y": 248, "w": 148, "h": 112, "variant": "hill"}
+    },
+    {
+      "id": "loc-auditorium",
+      "name": "Auditorium",
+      "zone": "The Hill",
+      "label": "Auditorium",
+      "x": 530,
+      "y": 248,
+      "foot": {"x": 456, "y": 248, "w": 148, "h": 112, "variant": "hill"}
+    },
+    {
+      "id": "loc-mensa",
+      "name": "Mensa",
+      "zone": "The Hill",
+      "label": "Mensa",
+      "x": 678,
+      "y": 248,
+      "foot": {"x": 604, "y": 248, "w": 148, "h": 112, "variant": "hill"}
+    },
+    {
+      "id": "loc-residenze",
+      "name": "Residenze",
+      "zone": "est",
+      "label": "Residenze",
+      "x": 860,
+      "y": 150,
+      "foot": {"x": 796, "y": 150, "w": 128, "h": 96, "variant": "building"}
+    },
+    {
+      "id": "loc-serra",
+      "name": "Serra",
+      "zone": "est",
+      "label": "Serra",
+      "x": 868,
+      "y": 262,
+      "foot": {"x": 808, "y": 262, "w": 120, "h": 62, "variant": "glass"}
+    },
+    {
+      "id": "loc-sport",
+      "name": "Palazzetto",
+      "zone": "sport",
+      "label": "Palazzetto",
+      "x": 856,
+      "y": 404,
+      "foot": {"x": 784, "y": 404, "w": 144, "h": 60, "variant": "building"}
+    },
+    {
+      "id": "loc-campo",
+      "name": "Campi",
+      "zone": "sport",
+      "label": "Campi",
+      "x": 682,
+      "y": 436,
+      "foot": {"x": 598, "y": 436, "w": 168, "h": 78, "variant": "field"}
+    },
+    {
+      "id": "loc-orto",
+      "name": "Orto",
+      "zone": "verde",
+      "label": "Orto",
+      "x": 214,
+      "y": 448,
+      "foot": {"x": 154, "y": 448, "w": 120, "h": 66, "variant": "garden"}
+    },
+    {
+      "id": "loc-corte",
+      "name": "H-Farmers",
+      "zone": "corte",
+      "label": "H-Farmers",
+      "x": 510,
+      "y": 400,
+      "foot": null
+    },
+    {
+      "id": "loc-argine",
+      "name": "Argine del Sile",
+      "zone": "fiume",
+      "label": "Sile",
+      "x": 268,
+      "y": 552,
+      "foot": null
+    }
+  ]
+}

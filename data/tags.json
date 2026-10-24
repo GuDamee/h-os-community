@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "dataset": "team",
+  "seed": 20261024,
+  "preference_space": {
+    "tags": 25,
+    "profile_sizes": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "theoretical_profiles": 245180,
+    "note": "Theoretical profiles are the combinations of 3 to 6 distinct tags. This file materializes one cohort, not that space."
+  },
+  "tags": [
+    "AI",
+    "data-science",
+    "programmazione",
+    "robotica",
+    "cybersecurity",
+    "design",
+    "UX-UI",
+    "arte",
+    "fotografia",
+    "cinema",
+    "musica",
+    "teatro",
+    "sport",
+    "fitness",
+    "calcio",
+    "basket",
+    "running",
+    "startup",
+    "imprenditoria",
+    "marketing",
+    "finanza",
+    "sostenibilita",
+    "ambiente",
+    "gaming",
+    "networking"
+  ]
+}
