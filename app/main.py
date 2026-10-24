@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import logging
+import re
 import os
 from contextlib import asynccontextmanager
 from math import comb
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
@@ -19,26 +20,19 @@ from app.access import emails_for
 from app.agent import approve as approve_action
 from app.agent import tick as tick_agent
 from app.brain import match_user
-from app.campus import (
-    approve_registration,
-    ask_campus,
-    calendar_payload,
-    build_memory,
-    community_feed,
-    ingest_event,
-    legacy_events,
-    library_events,
-    lookup_extra_source,
-    propose_registration,
-    public_agenda,
-    recommendations_payload,
-    reject_registration,
-)
 from app.corpus import ROOT, Corpus, demo_now, load_corpus
 from app.desk import DESK_ID, normalize_profile, public_desk, with_desk_user
 from app.narrate import narration_configured
 from app.scoring import FORMULAS
 from app.store import Store
+from app.community import (
+    append_message,
+    board_detail,
+    boards_summary,
+    calendar_payload,
+    load_calendar,
+    load_community,
+)
 
 log = logging.getLogger("hos")
 STATIC = ROOT / "static"
@@ -60,28 +54,6 @@ class ApproveIn(BaseModel):
     decision: str = "approve"
 
 
-class AskIn(BaseModel):
-    user_id: str
-    message: str = Field(min_length=1, max_length=500)
-
-
-class ProposeIn(BaseModel):
-    user_id: str
-    event_id: str
-
-
-class RegistrationDecisionIn(BaseModel):
-    user_id: str
-    approval_id: str
-
-
-class FeedbackIn(BaseModel):
-    user_id: str
-    body: str = Field(min_length=8, max_length=350)
-    rating: int = Field(ge=1, le=5)
-    subject: str = Field(default="campus", max_length=160)
-
-
 class DeskIn(BaseModel):
     """Local profile. Extra keys, including a password, are ignored and not stored."""
 
@@ -93,12 +65,30 @@ class DeskIn(BaseModel):
     pronote_id: str = Field(default="", max_length=300)
     canvas_link: str = Field(default="", max_length=300)
     pronote_link: str = Field(default="", max_length=300)
-    nickname: str = Field(default="", max_length=40)
     likes: list[str] = Field(min_length=1, max_length=25)
     dislikes: list[str] = Field(default_factory=list, max_length=25)
 
 
+class CommunityPostIn(BaseModel):
+    author: str = Field(default="", max_length=80)
+    text: str = Field(min_length=1, max_length=800)
+
+
+class FeedbackIn(BaseModel):
+    subject: str = Field(default="", max_length=200)
+    body: str = Field(default="", max_length=2000)
+    synthetic: bool = True
+
+
+class AssistantIn(BaseModel):
+    question: str = Field(min_length=1, max_length=400)
+    likes: list[str] = Field(default_factory=list)
+    user_id: str | None = None
+    history: list[dict] = Field(default_factory=list)
+
+
 class NoCacheStatic(StaticFiles):
+
     async def get_response(self, path: str, scope):
         response = await super().get_response(path, scope)
         response.headers["Cache-Control"] = "no-store"
@@ -110,6 +100,9 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
     corpus = load_corpus(data_dir)
     database = Path(db_path or os.getenv("HOS_DB", ROOT / "var" / "hos.sqlite"))
     store = Store(database)
+    community_dir = Path(data_dir or ROOT / "data")
+    if not (community_dir / "community.json").exists():
+        community_dir = ROOT / "data"
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -145,72 +138,17 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
                     {
                         "name": "gbrain",
                         "repo": "https://github.com/garrytan/gbrain",
-                        "uses": "Campus Brain",
-                        "status": "inspiration",
-                        "installed": False,
-                    },
-                    {
-                        "name": "cognee",
-                        "repo": "https://github.com/topoteretes/cognee",
-                        "uses": "Librarian memory, with PipesHub",
-                        "status": "planned",
-                        "installed": False,
-                    },
-                    {
-                        "name": "llamaindex",
-                        "repo": "https://github.com/run-llama/llama_index",
-                        "uses": "retrieve then reason",
-                        "status": "planned",
-                        "installed": False,
-                    },
-                    {
-                        "name": "smolagents",
-                        "repo": "https://github.com/huggingface/smolagents",
-                        "uses": "one tool per corpus",
-                        "status": "inspiration",
-                        "installed": False,
-                    },
-                    {
-                        "name": "haystack",
-                        "repo": "https://github.com/deepset-ai/haystack",
-                        "uses": "retriever then generator",
-                        "status": "inspiration",
-                        "installed": False,
-                    },
-                    {
-                        "name": "pydantic-ai",
-                        "repo": "https://github.com/pydantic/pydantic-ai",
-                        "uses": "typed citations",
-                        "status": "inspiration",
-                        "installed": False,
+                        "uses": "brain + citations",
                     },
                     {
                         "name": "PipesHub",
                         "repo": "https://github.com/pipeshub-ai/pipeshub-ai",
-                        "uses": "Librarian access and citations",
-                        "status": "inspiration",
-                        "installed": False,
-                    },
-                    {
-                        "name": "paperclip",
-                        "repo": "https://github.com/paperclipai/paperclip",
-                        "uses": "multi-role orchestration",
-                        "status": "planned",
-                        "installed": False,
-                    },
-                    {
-                        "name": "langgraph",
-                        "repo": "https://github.com/langchain-ai/langgraph",
-                        "uses": "HITL interrupt before registration",
-                        "status": "planned",
-                        "installed": False,
+                        "uses": "knowledge / access",
                     },
                     {
                         "name": "OpenInstinct",
                         "repo": "https://github.com/Merit-Systems/OpenInstinct",
                         "uses": "proactive agent + human control",
-                        "status": "inspiration",
-                        "installed": False,
                     },
                 ],
             },
@@ -220,17 +158,6 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
             "default_formula": "jaccard",
             "preference_space": _preference_space(corpus),
             "narration_mode": "gemma" if narration_configured() else "deterministic",
-            "assistant": "dataset_grounded",
-            "retrieval": "real",
-            "reasoning": "gemini" if narration_configured() else "deterministic",
-            "llamaindex": "planned",
-            "cognee": "planned",
-            "gemma": "optional" if narration_configured() else "planned",
-            "registration_gateway": "simulated_local",
-            "remote_registration_api": "not_configured",
-            "map": "esri_world_imagery",
-            "map_center": {"lat": 45.5665, "lng": 12.4305, "zoom": 18},
-            "canonical_library": "evt-120",
             "demo_now": demo_now().isoformat(),
             "synthetic_data": True,
             "counts": {
@@ -334,9 +261,6 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
                     return with_desk_user(corpus, profile).public_source(source_id)
                 except KeyError:
                     pass
-            extra = lookup_extra_source(source_id)
-            if extra is not None:
-                return extra
             raise HTTPException(status_code=404, detail=f"Unknown source {source_id}") from None
 
     @app.post("/match")
@@ -385,6 +309,40 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
             raise HTTPException(status_code=422, detail="status must be pending, approved, or dismissed")
         return {"actions": store.list_actions(user_id=user_id, status=status)}
 
+
+    @app.get("/community/boards")
+    def community_boards():
+        doc = load_community(community_dir)
+        return {"synthetic": True, "boards": boards_summary(doc)}
+
+    @app.get("/community/boards/{board_id}")
+    def community_board(board_id: str):
+        doc = load_community(community_dir)
+        board = board_detail(doc, board_id)
+        if board is None:
+            raise HTTPException(status_code=404, detail=f"Bacheca {board_id} non trovata")
+        return {"synthetic": True, "board": board}
+
+    @app.post("/community/boards/{board_id}/messages")
+    def community_post(board_id: str, body: CommunityPostIn):
+        try:
+            message = append_message(
+                community_dir,
+                board_id,
+                author=body.author,
+                text=body.text,
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=f"Bacheca {board_id} non trovata") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True, "message": message}
+
+    @app.get("/calendar")
+    def campus_calendar():
+        doc = load_calendar(community_dir)
+        return {"synthetic": True, **calendar_payload(doc)}
+
     @app.get("/bacheca")
     def bacheca(user_id: str | None = Query(default=None)):
         if user_id and not known_user(user_id):
@@ -395,131 +353,144 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
                 notices.append(action["notice"])
         return {"notices": notices, "delivered_externally": False}
 
-    @app.get("/recommendations")
-    def recommendations(user_id: str, limit: int = Query(default=5, ge=1, le=8)):
-        try:
-            return recommendations_payload(corpus, store, user_id, limit=limit)
-        except KeyError:
-            raise HTTPException(status_code=404, detail=f"Unknown user {user_id}") from None
-
-    @app.post("/assistant/ask")
-    def assistant_ask(body: AskIn):
-        try:
-            return ask_campus(corpus, store, body.user_id, body.message)
-        except KeyError:
-            raise HTTPException(status_code=404, detail=f"Unknown user {body.user_id}") from None
-        except RuntimeError as exc:
-            raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-    @app.get("/community")
-    def community(user_id: str | None = None):
-        if user_id and not known_user(user_id):
-            raise HTTPException(status_code=404, detail=f"Unknown user {user_id}")
-        try:
-            return community_feed(corpus, store, user_id)
-        except KeyError:
-            raise HTTPException(status_code=404, detail=f"Unknown user {user_id}") from None
-
-    @app.get("/calendar")
-    def calendar(user_id: str | None = None):
-        if user_id and not known_user(user_id):
-            raise HTTPException(status_code=404, detail=f"Unknown user {user_id}")
-        return calendar_payload(corpus, store, user_id)
-
-    @app.get("/agenda")
-    def agenda(user_id: str):
-        if not known_user(user_id):
-            raise HTTPException(status_code=404, detail=f"Unknown user {user_id}")
-        return public_agenda(store, user_id)
-
-    @app.post("/registrations/propose")
-    def registrations_propose(body: ProposeIn):
-        try:
-            return propose_registration(corpus, store, body.user_id, body.event_id)
-        except KeyError:
-            raise HTTPException(status_code=404, detail=f"Unknown user {body.user_id}") from None
-        except ValueError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    @app.post("/registrations/reject")
-    def registrations_reject(body: RegistrationDecisionIn):
-        try:
-            return reject_registration(corpus, store, body.user_id, body.approval_id)
-        except KeyError:
-            raise HTTPException(status_code=404, detail="Nessuna proposta in attesa con questo id") from None
-
-    @app.post("/registrations/approve")
-    def registrations_approve(body: RegistrationDecisionIn):
-        try:
-            return approve_registration(corpus, store, body.user_id, body.approval_id)
-        except KeyError:
-            raise HTTPException(status_code=404, detail=f"Unknown user {body.user_id}") from None
-        except ValueError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    @app.get("/library")
-    def library(source: str = "library"):
-        if source == "legacy":
-            events = legacy_events()
-            return {
-                "source": "legacy",
-                "canonical": False,
-                "note": "Archived 17-event set. IDs E00x are not evt-* and are not the live Library.",
-                "events": events,
-                "count": len(events),
-            }
-        if source != "library":
-            raise HTTPException(status_code=422, detail="source must be library or legacy")
-        events = library_events(corpus, store)
-        return {
-            "source": "library",
-            "canonical": True,
-            "note": "120-event Library with stable evt-* ids. Ingested extras, if any, are appended in this process only.",
-            "events": events,
-            "count": len(events),
-        }
-
-    @app.post("/library/events")
-    def library_ingest(payload: dict = Body()):
-        try:
-            return ingest_event(corpus, store, payload)
-        except ValueError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    @app.get("/memory/search")
-    def memory_search(q: str = Query(min_length=1, max_length=200)):
-        memory = build_memory(corpus, store)
-        hits = memory.search(q, limit=5)
-        return {
-            "engine": "local-graph",
-            "cognee": "planned",
-            "cognee_installed": False,
-            "memify": "planned",
-            "nodes": len(memory.nodes),
-            "edges": len(memory.edges),
-            "query": q,
-            "hits": hits,
-        }
-
-    @app.get("/feedback")
-    def read_feedback():
-        return {"synthetic": True, "visibility": "public", "feedback": store.list_feedback()}
-
-    @app.post("/feedback")
-    def write_feedback(body: FeedbackIn):
-        if not known_user(body.user_id):
-            raise HTTPException(status_code=404, detail=f"Unknown user {body.user_id}")
-        if body.user_id == DESK_ID:
-            profile = store.get_desk_profile()
-            author = public_desk(profile)["name"] if profile else "Studente"
-        else:
-            author = corpus.users_by_id[body.user_id]["name"]
-        return store.add_feedback(body.user_id, author, body.rating, body.body.strip(), body.subject.strip())
-
     @app.post("/demo/reset")
     def reset_demo():
         cleared = store.reset()
         return {"cleared": cleared, "note": "Approvals removed. Synthetic JSON was not touched."}
+
+
+    @app.post("/feedback")
+    def feedback_mock(payload: FeedbackIn):
+        """Demo-only feedback capture. Subject is Feedback: {event} — {date}."""
+        subject = (payload.subject or "").strip() or "Feedback: (senza evento)"
+        body = (payload.body or "").strip()
+        path = ROOT / "var" / "feedback_demo.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        import json as _json
+        from datetime import datetime, timezone
+        row = {
+            "at": datetime.now(timezone.utc).isoformat(),
+            "subject": subject[:200],
+            "body": body[:2000],
+            "synthetic": True,
+        }
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(_json.dumps(row, ensure_ascii=False) + "\n")
+        return {"ok": True, "subject": subject, "body": body, "stored": True, "synthetic": True}
+
+
+    @app.post("/assistant/ask")
+    def assistant_ask(payload: AssistantIn):
+        """Dataset-grounded campus Q&A with source ids. Uses Gemma only if configured."""
+        from app.narrate import narration_configured, gemma_complete
+
+        q = payload.question.strip()
+        q_low = q.lower()
+        from app import campus_agent
+        if not getattr(app.state, "agent_index", None):
+            app.state.agent_index = campus_agent.build_index(community_dir)
+        extra = []
+        uid = payload.user_id if payload.user_id and known_user(payload.user_id) else None
+        if uid and any(k in q_low for k in ("consigl", "recommend", "per me", "interess", "suggest")):
+            for m in (match_user(corpus, uid, limit=3, formula="jaccard").get("matches") or []):
+                extra.append({"id": str(m.get("event_id")), "kind": "match-personale",
+                              "text": f"Match per {uid}: {m.get('title')} score {m.get('score', 0):.2f}. {m.get('why') or ''}"})
+        res = campus_agent.ask(app.state.agent_index, q, extra, getattr(payload, "history", None))
+        res.update(answer=res["reply"], source_id=(res["sources"] or [None])[0], synthetic=True)
+        return res
+        sources: list[str] = []
+        bits: list[str] = []
+
+        # Calendar / lessons
+        cal = calendar_payload(load_calendar(community_dir))
+        items = cal.get("items") or []
+        for row in items:
+            blob = f"{row.get('title','')} {row.get('blurb','')} {row.get('location','')}".lower()
+            if any(w in blob for w in q_low.split() if len(w) > 3) or (
+                any(k in q_low for k in ("lezione", "calendario", "agenda", "orario")) and row.get("kind") == "lezione"
+            ):
+                bits.append(
+                    f"{'Evento' if row.get('kind')=='evento' else 'Lezione'} «{row.get('title')}»: "
+                    f"{row.get('weekday') or row.get('date')} {row.get('start')}–{row.get('end')} · {row.get('location') or 'Campus'}."
+                )
+                sources.append(str(row.get("id") or "calendar"))
+                break
+
+        # Events corpus
+        for event in corpus.events:
+            title = str(event.get("title") or "")
+            desc = str(event.get("description") or event.get("blurb") or "")
+            tags = " ".join(event.get("tags") or [])
+            blob = f"{title} {desc} {tags}".lower()
+            words = [w for w in re.split(r"[^a-z0-9àèéìòù]+", q_low) if len(w) > 2]
+            if words and sum(1 for w in words if w in blob) >= max(1, min(2, len(words)//2)):
+                loc = event.get("location") or {}
+                if isinstance(loc, dict):
+                    where = loc.get("building") or loc.get("name") or event.get("location_name") or "campus"
+                else:
+                    where = loc or event.get("location_name") or "campus"
+                bits.append(f"Evento «{title}» ({event.get('id')}). Dove: {where}. {desc[:160]}")
+                sources.append(str(event.get("id")))
+                if len(bits) >= 2:
+                    break
+
+        # Community messages
+        doc = load_community(community_dir)
+        for board in doc.get("boards") or []:
+            for msg in board.get("messages") or []:
+                text = str(msg.get("text") or "")
+                if any(w in text.lower() for w in q_low.split() if len(w) > 3):
+                    bits.append(
+                        f"In «{board.get('name')}», {msg.get('org') or msg.get('role')} {msg.get('author')}: «{text}»"
+                    )
+                    sources.append(str(msg.get("id") or board.get("id")))
+                    break
+            if len(bits) >= 3:
+                break
+
+        # Preference-based tip
+        if payload.likes and ("consigli" in q_low or "recommend" in q_low or "interess" in q_low or "per me" in q_low):
+            uid = payload.user_id if payload.user_id and known_user(payload.user_id) else None
+            if uid:
+                matched = match_user(corpus, uid, limit=1, formula="jaccard")
+                if matched.get("matches"):
+                    m = matched["matches"][0]
+                    bits.insert(0, f"Match personale: «{m.get('title')}» score {m.get('score', 0):.2f}. {m.get('why') or m.get('display_text') or ''}")
+                    sources.insert(0, str(m.get("event_id")))
+
+        if not bits:
+            bits.append(
+                f"Nessun record preciso. Corpus: {len(corpus.events)} eventi, "
+                f"{len((doc.get('boards') or []))} canali community, {len(items)} voci calendario. "
+                "Prova un titolo evento, una lezione o «consigliami un evento»."
+            )
+            sources.append("corpus-stats")
+
+        reply = " ".join(bits[:3]).strip()
+        mode = "rules"
+        if narration_configured():
+            try:
+                polished = gemma_complete(
+                    "Rispondi in italiano, max 4 frasi, solo fatti seguenti, cita gli id fonte. "
+                    f"Domanda: {q}\nFatti:\n" + "\n".join(bits[:4]),
+                    os.getenv("GEMINI_API_KEY", "").strip(),
+                    os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it"),
+                )
+                if polished and len(polished.strip()) > 20:
+                    reply = polished.strip()
+                    mode = "gemma"
+            except Exception as exc:  # noqa: BLE001
+                log.warning("assistant gemma skipped: %s", exc.__class__.__name__)
+
+        return {
+            "reply": reply,
+            "answer": reply,
+            "source_id": sources[0] if sources else None,
+            "sources": sources[:6],
+            "mode": mode,
+            "synthetic": True,
+        }
+
 
     @app.get("/")
     def index():
@@ -532,7 +503,7 @@ def create_app(db_path: Path | None = None, data_dir: Path | None = None) -> Fas
 
 
 def _preference_space(corpus) -> dict | None:
-    if corpus.dataset != "team" or not corpus.vocabulary:
+    if not corpus.vocabulary or not str(corpus.dataset).startswith("team"):
         return None
     return {
         "tags": len(corpus.vocabulary),

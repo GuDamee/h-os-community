@@ -1,6 +1,6 @@
 {
   "synthetic": true,
-  "dataset": "team",
+  "dataset": "team+community-dense",
   "seed": 20261024,
   "preference_space": {
     "tags": 25,
@@ -548,216 +548,205 @@
     },
     {
       "id": "usr-041",
-      "name": "Alex Verdi",
+      "name": "Nora V.",
       "role": "student",
       "preferences": [
-        "ambiente",
-        "arte",
-        "calcio"
+        "gaming",
+        "sostenibilita",
+        "sport",
+        "startup"
       ],
-      "year": 3,
-      "interests_text": "Mi interessano ambiente, arte, calcio e vorrei conoscere altri studenti con passioni simili."
+      "year": 1,
+      "interests_text": "Mi interessano gaming, sostenibilita, sport, startup e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-042",
-      "name": "Andrea Verdi",
+      "name": "Pietro S.",
       "role": "student",
       "preferences": [
         "arte",
-        "data-science",
+        "basket",
+        "design",
         "programmazione",
-        "robotica",
-        "startup"
+        "running"
       ],
-      "year": 3,
-      "interests_text": "Mi interessano arte, data-science, programmazione e vorrei conoscere altri studenti con passioni simili."
+      "year": 2,
+      "interests_text": "Mi interessano arte, basket, design, programmazione, running e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-043",
-      "name": "Sam Verdi",
+      "name": "Ilaria C.",
       "role": "student",
       "preferences": [
-        "basket",
-        "fitness",
-        "programmazione"
-      ],
-      "year": 1,
-      "interests_text": "Mi interessano basket, fitness, programmazione e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-044",
-      "name": "Nico Verdi",
-      "role": "student",
-      "preferences": [
-        "AI",
-        "cinema",
+        "gaming",
         "musica",
+        "running",
         "sport"
       ],
       "year": 3,
-      "interests_text": "Mi interessano AI, cinema, musica e vorrei conoscere altri studenti con passioni simili."
+      "interests_text": "Mi interessano gaming, musica, running, sport e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-044",
+      "name": "Diego F.",
+      "role": "student",
+      "preferences": [
+        "ambiente",
+        "calcio",
+        "cybersecurity",
+        "sport",
+        "teatro"
+      ],
+      "year": 1,
+      "interests_text": "Mi interessano ambiente, calcio, cybersecurity, sport, teatro e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-045",
-      "name": "Luca Verdi",
+      "name": "Emma Q.",
       "role": "student",
       "preferences": [
-        "arte",
-        "calcio",
-        "marketing",
-        "running",
+        "finanza",
+        "fotografia",
         "sport",
         "teatro"
       ],
       "year": 2,
-      "interests_text": "Mi interessano arte, calcio, marketing e vorrei conoscere altri studenti con passioni simili."
+      "interests_text": "Mi interessano finanza, fotografia, sport, teatro e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-046",
-      "name": "Mia Verdi",
+      "name": "Ravi P.",
+      "role": "student",
+      "preferences": [
+        "cinema",
+        "finanza",
+        "fotografia",
+        "musica",
+        "startup"
+      ],
+      "year": 3,
+      "interests_text": "Mi interessano cinema, finanza, fotografia, musica, startup e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-047",
+      "name": "Giada N.",
+      "role": "student",
+      "preferences": [
+        "UX-UI",
+        "arte",
+        "gaming",
+        "robotica"
+      ],
+      "year": 1,
+      "interests_text": "Mi interessano UX-UI, arte, gaming, robotica e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-048",
+      "name": "Tommaso B.",
+      "role": "student",
+      "preferences": [
+        "gaming",
+        "networking",
+        "running",
+        "sostenibilita",
+        "startup"
+      ],
+      "year": 2,
+      "interests_text": "Mi interessano gaming, networking, running, sostenibilita, startup e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-049",
+      "name": "Sara H.",
+      "role": "student",
+      "preferences": [
+        "AI",
+        "ambiente",
+        "gaming",
+        "programmazione"
+      ],
+      "year": 3,
+      "interests_text": "Mi interessano AI, ambiente, gaming, programmazione e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-050",
+      "name": "Kevin L.",
+      "role": "student",
+      "preferences": [
+        "AI",
+        "UX-UI",
+        "ambiente",
+        "basket",
+        "sport"
+      ],
+      "year": 1,
+      "interests_text": "Mi interessano AI, UX-UI, ambiente, basket, sport e cerco gruppi studio / passaggi / tip peer."
+    },
+    {
+      "id": "usr-051",
+      "name": "Marta Z.",
       "role": "student",
       "preferences": [
         "AI",
         "calcio",
-        "fitness",
-        "sostenibilita",
-        "sport"
-      ],
-      "year": 3,
-      "interests_text": "Mi interessano AI, calcio, fitness e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-047",
-      "name": "Noa Verdi",
-      "role": "student",
-      "preferences": [
-        "basket",
-        "calcio",
-        "fitness",
-        "gaming",
-        "programmazione"
-      ],
-      "year": 1,
-      "interests_text": "Mi interessano basket, calcio, fitness e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-048",
-      "name": "Eli Verdi",
-      "role": "student",
-      "preferences": [
-        "ambiente",
-        "finanza",
-        "fotografia",
         "programmazione",
-        "running",
-        "sostenibilita"
-      ],
-      "year": 2,
-      "interests_text": "Mi interessano ambiente, finanza, fotografia e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-049",
-      "name": "Ari Verdi",
-      "role": "student",
-      "preferences": [
-        "UX-UI",
-        "design",
-        "networking",
-        "sostenibilita",
-        "sport"
-      ],
-      "year": 1,
-      "interests_text": "Mi interessano UX-UI, design, networking e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-050",
-      "name": "Leo Verdi",
-      "role": "student",
-      "preferences": [
-        "UX-UI",
-        "basket",
-        "cybersecurity",
         "running"
       ],
       "year": 2,
-      "interests_text": "Mi interessano UX-UI, basket, cybersecurity e vorrei conoscere altri studenti con passioni simili."
-    },
-    {
-      "id": "usr-051",
-      "name": "Teo Verdi",
-      "role": "student",
-      "preferences": [
-        "ambiente",
-        "cybersecurity",
-        "data-science",
-        "robotica",
-        "sport"
-      ],
-      "year": 3,
-      "interests_text": "Mi interessano ambiente, cybersecurity, data-science e vorrei conoscere altri studenti con passioni simili."
+      "interests_text": "Mi interessano AI, calcio, programmazione, running e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-052",
-      "name": "Sasha Verdi",
+      "name": "Omar Y.",
       "role": "student",
       "preferences": [
-        "UX-UI",
+        "AI",
+        "arte",
+        "calcio",
         "cinema",
-        "fitness",
-        "imprenditoria",
-        "sport"
+        "fitness"
       ],
-      "year": 2,
-      "interests_text": "Mi interessano UX-UI, cinema, fitness e vorrei conoscere altri studenti con passioni simili."
+      "year": 3,
+      "interests_text": "Mi interessano AI, arte, calcio, cinema, fitness e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-053",
-      "name": "Vale Verdi",
+      "name": "Elena W.",
       "role": "student",
       "preferences": [
-        "arte",
-        "design",
-        "finanza",
+        "AI",
         "fotografia",
-        "gaming",
-        "imprenditoria"
+        "robotica",
+        "teatro"
       ],
-      "year": 3,
-      "interests_text": "Mi interessano arte, design, finanza e vorrei conoscere altri studenti con passioni simili."
+      "year": 1,
+      "interests_text": "Mi interessano AI, fotografia, robotica, teatro e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-054",
-      "name": "Dani Verdi",
+      "name": "Felix D.",
       "role": "student",
       "preferences": [
         "ambiente",
         "arte",
-        "basket",
         "calcio",
-        "cybersecurity",
-        "data-science"
+        "gaming",
+        "robotica"
       ],
       "year": 2,
-      "interests_text": "Mi interessano ambiente, arte, basket e vorrei conoscere altri studenti con passioni simili."
+      "interests_text": "Mi interessano ambiente, arte, calcio, gaming, robotica e cerco gruppi studio / passaggi / tip peer."
     },
     {
       "id": "usr-055",
-      "name": "Rene Verdi",
+      "name": "Noemi G.",
       "role": "student",
       "preferences": [
-        "arte",
+        "cybersecurity",
         "data-science",
-        "gaming",
-        "sport"
+        "robotica",
+        "startup"
       ],
-      "year": 1,
-      "interests_text": "Mi interessano arte, data-science, gaming e vorrei conoscere altri studenti con passioni simili."
+      "year": 3,
+      "interests_text": "Mi interessano cybersecurity, data-science, robotica, startup e cerco gruppi studio / passaggi / tip peer."
     }
-  ],
-  "cohort": {
-    "users": 55,
-    "events": 120,
-    "base_seed": 20261024,
-    "note": "usr-001–usr-040 and evt-001–evt-080 are the original seed. usr-041–usr-055 and evt-081–evt-120 continue that stream. usr-041 preferences are adjusted so evt-011 company stays usr-022 and usr-023."
-  }
+  ]
 }

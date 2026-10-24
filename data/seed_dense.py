@@ -1,0 +1,184 @@
+import json, random
+from pathlib import Path
+from datetime import datetime, timedelta
+
+root = Path(__file__).resolve().parent
+rng = random.Random(20261024)
+
+tags_doc = json.loads((root / "tags.json").read_text(encoding="utf-8"))
+tags = list(tags_doc["tags"])
+
+ev_doc = json.loads((root / "events.json").read_text(encoding="utf-8"))
+events = ev_doc["events"]
+# avoid double-seed
+if any(e["id"] == "evt-081" for e in events):
+    print("events already dense", len(events))
+else:
+    buildings = ["La Serra", "Building 1", "Building 2", "Building 3", "Building 4", "Building 5"]
+    titles = [
+        ("Study circle", "studio peer + matching tag"),
+        ("Community tip exchange", "consigli pratici tra studenti"),
+        ("Club open lab", "laboratorio aperto del club"),
+        ("Office-hour prep", "preparazione collettiva alle office hour"),
+        ("Evening mixer", "mixer serale campus"),
+        ("Skill swap", "scambio competenze"),
+        ("Ride & chat", "car sharing + networking"),
+        ("Green campus action", "azione sostenibilita"),
+        ("Portfolio clinic", "revisione portfolio"),
+        ("Match night", "serata matching interessi"),
+    ]
+    existing = {tuple(sorted(e["tags"])) for e in events}
+    new_events = []
+    n0 = len(events)
+    day0 = datetime(2026, 10, 25, 18, 0, 0)
+    for i in range(40):
+        k = 2 + (i % 3)
+        combo = None
+        for _ in range(100):
+            combo = tuple(sorted(rng.sample(tags, k)))
+            if combo not in existing:
+                existing.add(combo)
+                break
+        kind, blurb = titles[i % len(titles)]
+        start = day0 + timedelta(hours=i * 5)
+        end = start + timedelta(hours=2)
+        eid = f"evt-{n0 + i + 1:03d}"
+        focus = ", ".join(combo)
+        new_events.append({
+            "id": eid,
+            "title": f"{kind}: {combo[0]} + {combo[1]}",
+            "description": f"Incontro sintetico self-help community. {blurb}. Focus: {focus}.",
+            "tags": list(combo),
+            "location": {"building": buildings[i % len(buildings)]},
+            "start": start.strftime("%Y-%m-%dT%H:%M:%S"),
+            "end": end.strftime("%Y-%m-%dT%H:%M:%S"),
+            "capacity": 20 + (i * 3) % 80,
+            "source_id": eid,
+        })
+    events.extend(new_events)
+    ev_doc["events"] = events
+    ev_doc["seed"] = int(ev_doc.get("seed") or 0) + 1
+    ev_doc["dataset"] = "team+community-dense"
+    (root / "events.json").write_text(json.dumps(ev_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print("events now", len(events), "added", len(new_events))
+
+users_doc = json.loads((root / "users.json").read_text(encoding="utf-8"))
+users = users_doc["users"]
+if any(u["id"] == "usr-041" for u in users):
+    print("users already dense", len(users))
+else:
+    names = ["Nora V.", "Pietro S.", "Ilaria C.", "Diego F.", "Emma Q.", "Ravi P.", "Giada N.", "Tommaso B.", "Sara H.", "Kevin L.", "Marta Z.", "Omar Y.", "Elena W.", "Felix D.", "Noemi G."]
+    base_n = len(users)
+    for i, name in enumerate(names):
+        prefs = sorted(rng.sample(tags, 4 + (i % 2)))
+        uid = f"usr-{base_n + i + 1:03d}"
+        users.append({
+            "id": uid,
+            "name": name,
+            "role": "student",
+            "preferences": prefs,
+            "year": 1 + (i % 3),
+            "interests_text": f"Mi interessano {', '.join(prefs)} e cerco gruppi studio / passaggi / tip peer.",
+        })
+    users_doc["users"] = users
+    users_doc["dataset"] = "team+community-dense"
+    (root / "users.json").write_text(json.dumps(users_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print("users now", len(users))
+
+community = {
+  "synthetic": True,
+  "dataset": "team+community-dense",
+  "timezone": "Europe/Rome",
+  "boards": [
+    {"id": "board-generale", "name": "Community", "tag": "campus",
+     "description": "Feed principale. Post ufficiali + aiuto peer.",
+     "messages": [
+      {"id":"msg-so1","author":"Student Office","role":"admin","org":"Student Office","at":"2026-10-24T08:30:00+02:00","text":"Welcome week: badge office aperto fino alle 18 in Reception. Porta un documento."},
+      {"id":"msg-sl1","author":"Student Life","role":"admin","org":"Student Life","at":"2026-10-24T09:05:00+02:00","text":"Aperitivo Big Hall martedi 27 alle 19:00. Iscrizioni su Shelf entro lunedi."},
+      {"id":"msg-af1","author":"Age Fund Desk","role":"admin","org":"Age Fund","at":"2026-10-24T09:40:00+02:00","text":"Bando Age Fund micro-grant: deadline venerdi 18:00. Solo progetti con mentor di club o docente."},
+      {"id":"msg-club1","author":"Coding Club","role":"admin","org":"Club","at":"2026-10-24T10:15:00+02:00","text":"Jam Programming mercoledi 18:30 in Digital Lab. Porta il laptop; snack da Student Life."},
+      {"id":"msg-prof1","author":"Prof. Bianchi","role":"admin","org":"Faculty","at":"2026-10-24T11:00:00+02:00","text":"Business English: martedi 14:30-18, Room College. Portate il case pack stampato."},
+      {"id":"msg-g1","author":"Giulia R.","role":"student","at":"2026-10-24T11:20:00+02:00","text":"Qualcuno ha gli appunti di One Various Calculus di venerdi? Mi sono persa la parte sulle serie."},
+      {"id":"msg-g2","author":"Marco T.","role":"student","at":"2026-10-24T11:35:00+02:00","text":"@Giulia te li passo in Studio. Li ho su Drive, li carico anche su Shelf."},
+      {"id":"msg-g3","author":"Nora V.","role":"student","at":"2026-10-24T12:05:00+02:00","text":"Tip: in Biblioteca i posti vicino alle prese finiscono entro le 10. Arrivate presto nei giorni di Programming."},
+      {"id":"msg-so2","author":"Student Office","role":"admin","org":"Student Office","at":"2026-10-24T12:10:00+02:00","text":"Orari Reception aggiornati: Lun-Ven 09-18. Sabato chiuso salvo eventi Age Fund."},
+      {"id":"msg-g4","author":"Pietro S.","role":"student","at":"2026-10-24T13:40:00+02:00","text":"Cerco peer per ripasso AI + data-science stasera dopo le 18. Biblioteca o Digital Lab?"},
+      {"id":"msg-g5","author":"Ilaria C.","role":"student","at":"2026-10-24T14:10:00+02:00","text":"Io ci sto in Digital Lab. Porto esercizi su pandas. Unitevi!"},
+      {"id":"msg-sl2","author":"Student Life","role":"admin","org":"Student Life","at":"2026-10-24T15:00:00+02:00","text":"Reminder: locker Building College — chiave in Reception con badge."},
+    ]},
+    {"id": "board-eventi", "name": "Eventi", "tag": "eventi",
+     "description": "Eventi campus dopo le 18.",
+     "messages": [
+      {"id":"msg-e1","author":"Student Life","role":"admin","org":"Student Life","at":"2026-10-24T13:00:00+02:00","text":"Cinema under the trees · giovedi 19:30, H-Farmers. Portate una coperta."},
+      {"id":"msg-e2","author":"Startup Club","role":"admin","org":"Club","at":"2026-10-24T14:20:00+02:00","text":"Pitch night venerdi 18:30 Auditorium. 5 slot liberi — iscrizione su Shelf."},
+      {"id":"msg-e3","author":"Leo W.","role":"student","at":"2026-10-24T15:00:00+02:00","text":"Cerco 2 posti in auto verso Treviso dopo il pitch night. Divido benzina."},
+      {"id":"msg-e4","author":"Design Club","role":"admin","org":"Club","at":"2026-10-24T16:10:00+02:00","text":"Portfolio clinic UX-UI + design · lunedi 18:15 Building 4. Porta 3 slide."},
+      {"id":"msg-e5","author":"Emma Q.","role":"student","at":"2026-10-24T16:40:00+02:00","text":"Chi viene al cinema? Organizzo un gruppo in thread Studio."},
+      {"id":"msg-e6","author":"Green Club","role":"admin","org":"Club","at":"2026-10-24T17:05:00+02:00","text":"Pulizia argine Sile sabato 10:00. Guanti forniti da Student Life."},
+    ]},
+    {"id": "board-car", "name": "Offerte / car sharing", "tag": "mobilita",
+     "description": "Passaggi peer. Non e un servizio ufficiale H-FARM.",
+     "messages": [
+      {"id":"msg-c1","author":"Anna B.","role":"student","at":"2026-10-24T08:50:00+02:00","text":"Domani mattina parto da Mestre alle 8:30, 2 posti liberi verso H-FARM."},
+      {"id":"msg-c2","author":"Student Office","role":"admin","org":"Student Office","at":"2026-10-24T09:10:00+02:00","text":"Promemoria: i passaggi peer non sono assicurati dal campus. Accordatevi in privato."},
+      {"id":"msg-c3","author":"Diego F.","role":"student","at":"2026-10-24T17:30:00+02:00","text":"Ritorno H-FARM → Padova alle 21:15 dopo mixer. 3 posti, divido pedaggio."},
+      {"id":"msg-c4","author":"Sara H.","role":"student","at":"2026-10-24T18:05:00+02:00","text":"Cerco passaggio da Quarto d'Altino lunedi 8:00. Offro caffe."},
+      {"id":"msg-c5","author":"Kevin L.","role":"student","at":"2026-10-24T18:25:00+02:00","text":"@Sara ti posso prendere all'ingresso stazione alle 8:05. Scrivimi."},
+      {"id":"msg-c6","author":"Giada N.","role":"student","at":"2026-10-24T19:00:00+02:00","text":"Tip: il parcheggio nord si riempie entro le 9 nei giorni di Business English."},
+    ]},
+    {"id": "board-studio", "name": "Gruppi studio", "tag": "studio",
+     "description": "Aiuto tra pari su lezioni e progetti.",
+     "messages": [
+      {"id":"msg-s1","author":"Chiara M.","role":"student","at":"2026-10-24T16:00:00+02:00","text":"Business English martedi 14:30-18. Qualcuno ripassa i dialoghi stasera in Biblioteca?"},
+      {"id":"msg-s2","author":"Prof. Neri","role":"admin","org":"Faculty","at":"2026-10-24T16:30:00+02:00","text":"Office hour Programming: mercoledi 13:45-14:30 fuori Digital Lab."},
+      {"id":"msg-s3","author":"Ravi P.","role":"student","at":"2026-10-24T17:15:00+02:00","text":"Gruppo Calculus serie · Biblioteca piano terra · oggi 18:20. Porto esercizi."},
+      {"id":"msg-s4","author":"Marta Z.","role":"student","at":"2026-10-24T17:45:00+02:00","text":"Cerco buddy cybersecurity CTF-lite. Anche se siete principianti."},
+      {"id":"msg-s5","author":"Omar Y.","role":"student","at":"2026-10-24T18:10:00+02:00","text":"@Marta io ci sto. Sala studio Building 3 alle 19."},
+      {"id":"msg-s6","author":"Elena W.","role":"student","at":"2026-10-24T18:35:00+02:00","text":"Ho caricato su Shelf uno schema riassuntivo marketing + networking per pitch night."},
+      {"id":"msg-s7","author":"Prof. Bianchi","role":"admin","org":"Faculty","at":"2026-10-24T19:05:00+02:00","text":"Reminder: niente laptop chiuso in Business English — roleplay a coppie."},
+      {"id":"msg-s8","author":"Felix D.","role":"student","at":"2026-10-24T19:20:00+02:00","text":"Tip flash: Anki deck Programming loops condiviso in thread. Chiedete pure."},
+    ]},
+    {"id": "board-annunci", "name": "Annunci campus", "tag": "annunci",
+     "description": "Avvisi Student Office / Gestione campus / Student Life.",
+     "messages": [
+      {"id":"msg-a1","author":"Gestione campus","role":"admin","org":"Campus Ops","at":"2026-10-24T07:55:00+02:00","text":"La Serra chiude alle 22 questa settimana. Portate il badge."},
+      {"id":"msg-a2","author":"Student Life","role":"admin","org":"Student Life","at":"2026-10-24T10:40:00+02:00","text":"Locker disponibili al Building College — richiedi chiave in Reception."},
+      {"id":"msg-a3","author":"Student Office","role":"admin","org":"Student Office","at":"2026-10-24T11:50:00+02:00","text":"Wi-Fi guest per visitatori: chiedete voucher in Reception (validita 24h)."},
+      {"id":"msg-a4","author":"Age Fund Desk","role":"admin","org":"Age Fund","at":"2026-10-24T14:00:00+02:00","text":"FAQ Age Fund aggiornata su Shelf. Serve lettera mentor firmata."},
+    ]},
+    {"id": "board-gaming", "name": "Gaming & jam", "tag": "gaming",
+     "description": "Lobby e jam organizzate dai club + peer.",
+     "messages": [
+      {"id":"msg-gm1","author":"Gaming Club","role":"admin","org":"Club","at":"2026-10-24T17:00:00+02:00","text":"Lobby Rocket League stasera 18:30 Building 5. Bring headset."},
+      {"id":"msg-gm2","author":"Sam K.","role":"student","at":"2026-10-24T17:20:00+02:00","text":"Ci sono! Cerco duo ranked."},
+      {"id":"msg-gm3","author":"Noemi G.","role":"student","at":"2026-10-24T17:50:00+02:00","text":"Jam Unity beginners dopo la lobby. Porto snack."},
+      {"id":"msg-gm4","author":"Tommaso B.","role":"student","at":"2026-10-24T18:15:00+02:00","text":"Qualcuno ha un cavo HDMI di scorta? Il monitor del club ne mangia uno a settimana."},
+    ]},
+    {"id": "board-tips", "name": "Tips & lifehacks", "tag": "tips",
+     "description": "Consigli peer su campus, lezioni, cibo, focus.",
+     "messages": [
+      {"id":"msg-t1","author":"Giulia R.","role":"student","at":"2026-10-24T09:30:00+02:00","text":"Mensa: il turno 12:40 e il piu corto il mercoledi (giorno Programming)."},
+      {"id":"msg-t2","author":"Marco T.","role":"student","at":"2026-10-24T10:00:00+02:00","text":"Stampante Building 3: coda corta prima delle 09:15."},
+      {"id":"msg-t3","author":"Student Life","role":"admin","org":"Student Life","at":"2026-10-24T10:20:00+02:00","text":"Hydration stations: H-Farmers e Argine. Portate la borraccia."},
+      {"id":"msg-t4","author":"Chiara M.","role":"student","at":"2026-10-24T12:30:00+02:00","text":"Per Business English: sedersi in seconda fila aiuta per i roleplay."},
+      {"id":"msg-t5","author":"Leo W.","role":"student","at":"2026-10-24T15:45:00+02:00","text":"Focus tip: silenzio totale in Biblioteca zona nord dopo le 18."},
+      {"id":"msg-t6","author":"Anna B.","role":"student","at":"2026-10-24T16:20:00+02:00","text":"Se perdete il badge: Reception fa duplicato demo in 20 minuti (sintetico)."},
+    ]},
+  ],
+}
+(root / "community.json").write_text(json.dumps(community, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print("community msgs", sum(len(b["messages"]) for b in community["boards"]), "boards", len(community["boards"]))
+
+cal = json.loads((root / "calendar.json").read_text(encoding="utf-8"))
+cal["events"] = [
+  {"id":"ev-cinema","title":"Cinema under the trees","kind":"evento","date":"2026-10-29","start":"19:30","end":"21:30","location":"H-Farmers","blurb":"Student Life · porta una coperta","past":False},
+  {"id":"ev-pitch","title":"Pitch night Startup Club","kind":"evento","date":"2026-10-30","start":"18:30","end":"21:00","location":"Auditorium","blurb":"5 slot · Shelf","past":False},
+  {"id":"ev-aperitivo","title":"Aperitivo Big Hall","kind":"evento","date":"2026-10-27","start":"19:00","end":"21:00","location":"Big Hall","blurb":"Student Life","past":False},
+  {"id":"ev-green","title":"Pulizia argine Sile","kind":"evento","date":"2026-10-31","start":"10:00","end":"12:30","location":"Argine del Sile","blurb":"Green Club","past":False},
+  {"id":"ev-jam","title":"Coding jam","kind":"evento","date":"2026-10-28","start":"18:30","end":"21:00","location":"Digital Lab","blurb":"Coding Club","past":False},
+  {"id":"ev-portfolio","title":"Portfolio clinic UX-UI","kind":"evento","date":"2026-11-02","start":"18:15","end":"20:00","location":"Building 4","blurb":"Design Club","past":False},
+]
+cal["dataset"] = "team+community-dense"
+(root / "calendar.json").write_text(json.dumps(cal, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print("calendar events", len(cal["events"]))
+print("SEED OK")

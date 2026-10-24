@@ -1,7 +1,7 @@
 {
   "synthetic": true,
-  "dataset": "team",
-  "seed": 20261024,
+  "dataset": "team+community-dense",
+  "seed": 20261025,
   "preference_space": {
     "tags": 25,
     "profile_sizes": [
@@ -1439,711 +1439,682 @@
     },
     {
       "id": "evt-081",
-      "title": "Laboratorio pratico: basket",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: basket, imprenditoria, sport.",
+      "title": "Study circle: design + imprenditoria",
+      "description": "Incontro sintetico self-help community. studio peer + matching tag. Focus: design, imprenditoria.",
       "tags": [
-        "basket",
-        "imprenditoria",
-        "sport"
+        "design",
+        "imprenditoria"
       ],
       "location": {
-        "building": "Building 2"
+        "building": "La Serra"
       },
-      "start": "2026-11-21T20:00:00",
-      "end": "2026-11-21T22:00:00",
-      "capacity": 60,
+      "start": "2026-10-25T18:00:00",
+      "end": "2026-10-25T20:00:00",
+      "capacity": 20,
       "source_id": "evt-081"
     },
     {
       "id": "evt-082",
-      "title": "Meetup studenti: UX-UI",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: UX-UI, arte, basket, data-science, musica.",
+      "title": "Community tip exchange: cinema + gaming",
+      "description": "Incontro sintetico self-help community. consigli pratici tra studenti. Focus: cinema, gaming, programmazione.",
       "tags": [
-        "UX-UI",
-        "arte",
-        "basket",
-        "data-science",
-        "musica"
+        "cinema",
+        "gaming",
+        "programmazione"
       ],
       "location": {
-        "building": "Building 3"
+        "building": "Building 1"
       },
-      "start": "2026-11-22T16:00:00",
-      "end": "2026-11-22T17:30:00",
-      "capacity": 30,
+      "start": "2026-10-25T23:00:00",
+      "end": "2026-10-26T01:00:00",
+      "capacity": 23,
       "source_id": "evt-082"
     },
     {
       "id": "evt-083",
-      "title": "Workshop creativo: arte",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: arte, calcio, networking, sostenibilita.",
+      "title": "Club open lab: AI + UX-UI",
+      "description": "Incontro sintetico self-help community. laboratorio aperto del club. Focus: AI, UX-UI, finanza, running.",
       "tags": [
-        "arte",
-        "calcio",
-        "networking",
-        "sostenibilita"
+        "AI",
+        "UX-UI",
+        "finanza",
+        "running"
       ],
       "location": {
-        "building": "Building 4"
+        "building": "Building 2"
       },
-      "start": "2026-11-22T18:00:00",
-      "end": "2026-11-22T20:00:00",
-      "capacity": 40,
+      "start": "2026-10-26T04:00:00",
+      "end": "2026-10-26T06:00:00",
+      "capacity": 26,
       "source_id": "evt-083"
     },
     {
       "id": "evt-084",
-      "title": "Sfida a squadre: ambiente",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: ambiente, fitness.",
+      "title": "Office-hour prep: data-science + networking",
+      "description": "Incontro sintetico self-help community. preparazione collettiva alle office hour. Focus: data-science, networking.",
       "tags": [
-        "ambiente",
-        "fitness"
+        "data-science",
+        "networking"
       ],
       "location": {
-        "building": "Building 5"
+        "building": "Building 3"
       },
-      "start": "2026-11-22T20:00:00",
-      "end": "2026-11-22T21:00:00",
-      "capacity": 25,
+      "start": "2026-10-26T09:00:00",
+      "end": "2026-10-26T11:00:00",
+      "capacity": 29,
       "source_id": "evt-084"
     },
     {
       "id": "evt-085",
-      "title": "Talk con ospiti: fotografia",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: fotografia, gaming.",
+      "title": "Evening mixer: finanza + gaming",
+      "description": "Incontro sintetico self-help community. mixer serale campus. Focus: finanza, gaming, startup.",
       "tags": [
-        "fotografia",
-        "gaming"
+        "finanza",
+        "gaming",
+        "startup"
       ],
       "location": {
-        "building": "La Serra"
+        "building": "Building 4"
       },
-      "start": "2026-11-23T16:00:00",
-      "end": "2026-11-23T17:00:00",
-      "capacity": 30,
+      "start": "2026-10-26T14:00:00",
+      "end": "2026-10-26T16:00:00",
+      "capacity": 32,
       "source_id": "evt-085"
     },
     {
       "id": "evt-086",
-      "title": "Sessione introduttiva: design",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: design, gaming, sport.",
+      "title": "Skill swap: finanza + musica",
+      "description": "Incontro sintetico self-help community. scambio competenze. Focus: finanza, musica, programmazione, running.",
       "tags": [
-        "design",
-        "gaming",
-        "sport"
-      ],
-      "location": {
-        "building": "Building 1"
-      },
-      "start": "2026-11-23T18:00:00",
-      "end": "2026-11-23T19:30:00",
-      "capacity": 50,
-      "source_id": "evt-086"
-    },
-    {
-      "id": "evt-087",
-      "title": "Community night: design",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: design, imprenditoria, marketing, networking, startup.",
-      "tags": [
-        "design",
-        "imprenditoria",
-        "marketing",
-        "networking",
-        "startup"
-      ],
-      "location": {
-        "building": "Building 2"
-      },
-      "start": "2026-11-23T20:00:00",
-      "end": "2026-11-23T22:00:00",
-      "capacity": 50,
-      "source_id": "evt-087"
-    },
-    {
-      "id": "evt-088",
-      "title": "Progetto collaborativo: AI",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: AI, calcio, cinema, cybersecurity, startup.",
-      "tags": [
-        "AI",
-        "calcio",
-        "cinema",
-        "cybersecurity",
-        "startup"
-      ],
-      "location": {
-        "building": "Building 3"
-      },
-      "start": "2026-11-24T16:00:00",
-      "end": "2026-11-24T17:00:00",
-      "capacity": 50,
-      "source_id": "evt-088"
-    },
-    {
-      "id": "evt-089",
-      "title": "Mini hackathon: calcio",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: calcio, gaming, robotica.",
-      "tags": [
-        "calcio",
-        "gaming",
-        "robotica"
-      ],
-      "location": {
-        "building": "Building 4"
-      },
-      "start": "2026-11-24T18:00:00",
-      "end": "2026-11-24T20:00:00",
-      "capacity": 40,
-      "source_id": "evt-089"
-    },
-    {
-      "id": "evt-090",
-      "title": "Open lab: ambiente",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: ambiente, cybersecurity, data-science, gaming.",
-      "tags": [
-        "ambiente",
-        "cybersecurity",
-        "data-science",
-        "gaming"
-      ],
-      "location": {
-        "building": "Building 5"
-      },
-      "start": "2026-11-24T20:00:00",
-      "end": "2026-11-24T22:00:00",
-      "capacity": 15,
-      "source_id": "evt-090"
-    },
-    {
-      "id": "evt-091",
-      "title": "Laboratorio pratico: cinema",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: cinema, programmazione, startup.",
-      "tags": [
-        "cinema",
-        "programmazione",
-        "startup"
-      ],
-      "location": {
-        "building": "La Serra"
-      },
-      "start": "2026-11-25T16:00:00",
-      "end": "2026-11-25T17:00:00",
-      "capacity": 60,
-      "source_id": "evt-091"
-    },
-    {
-      "id": "evt-092",
-      "title": "Meetup studenti: cybersecurity",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: cybersecurity, data-science, marketing, programmazione.",
-      "tags": [
-        "cybersecurity",
-        "data-science",
-        "marketing",
-        "programmazione"
-      ],
-      "location": {
-        "building": "Building 1"
-      },
-      "start": "2026-11-25T18:00:00",
-      "end": "2026-11-25T19:00:00",
-      "capacity": 40,
-      "source_id": "evt-092"
-    },
-    {
-      "id": "evt-093",
-      "title": "Workshop creativo: ambiente",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: ambiente, cybersecurity, musica, programmazione.",
-      "tags": [
-        "ambiente",
-        "cybersecurity",
-        "musica",
-        "programmazione"
-      ],
-      "location": {
-        "building": "Building 2"
-      },
-      "start": "2026-11-25T20:00:00",
-      "end": "2026-11-25T21:30:00",
-      "capacity": 20,
-      "source_id": "evt-093"
-    },
-    {
-      "id": "evt-094",
-      "title": "Sfida a squadre: UX-UI",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: UX-UI, design, imprenditoria, startup, teatro.",
-      "tags": [
-        "UX-UI",
-        "design",
-        "imprenditoria",
-        "startup",
-        "teatro"
-      ],
-      "location": {
-        "building": "Building 3"
-      },
-      "start": "2026-11-26T16:00:00",
-      "end": "2026-11-26T17:30:00",
-      "capacity": 50,
-      "source_id": "evt-094"
-    },
-    {
-      "id": "evt-095",
-      "title": "Talk con ospiti: ambiente",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: ambiente, cinema, gaming.",
-      "tags": [
-        "ambiente",
-        "cinema",
-        "gaming"
-      ],
-      "location": {
-        "building": "Building 4"
-      },
-      "start": "2026-11-26T18:00:00",
-      "end": "2026-11-26T19:00:00",
-      "capacity": 25,
-      "source_id": "evt-095"
-    },
-    {
-      "id": "evt-096",
-      "title": "Sessione introduttiva: gaming",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: gaming, running, teatro.",
-      "tags": [
-        "gaming",
-        "running",
-        "teatro"
-      ],
-      "location": {
-        "building": "Building 5"
-      },
-      "start": "2026-11-26T20:00:00",
-      "end": "2026-11-26T21:30:00",
-      "capacity": 20,
-      "source_id": "evt-096"
-    },
-    {
-      "id": "evt-097",
-      "title": "Community night: AI",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: AI, fitness, running, sport, startup.",
-      "tags": [
-        "AI",
-        "fitness",
-        "running",
-        "sport",
-        "startup"
-      ],
-      "location": {
-        "building": "La Serra"
-      },
-      "start": "2026-11-27T16:00:00",
-      "end": "2026-11-27T17:30:00",
-      "capacity": 15,
-      "source_id": "evt-097"
-    },
-    {
-      "id": "evt-098",
-      "title": "Progetto collaborativo: data-science",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: data-science, finanza, fitness, sostenibilita, sport.",
-      "tags": [
-        "data-science",
         "finanza",
-        "fitness",
-        "sostenibilita",
-        "sport"
-      ],
-      "location": {
-        "building": "Building 1"
-      },
-      "start": "2026-11-27T18:00:00",
-      "end": "2026-11-27T19:00:00",
-      "capacity": 20,
-      "source_id": "evt-098"
-    },
-    {
-      "id": "evt-099",
-      "title": "Mini hackathon: design",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: design, running, sostenibilita.",
-      "tags": [
-        "design",
-        "running",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 2"
-      },
-      "start": "2026-11-27T20:00:00",
-      "end": "2026-11-27T21:00:00",
-      "capacity": 20,
-      "source_id": "evt-099"
-    },
-    {
-      "id": "evt-100",
-      "title": "Open lab: cinema",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: cinema, cybersecurity, sostenibilita.",
-      "tags": [
-        "cinema",
-        "cybersecurity",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 3"
-      },
-      "start": "2026-11-28T16:00:00",
-      "end": "2026-11-28T17:30:00",
-      "capacity": 25,
-      "source_id": "evt-100"
-    },
-    {
-      "id": "evt-101",
-      "title": "Laboratorio pratico: cinema",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: cinema, cybersecurity, sport.",
-      "tags": [
-        "cinema",
-        "cybersecurity",
-        "sport"
-      ],
-      "location": {
-        "building": "Building 4"
-      },
-      "start": "2026-11-28T18:00:00",
-      "end": "2026-11-28T19:00:00",
-      "capacity": 25,
-      "source_id": "evt-101"
-    },
-    {
-      "id": "evt-102",
-      "title": "Meetup studenti: UX-UI",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: UX-UI, basket, fotografia, musica, sostenibilita.",
-      "tags": [
-        "UX-UI",
-        "basket",
-        "fotografia",
         "musica",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 5"
-      },
-      "start": "2026-11-28T20:00:00",
-      "end": "2026-11-28T21:00:00",
-      "capacity": 60,
-      "source_id": "evt-102"
-    },
-    {
-      "id": "evt-103",
-      "title": "Workshop creativo: calcio",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: calcio, musica.",
-      "tags": [
-        "calcio",
-        "musica"
-      ],
-      "location": {
-        "building": "La Serra"
-      },
-      "start": "2026-11-29T16:00:00",
-      "end": "2026-11-29T18:00:00",
-      "capacity": 60,
-      "source_id": "evt-103"
-    },
-    {
-      "id": "evt-104",
-      "title": "Sfida a squadre: fitness",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: fitness, gaming, marketing, teatro.",
-      "tags": [
-        "fitness",
-        "gaming",
-        "marketing",
-        "teatro"
-      ],
-      "location": {
-        "building": "Building 1"
-      },
-      "start": "2026-11-29T18:00:00",
-      "end": "2026-11-29T20:00:00",
-      "capacity": 15,
-      "source_id": "evt-104"
-    },
-    {
-      "id": "evt-105",
-      "title": "Talk con ospiti: cybersecurity",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: cybersecurity, data-science, fitness, sostenibilita.",
-      "tags": [
-        "cybersecurity",
-        "data-science",
-        "fitness",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 2"
-      },
-      "start": "2026-11-29T20:00:00",
-      "end": "2026-11-29T21:30:00",
-      "capacity": 30,
-      "source_id": "evt-105"
-    },
-    {
-      "id": "evt-106",
-      "title": "Sessione introduttiva: AI",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: AI, ambiente, cybersecurity, networking, sostenibilita.",
-      "tags": [
-        "AI",
-        "ambiente",
-        "cybersecurity",
-        "networking",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 3"
-      },
-      "start": "2026-11-30T16:00:00",
-      "end": "2026-11-30T18:00:00",
-      "capacity": 60,
-      "source_id": "evt-106"
-    },
-    {
-      "id": "evt-107",
-      "title": "Community night: UX-UI",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: UX-UI, startup, teatro.",
-      "tags": [
-        "UX-UI",
-        "startup",
-        "teatro"
-      ],
-      "location": {
-        "building": "Building 4"
-      },
-      "start": "2026-11-30T18:00:00",
-      "end": "2026-11-30T19:00:00",
-      "capacity": 30,
-      "source_id": "evt-107"
-    },
-    {
-      "id": "evt-108",
-      "title": "Progetto collaborativo: arte",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: arte, calcio, fitness, networking.",
-      "tags": [
-        "arte",
-        "calcio",
-        "fitness",
-        "networking"
-      ],
-      "location": {
-        "building": "Building 5"
-      },
-      "start": "2026-11-30T20:00:00",
-      "end": "2026-11-30T21:30:00",
-      "capacity": 50,
-      "source_id": "evt-108"
-    },
-    {
-      "id": "evt-109",
-      "title": "Mini hackathon: robotica",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: robotica, sport.",
-      "tags": [
-        "robotica",
-        "sport"
-      ],
-      "location": {
-        "building": "La Serra"
-      },
-      "start": "2026-12-01T16:00:00",
-      "end": "2026-12-01T17:00:00",
-      "capacity": 40,
-      "source_id": "evt-109"
-    },
-    {
-      "id": "evt-110",
-      "title": "Open lab: AI",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: AI, cinema, sostenibilita.",
-      "tags": [
-        "AI",
-        "cinema",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 1"
-      },
-      "start": "2026-12-01T18:00:00",
-      "end": "2026-12-01T19:00:00",
-      "capacity": 25,
-      "source_id": "evt-110"
-    },
-    {
-      "id": "evt-111",
-      "title": "Laboratorio pratico: cybersecurity",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: cybersecurity, gaming.",
-      "tags": [
-        "cybersecurity",
-        "gaming"
-      ],
-      "location": {
-        "building": "Building 2"
-      },
-      "start": "2026-12-01T20:00:00",
-      "end": "2026-12-01T22:00:00",
-      "capacity": 20,
-      "source_id": "evt-111"
-    },
-    {
-      "id": "evt-112",
-      "title": "Meetup studenti: AI",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: AI, cinema, fitness, sport, startup.",
-      "tags": [
-        "AI",
-        "cinema",
-        "fitness",
-        "sport",
-        "startup"
-      ],
-      "location": {
-        "building": "Building 3"
-      },
-      "start": "2026-12-02T16:00:00",
-      "end": "2026-12-02T18:00:00",
-      "capacity": 40,
-      "source_id": "evt-112"
-    },
-    {
-      "id": "evt-113",
-      "title": "Workshop creativo: AI",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: AI, arte, fotografia, sostenibilita.",
-      "tags": [
-        "AI",
-        "arte",
-        "fotografia",
-        "sostenibilita"
-      ],
-      "location": {
-        "building": "Building 4"
-      },
-      "start": "2026-12-02T18:00:00",
-      "end": "2026-12-02T19:00:00",
-      "capacity": 30,
-      "source_id": "evt-113"
-    },
-    {
-      "id": "evt-114",
-      "title": "Sfida a squadre: ambiente",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: ambiente, running.",
-      "tags": [
-        "ambiente",
+        "programmazione",
         "running"
       ],
       "location": {
         "building": "Building 5"
       },
-      "start": "2026-12-02T20:00:00",
-      "end": "2026-12-02T21:00:00",
-      "capacity": 40,
-      "source_id": "evt-114"
+      "start": "2026-10-26T19:00:00",
+      "end": "2026-10-26T21:00:00",
+      "capacity": 35,
+      "source_id": "evt-086"
     },
     {
-      "id": "evt-115",
-      "title": "Talk con ospiti: basket",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: basket, fitness.",
+      "id": "evt-087",
+      "title": "Ride & chat: marketing + running",
+      "description": "Incontro sintetico self-help community. car sharing + networking. Focus: marketing, running.",
       "tags": [
-        "basket",
-        "fitness"
+        "marketing",
+        "running"
       ],
       "location": {
         "building": "La Serra"
       },
-      "start": "2026-12-03T16:00:00",
-      "end": "2026-12-03T18:00:00",
-      "capacity": 15,
-      "source_id": "evt-115"
+      "start": "2026-10-27T00:00:00",
+      "end": "2026-10-27T02:00:00",
+      "capacity": 38,
+      "source_id": "evt-087"
     },
     {
-      "id": "evt-116",
-      "title": "Sessione introduttiva: cybersecurity",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: cybersecurity, design, programmazione, robotica.",
+      "id": "evt-088",
+      "title": "Green campus action: running + sport",
+      "description": "Incontro sintetico self-help community. azione sostenibilita. Focus: running, sport, teatro.",
+      "tags": [
+        "running",
+        "sport",
+        "teatro"
+      ],
+      "location": {
+        "building": "Building 1"
+      },
+      "start": "2026-10-27T05:00:00",
+      "end": "2026-10-27T07:00:00",
+      "capacity": 41,
+      "source_id": "evt-088"
+    },
+    {
+      "id": "evt-089",
+      "title": "Portfolio clinic: basket + design",
+      "description": "Incontro sintetico self-help community. revisione portfolio. Focus: basket, design, fitness, networking.",
+      "tags": [
+        "basket",
+        "design",
+        "fitness",
+        "networking"
+      ],
+      "location": {
+        "building": "Building 2"
+      },
+      "start": "2026-10-27T10:00:00",
+      "end": "2026-10-27T12:00:00",
+      "capacity": 44,
+      "source_id": "evt-089"
+    },
+    {
+      "id": "evt-090",
+      "title": "Match night: basket + imprenditoria",
+      "description": "Incontro sintetico self-help community. serata matching interessi. Focus: basket, imprenditoria.",
+      "tags": [
+        "basket",
+        "imprenditoria"
+      ],
+      "location": {
+        "building": "Building 3"
+      },
+      "start": "2026-10-27T15:00:00",
+      "end": "2026-10-27T17:00:00",
+      "capacity": 47,
+      "source_id": "evt-090"
+    },
+    {
+      "id": "evt-091",
+      "title": "Study circle: fotografia + musica",
+      "description": "Incontro sintetico self-help community. studio peer + matching tag. Focus: fotografia, musica, teatro.",
+      "tags": [
+        "fotografia",
+        "musica",
+        "teatro"
+      ],
+      "location": {
+        "building": "Building 4"
+      },
+      "start": "2026-10-27T20:00:00",
+      "end": "2026-10-27T22:00:00",
+      "capacity": 50,
+      "source_id": "evt-091"
+    },
+    {
+      "id": "evt-092",
+      "title": "Community tip exchange: cinema + data-science",
+      "description": "Incontro sintetico self-help community. consigli pratici tra studenti. Focus: cinema, data-science, fitness, programmazione.",
+      "tags": [
+        "cinema",
+        "data-science",
+        "fitness",
+        "programmazione"
+      ],
+      "location": {
+        "building": "Building 5"
+      },
+      "start": "2026-10-28T01:00:00",
+      "end": "2026-10-28T03:00:00",
+      "capacity": 53,
+      "source_id": "evt-092"
+    },
+    {
+      "id": "evt-093",
+      "title": "Club open lab: cybersecurity + data-science",
+      "description": "Incontro sintetico self-help community. laboratorio aperto del club. Focus: cybersecurity, data-science.",
+      "tags": [
+        "cybersecurity",
+        "data-science"
+      ],
+      "location": {
+        "building": "La Serra"
+      },
+      "start": "2026-10-28T06:00:00",
+      "end": "2026-10-28T08:00:00",
+      "capacity": 56,
+      "source_id": "evt-093"
+    },
+    {
+      "id": "evt-094",
+      "title": "Office-hour prep: cinema + gaming",
+      "description": "Incontro sintetico self-help community. preparazione collettiva alle office hour. Focus: cinema, gaming, running.",
+      "tags": [
+        "cinema",
+        "gaming",
+        "running"
+      ],
+      "location": {
+        "building": "Building 1"
+      },
+      "start": "2026-10-28T11:00:00",
+      "end": "2026-10-28T13:00:00",
+      "capacity": 59,
+      "source_id": "evt-094"
+    },
+    {
+      "id": "evt-095",
+      "title": "Evening mixer: cybersecurity + design",
+      "description": "Incontro sintetico self-help community. mixer serale campus. Focus: cybersecurity, design, fotografia, programmazione.",
       "tags": [
         "cybersecurity",
         "design",
+        "fotografia",
+        "programmazione"
+      ],
+      "location": {
+        "building": "Building 2"
+      },
+      "start": "2026-10-28T16:00:00",
+      "end": "2026-10-28T18:00:00",
+      "capacity": 62,
+      "source_id": "evt-095"
+    },
+    {
+      "id": "evt-096",
+      "title": "Skill swap: arte + teatro",
+      "description": "Incontro sintetico self-help community. scambio competenze. Focus: arte, teatro.",
+      "tags": [
+        "arte",
+        "teatro"
+      ],
+      "location": {
+        "building": "Building 3"
+      },
+      "start": "2026-10-28T21:00:00",
+      "end": "2026-10-28T23:00:00",
+      "capacity": 65,
+      "source_id": "evt-096"
+    },
+    {
+      "id": "evt-097",
+      "title": "Ride & chat: data-science + imprenditoria",
+      "description": "Incontro sintetico self-help community. car sharing + networking. Focus: data-science, imprenditoria, sostenibilita.",
+      "tags": [
+        "data-science",
+        "imprenditoria",
+        "sostenibilita"
+      ],
+      "location": {
+        "building": "Building 4"
+      },
+      "start": "2026-10-29T02:00:00",
+      "end": "2026-10-29T04:00:00",
+      "capacity": 68,
+      "source_id": "evt-097"
+    },
+    {
+      "id": "evt-098",
+      "title": "Green campus action: calcio + cinema",
+      "description": "Incontro sintetico self-help community. azione sostenibilita. Focus: calcio, cinema, musica, startup.",
+      "tags": [
+        "calcio",
+        "cinema",
+        "musica",
+        "startup"
+      ],
+      "location": {
+        "building": "Building 5"
+      },
+      "start": "2026-10-29T07:00:00",
+      "end": "2026-10-29T09:00:00",
+      "capacity": 71,
+      "source_id": "evt-098"
+    },
+    {
+      "id": "evt-099",
+      "title": "Portfolio clinic: data-science + sport",
+      "description": "Incontro sintetico self-help community. revisione portfolio. Focus: data-science, sport.",
+      "tags": [
+        "data-science",
+        "sport"
+      ],
+      "location": {
+        "building": "La Serra"
+      },
+      "start": "2026-10-29T12:00:00",
+      "end": "2026-10-29T14:00:00",
+      "capacity": 74,
+      "source_id": "evt-099"
+    },
+    {
+      "id": "evt-100",
+      "title": "Match night: UX-UI + basket",
+      "description": "Incontro sintetico self-help community. serata matching interessi. Focus: UX-UI, basket, programmazione.",
+      "tags": [
+        "UX-UI",
+        "basket",
+        "programmazione"
+      ],
+      "location": {
+        "building": "Building 1"
+      },
+      "start": "2026-10-29T17:00:00",
+      "end": "2026-10-29T19:00:00",
+      "capacity": 77,
+      "source_id": "evt-100"
+    },
+    {
+      "id": "evt-101",
+      "title": "Study circle: basket + finanza",
+      "description": "Incontro sintetico self-help community. studio peer + matching tag. Focus: basket, finanza, networking, startup.",
+      "tags": [
+        "basket",
+        "finanza",
+        "networking",
+        "startup"
+      ],
+      "location": {
+        "building": "Building 2"
+      },
+      "start": "2026-10-29T22:00:00",
+      "end": "2026-10-30T00:00:00",
+      "capacity": 80,
+      "source_id": "evt-101"
+    },
+    {
+      "id": "evt-102",
+      "title": "Community tip exchange: robotica + startup",
+      "description": "Incontro sintetico self-help community. consigli pratici tra studenti. Focus: robotica, startup.",
+      "tags": [
+        "robotica",
+        "startup"
+      ],
+      "location": {
+        "building": "Building 3"
+      },
+      "start": "2026-10-30T03:00:00",
+      "end": "2026-10-30T05:00:00",
+      "capacity": 83,
+      "source_id": "evt-102"
+    },
+    {
+      "id": "evt-103",
+      "title": "Club open lab: basket + data-science",
+      "description": "Incontro sintetico self-help community. laboratorio aperto del club. Focus: basket, data-science, sostenibilita.",
+      "tags": [
+        "basket",
+        "data-science",
+        "sostenibilita"
+      ],
+      "location": {
+        "building": "Building 4"
+      },
+      "start": "2026-10-30T08:00:00",
+      "end": "2026-10-30T10:00:00",
+      "capacity": 86,
+      "source_id": "evt-103"
+    },
+    {
+      "id": "evt-104",
+      "title": "Office-hour prep: ambiente + design",
+      "description": "Incontro sintetico self-help community. preparazione collettiva alle office hour. Focus: ambiente, design, gaming, teatro.",
+      "tags": [
+        "ambiente",
+        "design",
+        "gaming",
+        "teatro"
+      ],
+      "location": {
+        "building": "Building 5"
+      },
+      "start": "2026-10-30T13:00:00",
+      "end": "2026-10-30T15:00:00",
+      "capacity": 89,
+      "source_id": "evt-104"
+    },
+    {
+      "id": "evt-105",
+      "title": "Evening mixer: AI + arte",
+      "description": "Incontro sintetico self-help community. mixer serale campus. Focus: AI, arte.",
+      "tags": [
+        "AI",
+        "arte"
+      ],
+      "location": {
+        "building": "La Serra"
+      },
+      "start": "2026-10-30T18:00:00",
+      "end": "2026-10-30T20:00:00",
+      "capacity": 92,
+      "source_id": "evt-105"
+    },
+    {
+      "id": "evt-106",
+      "title": "Skill swap: AI + data-science",
+      "description": "Incontro sintetico self-help community. scambio competenze. Focus: AI, data-science, running.",
+      "tags": [
+        "AI",
+        "data-science",
+        "running"
+      ],
+      "location": {
+        "building": "Building 1"
+      },
+      "start": "2026-10-30T23:00:00",
+      "end": "2026-10-31T01:00:00",
+      "capacity": 95,
+      "source_id": "evt-106"
+    },
+    {
+      "id": "evt-107",
+      "title": "Ride & chat: cinema + fitness",
+      "description": "Incontro sintetico self-help community. car sharing + networking. Focus: cinema, fitness, programmazione, running.",
+      "tags": [
+        "cinema",
+        "fitness",
         "programmazione",
+        "running"
+      ],
+      "location": {
+        "building": "Building 2"
+      },
+      "start": "2026-10-31T04:00:00",
+      "end": "2026-10-31T06:00:00",
+      "capacity": 98,
+      "source_id": "evt-107"
+    },
+    {
+      "id": "evt-108",
+      "title": "Green campus action: data-science + design",
+      "description": "Incontro sintetico self-help community. azione sostenibilita. Focus: data-science, design.",
+      "tags": [
+        "data-science",
+        "design"
+      ],
+      "location": {
+        "building": "Building 3"
+      },
+      "start": "2026-10-31T09:00:00",
+      "end": "2026-10-31T11:00:00",
+      "capacity": 21,
+      "source_id": "evt-108"
+    },
+    {
+      "id": "evt-109",
+      "title": "Portfolio clinic: calcio + gaming",
+      "description": "Incontro sintetico self-help community. revisione portfolio. Focus: calcio, gaming, running.",
+      "tags": [
+        "calcio",
+        "gaming",
+        "running"
+      ],
+      "location": {
+        "building": "Building 4"
+      },
+      "start": "2026-10-31T14:00:00",
+      "end": "2026-10-31T16:00:00",
+      "capacity": 24,
+      "source_id": "evt-109"
+    },
+    {
+      "id": "evt-110",
+      "title": "Match night: ambiente + design",
+      "description": "Incontro sintetico self-help community. serata matching interessi. Focus: ambiente, design, fotografia, marketing.",
+      "tags": [
+        "ambiente",
+        "design",
+        "fotografia",
+        "marketing"
+      ],
+      "location": {
+        "building": "Building 5"
+      },
+      "start": "2026-10-31T19:00:00",
+      "end": "2026-10-31T21:00:00",
+      "capacity": 27,
+      "source_id": "evt-110"
+    },
+    {
+      "id": "evt-111",
+      "title": "Study circle: fitness + startup",
+      "description": "Incontro sintetico self-help community. studio peer + matching tag. Focus: fitness, startup.",
+      "tags": [
+        "fitness",
+        "startup"
+      ],
+      "location": {
+        "building": "La Serra"
+      },
+      "start": "2026-11-01T00:00:00",
+      "end": "2026-11-01T02:00:00",
+      "capacity": 30,
+      "source_id": "evt-111"
+    },
+    {
+      "id": "evt-112",
+      "title": "Community tip exchange: arte + finanza",
+      "description": "Incontro sintetico self-help community. consigli pratici tra studenti. Focus: arte, finanza, robotica.",
+      "tags": [
+        "arte",
+        "finanza",
         "robotica"
       ],
       "location": {
         "building": "Building 1"
       },
-      "start": "2026-12-03T18:00:00",
-      "end": "2026-12-03T20:00:00",
-      "capacity": 50,
-      "source_id": "evt-116"
+      "start": "2026-11-01T05:00:00",
+      "end": "2026-11-01T07:00:00",
+      "capacity": 33,
+      "source_id": "evt-112"
     },
     {
-      "id": "evt-117",
-      "title": "Community night: UX-UI",
-      "description": "Un incontro aperto agli studenti per sperimentare, confrontarsi e conoscere nuove persone. Focus: UX-UI, basket, robotica, sport, teatro.",
+      "id": "evt-113",
+      "title": "Club open lab: arte + cinema",
+      "description": "Incontro sintetico self-help community. laboratorio aperto del club. Focus: arte, cinema, design, sostenibilita.",
       "tags": [
-        "UX-UI",
-        "basket",
-        "robotica",
-        "sport",
-        "teatro"
+        "arte",
+        "cinema",
+        "design",
+        "sostenibilita"
       ],
       "location": {
         "building": "Building 2"
       },
-      "start": "2026-12-03T20:00:00",
-      "end": "2026-12-03T21:00:00",
-      "capacity": 50,
-      "source_id": "evt-117"
+      "start": "2026-11-01T10:00:00",
+      "end": "2026-11-01T12:00:00",
+      "capacity": 36,
+      "source_id": "evt-113"
     },
     {
-      "id": "evt-118",
-      "title": "Progetto collaborativo: ambiente",
-      "description": "Attività guidate e momenti di networking per condividere idee e interessi. Focus: ambiente, arte.",
+      "id": "evt-114",
+      "title": "Office-hour prep: cybersecurity + startup",
+      "description": "Incontro sintetico self-help community. preparazione collettiva alle office hour. Focus: cybersecurity, startup.",
       "tags": [
-        "ambiente",
-        "arte"
+        "cybersecurity",
+        "startup"
       ],
       "location": {
         "building": "Building 3"
       },
-      "start": "2026-12-04T16:00:00",
-      "end": "2026-12-04T18:00:00",
-      "capacity": 60,
-      "source_id": "evt-118"
+      "start": "2026-11-01T15:00:00",
+      "end": "2026-11-01T17:00:00",
+      "capacity": 39,
+      "source_id": "evt-114"
     },
     {
-      "id": "evt-119",
-      "title": "Mini hackathon: programmazione",
-      "description": "Un evento interattivo con esercizi di gruppo e discussione finale. Focus: programmazione, sostenibilita, sport.",
+      "id": "evt-115",
+      "title": "Evening mixer: calcio + networking",
+      "description": "Incontro sintetico self-help community. mixer serale campus. Focus: calcio, networking, sostenibilita.",
       "tags": [
-        "programmazione",
-        "sostenibilita",
-        "sport"
+        "calcio",
+        "networking",
+        "sostenibilita"
       ],
       "location": {
         "building": "Building 4"
       },
-      "start": "2026-12-04T18:00:00",
-      "end": "2026-12-04T19:30:00",
-      "capacity": 15,
-      "source_id": "evt-119"
+      "start": "2026-11-01T20:00:00",
+      "end": "2026-11-01T22:00:00",
+      "capacity": 42,
+      "source_id": "evt-115"
     },
     {
-      "id": "evt-120",
-      "title": "Open lab: ambiente",
-      "description": "Esperienze pratiche per imparare insieme e costruire connessioni nel campus. Focus: ambiente, arte, cybersecurity, sostenibilita.",
+      "id": "evt-116",
+      "title": "Skill swap: finanza + fitness",
+      "description": "Incontro sintetico self-help community. scambio competenze. Focus: finanza, fitness, networking, startup.",
       "tags": [
-        "ambiente",
-        "arte",
-        "cybersecurity",
-        "sostenibilita"
+        "finanza",
+        "fitness",
+        "networking",
+        "startup"
       ],
       "location": {
         "building": "Building 5"
       },
-      "start": "2026-12-04T20:00:00",
-      "end": "2026-12-04T21:00:00",
-      "capacity": 15,
+      "start": "2026-11-02T01:00:00",
+      "end": "2026-11-02T03:00:00",
+      "capacity": 45,
+      "source_id": "evt-116"
+    },
+    {
+      "id": "evt-117",
+      "title": "Ride & chat: fotografia + marketing",
+      "description": "Incontro sintetico self-help community. car sharing + networking. Focus: fotografia, marketing.",
+      "tags": [
+        "fotografia",
+        "marketing"
+      ],
+      "location": {
+        "building": "La Serra"
+      },
+      "start": "2026-11-02T06:00:00",
+      "end": "2026-11-02T08:00:00",
+      "capacity": 48,
+      "source_id": "evt-117"
+    },
+    {
+      "id": "evt-118",
+      "title": "Green campus action: UX-UI + cinema",
+      "description": "Incontro sintetico self-help community. azione sostenibilita. Focus: UX-UI, cinema, cybersecurity.",
+      "tags": [
+        "UX-UI",
+        "cinema",
+        "cybersecurity"
+      ],
+      "location": {
+        "building": "Building 1"
+      },
+      "start": "2026-11-02T11:00:00",
+      "end": "2026-11-02T13:00:00",
+      "capacity": 51,
+      "source_id": "evt-118"
+    },
+    {
+      "id": "evt-119",
+      "title": "Portfolio clinic: cybersecurity + gaming",
+      "description": "Incontro sintetico self-help community. revisione portfolio. Focus: cybersecurity, gaming, networking, sostenibilita.",
+      "tags": [
+        "cybersecurity",
+        "gaming",
+        "networking",
+        "sostenibilita"
+      ],
+      "location": {
+        "building": "Building 2"
+      },
+      "start": "2026-11-02T16:00:00",
+      "end": "2026-11-02T18:00:00",
+      "capacity": 54,
+      "source_id": "evt-119"
+    },
+    {
+      "id": "evt-120",
+      "title": "Match night: running + startup",
+      "description": "Incontro sintetico self-help community. serata matching interessi. Focus: running, startup.",
+      "tags": [
+        "running",
+        "startup"
+      ],
+      "location": {
+        "building": "Building 3"
+      },
+      "start": "2026-11-02T21:00:00",
+      "end": "2026-11-02T23:00:00",
+      "capacity": 57,
       "source_id": "evt-120"
     }
-  ],
-  "cohort": {
-    "users": 55,
-    "events": 120,
-    "base_seed": 20261024,
-    "note": "usr-001–usr-040 and evt-001–evt-080 are the original seed. usr-041–usr-055 and evt-081–evt-120 continue that stream. usr-041 preferences are adjusted so evt-011 company stays usr-022 and usr-023."
-  }
+  ]
 }

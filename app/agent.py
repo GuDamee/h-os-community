@@ -58,14 +58,7 @@ def tick(
         score=match["score"],
         trace=trace,
     )
-    return {
-        "status": "proposed",
-        "action": action,
-        "roles": ["librarian", "campus_brain", "student_agent", "human"],
-        "patterns": ["gbrain", "cognee", "pipeshub", "paperclip", "langgraph", "openinstinct"],
-        "inspiration_installed": False,
-        "requires_human": True,
-    }
+    return {"status": "proposed", "action": action}
 
 
 def approve(corpus: Corpus, store: Store, action_id: str, decision: str) -> dict:

@@ -38,16 +38,9 @@ def normalize_profile(raw: dict, vocabulary: list[str] | None) -> dict:
     email = str(raw.get("email", "")).strip()
     if EMAIL_RE.fullmatch(email) is None:
         raise ValueError("L'email deve contenere @. Il dominio può essere finto.")
-    nickname = " ".join(str(raw.get("nickname") or "").split())
     nome = " ".join(str(raw.get("nome", "")).split())
     cognome = " ".join(str(raw.get("cognome", "")).split())
-    if nickname:
-        if not 2 <= len(nickname) <= 40:
-            raise ValueError("Il nickname deve avere tra 2 e 40 caratteri.")
-        nome = nickname
-        if not str(raw.get("cognome") or "").strip():
-            cognome = ""
-    elif not nome and not cognome:
+    if not nome and not cognome:
         nome, cognome = name_from_email(email)
     elif not nome:
         nome = name_from_email(email)[0]
@@ -81,7 +74,6 @@ def public_desk(profile: dict) -> dict:
     return {
         "id": DESK_ID,
         "name": display_name(profile),
-        "nickname": profile["nome"],
         "nome": profile["nome"],
         "cognome": profile["cognome"],
         "role": "student",

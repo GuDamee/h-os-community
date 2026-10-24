@@ -1,16 +1,14 @@
-# H-OS
+# H-ELP
 
 **License: MIT.** This repository is open source under the [MIT License](LICENSE). It is meant to be cloned from GitHub, read, and changed. The Hack Day build does not vendor another agent stack. It takes three open-source patterns and reimplements them in one small Python process.
 
-H-OS is a small operating system for the H-FARM community. The campus is full of the right room for the wrong people: a river cleanup, a lab hour, a pitch breakfast, a film at H-Farmers. Students miss them because nobody is matching the week to a person. H-OS reads preferences and events, proposes one notice, and stops. A human approves. Only then does the notice hang on the bacheca.
+**H-ELP** is the name on the student desk. The repository is still `h-os-community`, and the Python process keeps the H-OS names (`HOS_DB`, `HOS_DATA_DIR`, the FastAPI title). What a student sees after `./run.sh` is H-ELP: an Instagram-style vertical bacheca, **Chiedi ad H-ELP** and **Sondaggio** in the center of the top bar, and a left drawer with Mappa eventi, Prenotazioni, Feedback, and Chatta. Chatta writes an email to Student Office, Student Life, or a docente. There is no student-to-student chat and no bottom floating button.
+
+H-ELP is a small operating system for the H-FARM community. The campus is full of the right room for the wrong people: a river cleanup, a lab hour, a pitch breakfast, a film in the corte. Students miss them because nobody is matching the week to a person. The desk reads preferences and events, proposes one notice, and stops. A human approves. Only then does the notice hang on the bacheca.
 
 Built for H-FARM Hacktoberfest Hack Day, Treviso, 24 October 2026. The screen tonight is the student desk. The thing to hand a judge is this repository.
 
 ## Architecture
-
-The running engine is FastAPI plus `app/hos_core.py`. [ARCHITECTURE.md](ARCHITECTURE.md) maps Librarian, Campus Brain, and Agent, and marks each piece REAL, MOCKED, or PLANNED.
-
-The desk path is **Chiedi un evento** → sourced ask → recommendation → **Proponi iscrizione** → **Approva** → agenda. Propose does not register. `app/campus_agent.py` retrieves events, community posts, and `data/docs`, reasons over those hits, and replies with the `source_id`s that survive. Gemini rewrites that reply only with `GEMINI_API_KEY` and only when every id was retrieved. The shape follows smolagents, LlamaIndex, Haystack, and PydanticAI. Those packages are not installed. GBrain, PipesHub, Cognee, Paperclip, and LangGraph are inspiration too.
 
 We build on the [GBrain](https://github.com/garrytan/gbrain) citation pattern and the [PipesHub](https://github.com/pipeshub-ai/pipeshub-ai) access pattern, plus the [OpenInstinct](https://github.com/Merit-Systems/OpenInstinct) pattern of a proactive agent under human control. The map, the bacheca, and the preference list are the thin campus layer we wrote on top.
 
@@ -25,11 +23,11 @@ The product under that layer is a shared events store and one agent per student.
 | [garrytan/gbrain](https://github.com/garrytan/gbrain) | **Inspired. Not a fork.** GBrain keeps facts with their sources. We do not vendor it. We keep the rule: every answer names the source ids it used. | Our code: `app/brain.py`, `app/scoring.py` |
 | [pipeshub-ai/pipeshub-ai](https://github.com/pipeshub-ai/pipeshub-ai) | **Inspired. Not a fork.** PipesHub is a context layer with access rules. We do not run its connectors or `install.sh`. We keep the rule: records stay records, and a desk reads what that person may see. | Our code: `app/access.py` and the JSON in `data/` |
 | [Merit-Systems/OpenInstinct](https://github.com/Merit-Systems/OpenInstinct) | **Inspired. Not a fork.** OpenInstinct can act and still waits for a person before it sends or spends. We do not deploy it, iMessage, or its browser. We keep the rule: one agent per student, one proposal, approval before it goes out. | Our code: `app/agent.py` |
-| Campus UI | **Our code.** The thin layer. Signup, the swipe of tags, the map, the bacheca, and the preference roster. | `static/` |
-| Local access | **Our code.** The form asks for an institutional email, that email's password, and optional Canvas and Pronote links. The password is checked in the page and is not stored. The desk name is the part before `@` (`alex@` becomes Alex). Likes live in the browser and in `var/hos.sqlite`. The links are not opened. | `app/desk.py`, `POST /desk/profile` |
-| Shared events and preferences | **Team dataset, integrated here.** 40 students, 80 events, 12 mock emails, 25 tags. Each file is marked `synthetic: true`. Preference ids such as `pref-001-cinema` are indexes this desk assigns to tags that are already on the student. They are not extra rows in the JSON. | `data/users.json`, `data/events.json`, `data/emails.json`, `data/tags.json` |
-| Campus map | **Our code, on Esri World Imagery.** Events name a building and do not carry coordinates. The desk projects those schematic pins around H-FARM at La Serra, Roncade (45.5665, 12.4305). It is not a survey of each building. | `data/places.json`, `static/app.js` |
-| Map client | **Vendored, not one of the three.** Leaflet 1.9.4 (BSD-2-Clause) draws the map. Tiles are Esri World Imagery plus the Esri place-label overlay. There is no Google Maps key. | `static/vendor/leaflet/` |
+| Campus UI | **Our code.** The thin layer. Signup, the H-ELP bacheca, the map, Sondaggio, and Chatta to the office or a docente. | `static/` |
+| Local access | **Our code.** The form asks for a nickname, an institutional email, that email's password, and optional Canvas and Pronote links. The password is checked in the page and is not stored. The desk name on screen is the nickname. Likes live in the browser and in `var/hos.sqlite`. The links are not opened. | `app/desk.py`, `POST /desk/profile` |
+| Shared events and preferences | **Team dataset, integrated here.** 55 students, 120 events, 12 mock emails, 25 tags. Each file is marked `synthetic: true`. Preference ids such as `pref-001-cinema` are indexes this desk assigns to tags that are already on the student. They are not extra rows in the JSON. | `data/users.json`, `data/events.json`, `data/emails.json`, `data/tags.json` |
+| Campus map | **Our code.** Events name a building and do not carry coordinates. The desk projects those schematic pins around the published H-FARM Roncade point. The default tiles are Esri World Imagery. **Strade** switches to OpenStreetMap. It is not a survey of each building. | `data/places.json`, `static/app.js` |
+| Map client | **Vendored, not one of the three.** Leaflet 1.9.4 (BSD-2-Clause) draws the map. Tiles are OpenStreetMap. There is no Google Maps key. | `static/vendor/leaflet/` |
 | HTTP API and approval memory | **Our code.** | `app/main.py`. Approvals land in `var/hos.sqlite` on first run and are not committed. |
 
 Nothing in `app/` is copied from those three repositories. The only vendored library is Leaflet, under `static/vendor/leaflet/`, and it is not one of them.
@@ -65,7 +63,7 @@ One process. FastAPI serves the API and the desk. Gemma, if you set a key, may r
 | --- | --- | --- |
 | **Gestori** | Keep places, hours, and what is open. | Not a login. The team events do not name a host. The loader still accepts `host_role` when a file has it. |
 | **Prof** | Put courses, office hours, and readings into circulation. | Not a login. Same as gestori: a field the team file does not carry. |
-| **Studenti** | Decide what is worth showing up for, and with whom. | The only desk that is switched on. Forty synthetic students. |
+| **Studenti** | Decide what is worth showing up for, and with whom. | The only desk that is switched on. Fifty-five synthetic students. |
 
 The agent serves students only. The loader refuses a user whose role is not `student`.
 
@@ -73,7 +71,7 @@ The agent serves students only. The loader refuses a user whose role is not `stu
 
 | Real in this process | Mock, and labeled as such |
 | --- | --- |
-| Jaccard (baseline) and the overlap coefficient in `app/scoring.py`. The older weighted formula remains for a file that actually stores weights | The forty students and the tags they listed. No program, no hometown, no preference weight: those fields are not in the team JSON, and this desk does not add them |
+| Jaccard (baseline) and the overlap coefficient in `app/scoring.py`. The older weighted formula remains for a file that actually stores weights | The 55 students and the tags they listed. No program, no hometown, no preference weight: those fields are not in the team JSON, and this desk does not add them |
 | Source ids on every match, trace, and notice | The eighty events, their building names, and their capacities. The file does not say who is hosting or how many seats are already taken |
 | The gate: a tick creates `pending`, and nothing is posted until `POST /agent/approve` | The twelve emails. Addresses are on `.example`. No message is sent |
 | SQLite memory of approvals and of the local desk profile (`var/hos.sqlite`). The profile table has no password column | The map pins. See the building table below. The drawing follows the campus layout and is not a survey |
@@ -84,7 +82,7 @@ Files the loader reads must contain `"synthetic": true`. If that flag is missing
 
 ## Team dataset
 
-The cohort in `data/` is the team's generator (`data/generate_data.py`, seed `20261024`): 40 students, 80 events, 12 mock emails, 25 tags. The attached inbox file was the email list, not a schema. The field contract is `data/schema.json`.
+The cohort committed in `data/` is 55 students, 120 events, 12 mock emails, and 25 tags. `data/generate_data.py` (seed `20261024`) can rebuild a smaller cohort; the field contract is `data/schema.json`.
 
 Preferences are tag names, three to six of them. From 25 tags that is
 
@@ -92,7 +90,7 @@ Preferences are tag names, three to six of them. From 25 tags that is
 C(25,3) + C(25,4) + C(25,5) + C(25,6) = 245180
 ```
 
-theoretical profiles. That number is why a matcher has to be a formula instead of a hand-written card for every student. The repository materializes 40 profiles, not the 245180.
+theoretical profiles. That number is why a matcher has to be a formula instead of a hand-written card for every student. The repository materializes 55 profiles, not the 245180.
 
 Buildings in the event file, and the pin this desk uses:
 
@@ -115,7 +113,7 @@ Python 3.11 or newer.
 ./run.sh
 ```
 
-Then open [http://127.0.0.1:47231](http://127.0.0.1:47231).
+Then open [http://127.0.0.1:47231](http://127.0.0.1:47231). If the page still looks like an older desk, hard-refresh with **Ctrl+F5** (on macOS, **Cmd+Shift+R**) so the browser drops cached CSS and JavaScript and loads this H-ELP desk.
 
 `run.sh` creates `.venv`, installs `requirements.txt`, and starts uvicorn on port **47231**. Another port: `PORT=47241 ./run.sh`.
 
@@ -140,14 +138,14 @@ Reset the bacheca with **Azzera approvazioni** in the student column, `POST /dem
 
 ## Demo, 90 seconds
 
-The UI is in Italian. The clock is frozen at Saturday 24 October 2026, 18:40, Treviso time. The first screen is the access sheet, not the map.
+The UI is in Italian. The clock is frozen at Saturday 24 October 2026, 18:40, Treviso time. The first screen is the access sheet. The student-facing name is **H-ELP**.
 
-1. Email `alex@campus.example`. Password `HackDay!1` (it passes the rule and is then cleared; it is not sent and not stored). The form has no nome or cognome: the desk shows **Alex**, from the mailbox name. Canvas and Pronote are optional links (`https://…`), left empty. Tick **Accetta i termini e servizi**. Press **Entra**.
-2. The preference cards are the 25 tags in `data/tags.json`. Drag or scroll down for LIKE, up for DISLIKE. For the short path, press **Profilo demo: cinema, finanza, gaming, programmazione**. That is the same set as cohort student `usr-001`, not a copy of his row.
-3. The home is the wireframe. **Mappa** is an Esri satellite view of H-FARM at La Serra, Roncade (45.5665, 12.4305). **Bacheca community** lists the synthetic boards (Student Life, Student Office, Age Fund, Professori, Club, Peer help, Shelf) as labels; **Tutte** shows every post. **Calendario** is an iPhone-style month or week grid: **Mese** / **Settimana**, and a tap on a day lists that day's lesson, evening, or approved agenda item. **Prenotazioni** keeps the Prenota button off. The legend matches the slide: red Mandatory, blue Student events, green Sport / community, yellow Campus event. The top card is **Progetto collaborativo: finanza**, Jaccard **0.50**, a yellow pin on Biblioteca because the event says Building 3. Hover or focus that pin: the card names the event, a short line, the score, and **Apri in bacheca** when it is a match. Under **Perché ti consiglio questo** the bacheca card shows two to four Italian sentences. Without `GEMINI_API_KEY` they are the template from the overlapping tags and the score, and they still name `pref-desk-finanza`, `evt-058`, and `loc-library`. With the key, Gemma writes that note and the desk keeps it only when those ids survive.
-4. Press **Tic dell'agente**. The dock fills EVENT, CONTEXT, REASONING, ACTION. The signal is `preference_overlap` (the local profile has no mock email). Status stays `pending`. Nothing is posted yet.
-5. Press **Approva**. A card is stamped **APPESO**. The notice says no email was sent. The smiley is the local session: Esci forgets the browser copy. The password was never kept.
-6. Press **Coorte** and select Andrea Rossi (`usr-002`). His pin moves to the Auditorium, **Laboratorio pratico: UX-UI**, score 0.60. Alex's local notice does not follow him. The forty cohort students are still the shared events store. `usr-001` still matches `evt-058` if you call the API directly.
+1. Nickname `alex.campus`. Email `alex@campus.example`. Password `HackDay!1` (it passes the rule and is then cleared; it is not sent and not stored). Canvas and Pronote are optional links (`https://…`), left empty. Tick **Accetta i termini e servizi**. Press **Entra**. You land on the bacheca. Personalizza is optional, from the button in the rail or the modal.
+2. The bacheca is a vertical feed. Cards are colored by source: Club, Eventi Student Life, Messaggi Student Office, Messaggi docenti. There is no student-to-student chat and no bottom floating action button. Open **Filtri · cerca · personalizza** under the feed for search and the agent match (**Abbina** / **Tic**).
+3. The top bar center is **Chiedi ad H-ELP** and **Sondaggio**. Chiedi opens the campus assistant. Sondaggio is a short local interest poll. The left drawer (Menu on a narrow window) is **Mappa eventi**, **Prenotazioni**, **Feedback**, and **Chatta**. Chatta composes an email to Student Office, Student Life, Age Fund, or a docente. It does not message another student. The send stays in this browser.
+4. **Mappa eventi** opens on Esri satellite imagery of H-FARM at Roncade, with an OpenStreetMap street layer under **Strade**. The legend is red Mandatory, blue Student events, green Sport / community, yellow Campus event. For the cohort student `usr-001` (cinema, finanza, gaming, programmazione) the top Jaccard match is **Community tip exchange: cinema + gaming** (`evt-082`) at **0.75**, Building 1, pin `loc-college`. The same likes on the local desk (`usr-desk`) follow that match. **Progetto collaborativo: finanza** (`evt-058`) stays in the ranking at 0.50 on Building 3. Without `GEMINI_API_KEY` the “perché” is the Italian template and still names `pref-001-cinema`, `evt-082`, and `loc-college`. With the key, Gemma writes that note and the desk keeps it only when those ids survive.
+5. **Tic** prepares one notice. Status stays `pending`. Nothing is posted yet. **Approva** stamps it. The notice says no email was sent. Esci forgets the browser copy. The password was never kept.
+6. The shared store is 55 synthetic students and 120 events. `POST /match` with `usr-001` returns `evt-082` at 0.75. Alex's local notice does not move when you read another student.
 
 Overlap stays in the formula menu. On the local profile the same event scores 1.00 under Overlap, because those two shared tags cover the smaller set.
 
@@ -171,7 +169,7 @@ curl -s -X POST localhost:47231/agent/approve \
 curl -s 'localhost:47231/bacheca?user_id=usr-desk'
 ```
 
-There is no password field on that POST. A `password` key in the JSON is ignored. Cohort match is unchanged: `"user_id":"usr-001"` still returns `evt-058` at 0.50.
+There is no password field on that POST. A `password` key in the JSON is ignored. Cohort match for `"user_id":"usr-001"` returns `evt-082` at 0.75.
 
 Use the `action.id` from the tick response. `decision` may be `approve` or `dismiss`. A second decision on a finished action returns 409, except repeating the same decision, which is idempotent.
 
@@ -183,7 +181,7 @@ Use the `action.id` from the tick response. `decision` may be `approve` or `dism
 | GET | `/tags` | The 25 topic tags used by the swipe cards |
 | POST | `/desk/profile` | Local student. Likes become preferences. No password is stored. Canvas and Pronote are mock strings |
 | GET | `/desk/profile` | That local student, or 404 |
-| GET | `/users` | The forty synthetic students. The local desk user is not in this list |
+| GET | `/users` | The 55 synthetic students. The local desk user is not in this list |
 | GET | `/users/{id}` | One student. Preference ids are indexes over the tag list |
 | POST | `/match` | Body `{"user_id","limit","formula"}`. `formula` is `jaccard` (default) or `overlap`. `weighted` is 422 on this dataset, because the tags have no weights |
 | POST | `/agent/tick` | Body `{"user_id","formula"}`, both optional. One proposal for that student's agent, or `idle` |
@@ -286,15 +284,15 @@ HOS_DATA_DIR=data/generated uvicorn app.main:app --port 47231
 
 ## Visual direction
 
-The three screens follow the paper wireframes: accesso, swipe, then the desk. The signup form asks for an institutional email, the email password, and optional Canvas and Pronote links. Cards are slightly rounded, section titles and the named rail (Bacheca, Mappa, Calendario, Prenotazioni) have a clear border, and a swipe moves the card.
+The student-facing name is **H-ELP**. The desk is accesso, then the vertical bacheca. Personalizza is a modal, not a required swipe. The left drawer lists Bacheca, then Mappa eventi, Prenotazioni, Feedback, and Chatta. The top bar center is **Chiedi ad H-ELP** and **Sondaggio**. Source colors on the feed are Club (purple), Eventi Student Life (green), Messaggi Student Office (blue), and Messaggi docenti (amber). Chatta is an email to the office or a docente, not a student DM. There is no student chat channel and no bottom FAB.
 
-The map is Leaflet on Esri World Imagery, centered on H-FARM at La Serra, Roncade (45.5665, 12.4305), with the Esri boundaries-and-places overlay for labels. Pin positions are the schematic `x`/`y` from `data/places.json`, projected around that point. They are desk placements, not surveyed building corners. Category is not a field in the JSON. The title picks it first: Sessione introduttiva and Laboratorio pratico are red Mandatory, Meetup studenti, Community night, and Sfida a squadre are blue Student events. A sport-like tag on anything else is green Sport / community. The rest are yellow Campus event. A building with more than one category gets one pin per category, nudged apart. Hover, click, or focus opens the Leaflet popup for that pin. **Apri in bacheca** appears when that event is a match. Approva stamps the bacheca card and scrolls it into view.
+The signup form asks for a nickname, an institutional email, that email's password, and optional Canvas and Pronote links. The password is checked in the page and is not stored.
 
-The calendar opens from **Calendario** or the date stack. **Mese** is a Monday-first month grid. **Settimana** is seven day columns. A tap selects the day and lists lezioni, serate after 18:00, and agenda rows created only after **Approva**. The demo clock stays 24 October 2026.
+The map is Leaflet, centered on the published H-FARM campus point at Via Adriano Olivetti, Roncade. The default layer is Esri World Imagery. **Strade** is OpenStreetMap. Pin positions are the schematic `x`/`y` from `data/places.json`, projected around that point. They are desk placements, not surveyed building corners. La Serra has no separate public coordinate in this build. Category is not a field in the JSON. The title picks it first: Sessione introduttiva and Laboratorio pratico are red Mandatory, Meetup studenti, Community night, and Sfida a squadre are blue Student events. A sport-like tag on anything else is green Sport / community. The rest are yellow Campus event. A building with more than one category gets one pin per category, nudged apart. Hover, click, or focus opens the Leaflet popup for that pin.
 
-Colors are sampled from the public [h-farm.com](https://www.h-farm.com) stylesheet on 24 October 2026 (`--primary` `#e2231a`, `--dark` `#202020`, `--gray-100` `#f9f9f9`, `--gray-200` `#f4f2f2`) plus the wireframe cyan rail and campus green. The small required-field red is that primary, darkened so the label stays readable. This is inspired by H-FARM campus visuals. It is not an official brand kit.
+Colors on the feed follow the four sources above. The page also samples the public [h-farm.com](https://www.h-farm.com) stylesheet on 24 October 2026 (`--primary` `#e2231a`, `--dark` `#202020`, `--gray-100` `#f9f9f9`, `--gray-200` `#f4f2f2`) plus campus green. This is inspired by H-FARM campus visuals. It is not an official brand kit.
 
-Prenotazioni stays a labeled stub. Budget, car sharing, and the map bubble stay off: the bubble does not chat and does not post. The calendar is on. The name on screen is H-OS.
+Prenotazioni stays a labeled stub: the Prenota buttons are off. After a clone, use **Ctrl+F5** on [http://127.0.0.1:47231](http://127.0.0.1:47231) so a cached older shell does not hide this H-ELP desk.
 
 ## Inspiration
 

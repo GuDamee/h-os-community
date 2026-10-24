@@ -11,5 +11,5 @@ source .venv/bin/activate
 python -m pip install -q -r requirements.txt
 
 PORT="${PORT:-47231}"
-echo "H-OS → http://127.0.0.1:${PORT}"
+echo "H-ELP → http://127.0.0.1:${PORT}"
 exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT}"

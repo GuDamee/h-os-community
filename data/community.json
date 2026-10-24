@@ -1,969 +1,403 @@
 {
   "synthetic": true,
-  "dataset": "community-feed",
-  "visibility": "public",
-  "note": "Seven public synthetic boards. Authors are fictional. No private messages and no payments.",
-  "contacts": [
-    {
-      "id": "contact-student-life",
-      "source_id": "contact-student-life",
-      "name": "Student Life",
-      "role": "student_life",
-      "email": "student.life@campus.example",
-      "where": "Bacheca e Serra",
-      "note": "Casella fittizia. Nessuna email viene inviata."
-    },
-    {
-      "id": "contact-student-office",
-      "source_id": "contact-student-office",
-      "name": "Student Office",
-      "role": "student_office",
-      "email": "student.office@campus.example",
-      "where": "Reception",
-      "note": "Sportello simulato. Canvas e Pronote non sono collegati."
-    },
-    {
-      "id": "contact-age-fund",
-      "source_id": "contact-age-fund",
-      "name": "Age Fund",
-      "role": "age_fund",
-      "email": "age.fund@campus.example",
-      "where": "Startup Village",
-      "note": "Micro-borse simboliche. Non è un pagamento."
-    },
-    {
-      "id": "contact-ada",
-      "source_id": "contact-ada",
-      "name": "Prof.ssa Ada Demo",
-      "role": "prof",
-      "email": "ada.demo@campus.example",
-      "where": "Digital Lab, Building 2",
-      "note": "Docente fittizia di Programming."
-    },
-    {
-      "id": "contact-mark",
-      "source_id": "contact-mark",
-      "name": "Prof. Mark Demo",
-      "role": "prof",
-      "email": "mark.demo@campus.example",
-      "where": "Building 1",
-      "note": "Docente fittizio di Business English."
-    },
-    {
-      "id": "contact-ivo",
-      "source_id": "contact-ivo",
-      "name": "Prof. Ivo Demo",
-      "role": "prof",
-      "email": "ivo.demo@campus.example",
-      "where": "Biblioteca, Building 3",
-      "note": "Docente fittizio di One Various Calculus."
-    }
-  ],
+  "dataset": "team+community-dense",
+  "timezone": "Europe/Rome",
   "boards": [
     {
-      "id": "board-student-life",
-      "title": "Student Life",
-      "kind": "admin",
-      "owner_role": "student_life",
-      "owner_name": "Student Life — ruolo simulato",
-      "tags": [
-        "networking",
-        "startup"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-generale",
+      "name": "Community",
+      "tag": "campus",
+      "description": "Feed principale. Post ufficiali + aiuto peer.",
+      "messages": [
         {
-          "id": "post-sl-001",
-          "source_id": "post-sl-001",
-          "author_name": "Student Life — ruolo simulato",
-          "author_role": "student_life",
-          "published_at": "2026-10-20T09:00:00+02:00",
-          "title": "Bacheca aperta",
-          "body": "La bacheca di questa demo raccoglie avvisi sintetici di Student Life. Nessun messaggio esce dal campus inventato.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-so1",
+          "author": "Student Office",
+          "role": "admin",
+          "org": "Student Office",
+          "at": "2026-10-24T08:30:00+02:00",
+          "text": "Welcome week: badge office aperto fino alle 18 in Reception. Porta un documento."
         },
         {
-          "id": "post-sl-002",
-          "source_id": "post-sl-002",
-          "author_name": "Student Life — ruolo simulato",
-          "author_role": "student_life",
-          "published_at": "2026-10-22T11:30:00+02:00",
-          "title": "Serata in Serra",
-          "body": "Venerdì dopo le 18 la Serra resta il punto di incontro. È un avviso fittizio: controlla l'evento in Library prima di muoverti.",
-          "tags": [
-            "networking",
-            "musica"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-sl1",
+          "author": "Student Life",
+          "role": "admin",
+          "org": "Student Life",
+          "at": "2026-10-24T09:05:00+02:00",
+          "text": "Aperitivo Big Hall martedi 27 alle 19:00. Iscrizioni su Shelf entro lunedi."
         },
         {
-          "id": "post-sl-003",
-          "source_id": "post-sl-003",
-          "author_name": "Student Life — ruolo simulato",
-          "author_role": "student_life",
-          "published_at": "2026-10-23T16:10:00+02:00",
-          "title": "Club night e gaming",
-          "body": "Il tavolo gaming in Building 2 è prenotabile solo dentro H-OS, in simulazione. Non è un sistema di sale reale.",
-          "tags": [
-            "gaming",
-            "networking"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-af1",
+          "author": "Age Fund Desk",
+          "role": "admin",
+          "org": "Age Fund",
+          "at": "2026-10-24T09:40:00+02:00",
+          "text": "Bando Age Fund micro-grant: deadline venerdi 18:00. Solo progetti con mentor di club o docente."
         },
         {
-          "id": "post-sl-004",
-          "source_id": "post-sl-004",
-          "author_name": "Student Life — ruolo simulato",
-          "author_role": "student_life",
-          "published_at": "2026-10-24T08:40:00+02:00",
-          "title": "Volontari per l'orto",
-          "body": "Cerchiamo mani per l'orto sintetico del dataset. Porta guanti se vuoi, il post non assegna turni veri.",
-          "tags": [
-            "ambiente",
-            "sostenibilita"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-club1",
+          "author": "Coding Club",
+          "role": "admin",
+          "org": "Club",
+          "at": "2026-10-24T10:15:00+02:00",
+          "text": "Jam Programming mercoledi 18:30 in Digital Lab. Porta il laptop; snack da Student Life."
+        },
+        {
+          "id": "msg-prof1",
+          "author": "Prof. Bianchi",
+          "role": "admin",
+          "org": "Faculty",
+          "at": "2026-10-24T11:00:00+02:00",
+          "text": "Business English: martedi 14:30-18, Room College. Portate il case pack stampato."
+        },
+        {
+          "id": "msg-g1",
+          "author": "Giulia R.",
+          "role": "student",
+          "at": "2026-10-24T11:20:00+02:00",
+          "text": "Qualcuno ha gli appunti di One Various Calculus di venerdi? Mi sono persa la parte sulle serie."
+        },
+        {
+          "id": "msg-g2",
+          "author": "Marco T.",
+          "role": "student",
+          "at": "2026-10-24T11:35:00+02:00",
+          "text": "@Giulia te li passo in Studio. Li ho su Drive, li carico anche su Shelf."
+        },
+        {
+          "id": "msg-g3",
+          "author": "Nora V.",
+          "role": "student",
+          "at": "2026-10-24T12:05:00+02:00",
+          "text": "Tip: in Biblioteca i posti vicino alle prese finiscono entro le 10. Arrivate presto nei giorni di Programming."
+        },
+        {
+          "id": "msg-so2",
+          "author": "Student Office",
+          "role": "admin",
+          "org": "Student Office",
+          "at": "2026-10-24T12:10:00+02:00",
+          "text": "Orari Reception aggiornati: Lun-Ven 09-18. Sabato chiuso salvo eventi Age Fund."
+        },
+        {
+          "id": "msg-g4",
+          "author": "Pietro S.",
+          "role": "student",
+          "at": "2026-10-24T13:40:00+02:00",
+          "text": "Cerco peer per ripasso AI + data-science stasera dopo le 18. Biblioteca o Digital Lab?"
+        },
+        {
+          "id": "msg-g5",
+          "author": "Ilaria C.",
+          "role": "student",
+          "at": "2026-10-24T14:10:00+02:00",
+          "text": "Io ci sto in Digital Lab. Porto esercizi su pandas. Unitevi!"
+        },
+        {
+          "id": "msg-sl2",
+          "author": "Student Life",
+          "role": "admin",
+          "org": "Student Life",
+          "at": "2026-10-24T15:00:00+02:00",
+          "text": "Reminder: locker Building College — chiave in Reception con badge."
         }
       ]
     },
     {
-      "id": "board-student-office",
-      "title": "Student Office",
-      "kind": "admin",
-      "owner_role": "student_office",
-      "owner_name": "Student Office — ruolo simulato",
-      "tags": [
-        "networking"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-eventi",
+      "name": "Eventi",
+      "tag": "eventi",
+      "description": "Eventi campus dopo le 18.",
+      "messages": [
         {
-          "id": "post-so-001",
-          "source_id": "post-so-001",
-          "author_name": "Student Office — ruolo simulato",
-          "author_role": "student_office",
-          "published_at": "2026-10-21T08:15:00+02:00",
-          "title": "Sportello di martedì",
-          "body": "Reception, martedì 10:00–13:00. Orario di scena per la demo. Nessuna pratica viene protocollata.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-e1",
+          "author": "Student Life",
+          "role": "admin",
+          "org": "Student Life",
+          "at": "2026-10-24T13:00:00+02:00",
+          "text": "Cinema under the trees · giovedi 19:30, H-Farmers. Portate una coperta."
         },
         {
-          "id": "post-so-002",
-          "source_id": "post-so-002",
-          "author_name": "Student Office — ruolo simulato",
-          "author_role": "student_office",
-          "published_at": "2026-10-23T09:05:00+02:00",
-          "title": "Certificati: solo mock",
-          "body": "Canvas e Pronote restano link facoltativi. Lo Student Office di H-OS non scarica documenti da quei sistemi.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-e2",
+          "author": "Startup Club",
+          "role": "admin",
+          "org": "Club",
+          "at": "2026-10-24T14:20:00+02:00",
+          "text": "Pitch night venerdi 18:30 Auditorium. 5 slot liberi — iscrizione su Shelf."
         },
         {
-          "id": "post-so-003",
-          "source_id": "post-so-003",
-          "author_name": "Student Office — ruolo simulato",
-          "author_role": "student_office",
-          "published_at": "2026-10-24T07:50:00+02:00",
-          "title": "Badge visitatori",
-          "body": "Se porti un ospite in Serra, passa in Reception. Regola scritta per il dataset, non un regolamento ufficiale H-FARM.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-e3",
+          "author": "Leo W.",
+          "role": "student",
+          "at": "2026-10-24T15:00:00+02:00",
+          "text": "Cerco 2 posti in auto verso Treviso dopo il pitch night. Divido benzina."
+        },
+        {
+          "id": "msg-e4",
+          "author": "Design Club",
+          "role": "admin",
+          "org": "Club",
+          "at": "2026-10-24T16:10:00+02:00",
+          "text": "Portfolio clinic UX-UI + design · lunedi 18:15 Building 4. Porta 3 slide."
+        },
+        {
+          "id": "msg-e5",
+          "author": "Emma Q.",
+          "role": "student",
+          "at": "2026-10-24T16:40:00+02:00",
+          "text": "Chi viene al cinema? Organizzo un gruppo in thread Studio."
+        },
+        {
+          "id": "msg-e6",
+          "author": "Green Club",
+          "role": "admin",
+          "org": "Club",
+          "at": "2026-10-24T17:05:00+02:00",
+          "text": "Pulizia argine Sile sabato 10:00. Guanti forniti da Student Life."
         }
       ]
     },
     {
-      "id": "board-age-fund",
-      "title": "Age Fund",
-      "kind": "admin",
-      "owner_role": "age_fund",
-      "owner_name": "Age Fund — sportello simulato",
-      "tags": [
-        "finanza",
-        "sostenibilita",
-        "startup"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-car",
+      "name": "Offerte / car sharing",
+      "tag": "mobilita",
+      "description": "Passaggi peer. Non e un servizio ufficiale H-FARM.",
+      "messages": [
         {
-          "id": "post-af-001",
-          "source_id": "post-af-001",
-          "author_name": "Age Fund — sportello simulato",
-          "author_role": "age_fund",
-          "published_at": "2026-10-18T10:00:00+02:00",
-          "title": "Micro-borse di ottobre",
-          "body": "Age Fund in questa demo assegna borse finte da 50 a 150 euro-simbolo per materiali di progetto. Non c'è un bonifico.",
-          "tags": [
-            "finanza",
-            "startup"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-c1",
+          "author": "Anna B.",
+          "role": "student",
+          "at": "2026-10-24T08:50:00+02:00",
+          "text": "Domani mattina parto da Mestre alle 8:30, 2 posti liberi verso H-FARM."
         },
         {
-          "id": "post-af-002",
-          "source_id": "post-af-002",
-          "author_name": "Age Fund — sportello simulato",
-          "author_role": "age_fund",
-          "published_at": "2026-10-21T14:20:00+02:00",
-          "title": "Fondi per prototipi verdi",
-          "body": "I progetti con tag ambiente o sostenibilità possono chiedere un contributo simbolico. La domanda resta nel browser della demo.",
-          "tags": [
-            "ambiente",
-            "sostenibilita",
-            "finanza"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-c2",
+          "author": "Student Office",
+          "role": "admin",
+          "org": "Student Office",
+          "at": "2026-10-24T09:10:00+02:00",
+          "text": "Promemoria: i passaggi peer non sono assicurati dal campus. Accordatevi in privato."
         },
         {
-          "id": "post-af-003",
-          "source_id": "post-af-003",
-          "author_name": "Age Fund — sportello simulato",
-          "author_role": "age_fund",
-          "published_at": "2026-10-23T12:00:00+02:00",
-          "title": "Niente pagamenti nello scaffale",
-          "body": "Lo scaffale condivide oggetti. Age Fund non incassa e non sostituisce il budget, che in questa scrivania è spento.",
-          "tags": [
-            "finanza"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-c3",
+          "author": "Diego F.",
+          "role": "student",
+          "at": "2026-10-24T17:30:00+02:00",
+          "text": "Ritorno H-FARM → Padova alle 21:15 dopo mixer. 3 posti, divido pedaggio."
+        },
+        {
+          "id": "msg-c4",
+          "author": "Sara H.",
+          "role": "student",
+          "at": "2026-10-24T18:05:00+02:00",
+          "text": "Cerco passaggio da Quarto d'Altino lunedi 8:00. Offro caffe."
+        },
+        {
+          "id": "msg-c5",
+          "author": "Kevin L.",
+          "role": "student",
+          "at": "2026-10-24T18:25:00+02:00",
+          "text": "@Sara ti posso prendere all'ingresso stazione alle 8:05. Scrivimi."
+        },
+        {
+          "id": "msg-c6",
+          "author": "Giada N.",
+          "role": "student",
+          "at": "2026-10-24T19:00:00+02:00",
+          "text": "Tip: il parcheggio nord si riempie entro le 9 nei giorni di Business English."
         }
       ]
     },
     {
-      "id": "board-professori",
-      "title": "Professori",
-      "kind": "admin",
-      "owner_role": "prof",
-      "owner_name": "Ricevimento docenti simulati",
-      "tags": [
-        "AI",
-        "data-science",
-        "marketing",
-        "networking",
-        "programmazione",
-        "robotica"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-studio",
+      "name": "Gruppi studio",
+      "tag": "studio",
+      "description": "Aiuto tra pari su lezioni e progetti.",
+      "messages": [
         {
-          "id": "post-pr-001",
-          "source_id": "post-pr-001",
-          "author_name": "Prof.ssa Ada Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-19T18:00:00+02:00",
-          "title": "Programming, mercoledì e giovedì",
-          "body": "Lezione sintetica: mercoledì e giovedì 10:00–13:30. Porta un portatile. Il corso non è collegato a un registro reale.",
-          "tags": [
-            "programmazione"
-          ],
-          "kind": "office_hours",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s1",
+          "author": "Chiara M.",
+          "role": "student",
+          "at": "2026-10-24T16:00:00+02:00",
+          "text": "Business English martedi 14:30-18. Qualcuno ripassa i dialoghi stasera in Biblioteca?"
         },
         {
-          "id": "post-pr-002",
-          "source_id": "post-pr-002",
-          "author_name": "Prof.ssa Ada Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-22T17:05:00+02:00",
-          "title": "Ricevimento dopo il lab",
-          "body": "Giovedì 14:00–14:40 in Digital Lab, Building 2. Domande su debug e repository. Nessun voto viene scritto da questo post.",
-          "tags": [
-            "programmazione",
-            "robotica"
-          ],
-          "kind": "office_hours",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s2",
+          "author": "Prof. Neri",
+          "role": "admin",
+          "org": "Faculty",
+          "at": "2026-10-24T16:30:00+02:00",
+          "text": "Office hour Programming: mercoledi 13:45-14:30 fuori Digital Lab."
         },
         {
-          "id": "post-pr-003",
-          "source_id": "post-pr-003",
-          "author_name": "Prof.ssa Ada Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-24T09:10:00+02:00",
-          "title": "Esempio di AI sul serio piccolo",
-          "body": "Se ti interessa l'AI, parti da un dataset che sai citare. In H-OS ogni consiglio di evento deve nominare un source_id.",
-          "tags": [
-            "AI",
-            "programmazione",
-            "data-science"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s3",
+          "author": "Ravi P.",
+          "role": "student",
+          "at": "2026-10-24T17:15:00+02:00",
+          "text": "Gruppo Calculus serie · Biblioteca piano terra · oggi 18:20. Porto esercizi."
         },
         {
-          "id": "post-en-001",
-          "source_id": "post-en-001",
-          "author_name": "Prof. Mark Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-20T15:00:00+02:00",
-          "title": "Business English, martedì",
-          "body": "Martedì 14:30–18:00. Corso sintetico di Business English. Si parla di pitch e mail di lavoro, con indirizzi .example.",
-          "tags": [
-            "networking",
-            "marketing"
-          ],
-          "kind": "office_hours",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s4",
+          "author": "Marta Z.",
+          "role": "student",
+          "at": "2026-10-24T17:45:00+02:00",
+          "text": "Cerco buddy cybersecurity CTF-lite. Anche se siete principianti."
         },
         {
-          "id": "post-en-002",
-          "source_id": "post-en-002",
-          "author_name": "Prof. Mark Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-23T18:30:00+02:00",
-          "title": "Tavolo conversation",
-          "body": "Se salti la lezione, il gruppo di conversazione del martedì sera non segna assenze. È un incontro tra studenti del dataset.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s5",
+          "author": "Omar Y.",
+          "role": "student",
+          "at": "2026-10-24T18:10:00+02:00",
+          "text": "@Marta io ci sto. Sala studio Building 3 alle 19."
         },
         {
-          "id": "post-ca-001",
-          "source_id": "post-ca-001",
-          "author_name": "Prof. Ivo Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-17T12:00:00+02:00",
-          "title": "One Various Calculus, venerdì",
-          "body": "Venerdì 12:00–13:30. Il nome del corso nel calendario demo è One Various Calculus. Eserizi sui limiti, niente appello vero.",
-          "tags": [
-            "data-science"
-          ],
-          "kind": "office_hours",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s6",
+          "author": "Elena W.",
+          "role": "student",
+          "at": "2026-10-24T18:35:00+02:00",
+          "text": "Ho caricato su Shelf uno schema riassuntivo marketing + networking per pitch night."
         },
         {
-          "id": "post-ca-002",
-          "source_id": "post-ca-002",
-          "author_name": "Prof. Ivo Demo",
-          "author_role": "prof",
-          "published_at": "2026-10-22T19:40:00+01:00",
-          "title": "Foglio 3, derivate",
-          "body": "Il foglio esercizi è descritto qui, non allegato: tre derivate e un grafico. Chi vuole il gruppo studio usi il thread dedicato.",
-          "tags": [
-            "data-science"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-s7",
+          "author": "Prof. Bianchi",
+          "role": "admin",
+          "org": "Faculty",
+          "at": "2026-10-24T19:05:00+02:00",
+          "text": "Reminder: niente laptop chiuso in Business English — roleplay a coppie."
+        },
+        {
+          "id": "msg-s8",
+          "author": "Felix D.",
+          "role": "student",
+          "at": "2026-10-24T19:20:00+02:00",
+          "text": "Tip flash: Anki deck Programming loops condiviso in thread. Chiedete pure."
         }
       ]
     },
     {
-      "id": "board-club",
-      "title": "Club",
-      "kind": "club",
-      "owner_role": "club",
-      "owner_name": "Club sintetici",
-      "tags": [
-        "AI",
-        "arte",
-        "basket",
-        "calcio",
-        "cinema",
-        "finanza",
-        "fitness",
-        "fotografia",
-        "imprenditoria",
-        "programmazione",
-        "running",
-        "sport",
-        "startup"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-annunci",
+      "name": "Annunci campus",
+      "tag": "annunci",
+      "description": "Avvisi Student Office / Gestione campus / Student Life.",
+      "messages": [
         {
-          "id": "post-cl-001",
-          "source_id": "post-cl-001",
-          "author_name": "Neural Makers Demo",
-          "author_role": "club",
-          "published_at": "2026-10-21T18:45:00+02:00",
-          "title": "Lab modelli piccoli",
-          "body": "Club fittizio. Giovedì sera proviamo un classificatore su dati inventati. Porta curiosità, non un account cloud.",
-          "tags": [
-            "AI",
-            "programmazione"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-a1",
+          "author": "Gestione campus",
+          "role": "admin",
+          "org": "Campus Ops",
+          "at": "2026-10-24T07:55:00+02:00",
+          "text": "La Serra chiude alle 22 questa settimana. Portate il badge."
         },
         {
-          "id": "post-cl-002",
-          "source_id": "post-cl-002",
-          "author_name": "Neural Makers Demo",
-          "author_role": "club",
-          "published_at": "2026-10-23T21:05:00+02:00",
-          "title": "Chi spiega le loss",
-          "body": "Cerchiamo uno studente che racconti in dieci minuti cos'è una loss. Peer help, non una lezione ufficiale.",
-          "tags": [
-            "AI"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-a2",
+          "author": "Student Life",
+          "role": "admin",
+          "org": "Student Life",
+          "at": "2026-10-24T10:40:00+02:00",
+          "text": "Locker disponibili al Building College — richiedi chiave in Reception."
         },
         {
-          "id": "post-cl-003",
-          "source_id": "post-cl-003",
-          "author_name": "Pitch Garage Demo",
-          "author_role": "club",
-          "published_at": "2026-10-20T19:10:00+02:00",
-          "title": "Pitch da 90 secondi",
-          "body": "Lunedì dopo le 18, tre pitch. Il club è sintetico. Age Fund può ascoltare, non firma assegni.",
-          "tags": [
-            "startup",
-            "imprenditoria",
-            "finanza"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-a3",
+          "author": "Student Office",
+          "role": "admin",
+          "org": "Student Office",
+          "at": "2026-10-24T11:50:00+02:00",
+          "text": "Wi-Fi guest per visitatori: chiedete voucher in Reception (validita 24h)."
         },
         {
-          "id": "post-cl-004",
-          "source_id": "post-cl-004",
-          "author_name": "Pitch Garage Demo",
-          "author_role": "club",
-          "published_at": "2026-10-24T10:15:00+02:00",
-          "title": "Numeri di un caso",
-          "body": "Esempio didattico: un banchetto con 40 coperti e un costo finto. Non è la contabilità del campus.",
-          "tags": [
-            "finanza",
-            "startup"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cl-005",
-          "source_id": "post-cl-005",
-          "author_name": "Sport senza esperienza",
-          "author_role": "club",
-          "published_at": "2026-10-22T12:30:00+02:00",
-          "title": "Calcetto alle 20",
-          "body": "Mercoledì 20:00 ai campi. Posto per chi non ha mai giocato. Iscrizione solo dopo approvazione nella demo.",
-          "tags": [
-            "calcio",
-            "sport"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cl-006",
-          "source_id": "post-cl-006",
-          "author_name": "Sport senza esperienza",
-          "author_role": "club",
-          "published_at": "2026-10-23T13:00:00+02:00",
-          "title": "Basket in palazzetto",
-          "body": "Giovedì 19:30. Pallone del club sintetico. Se il basket non ti interessa, la preferenza DISLIKE lo abbassa nel feed.",
-          "tags": [
-            "basket",
-            "sport"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cl-007",
-          "source_id": "post-cl-007",
-          "author_name": "Sport senza esperienza",
-          "author_role": "club",
-          "published_at": "2026-10-24T06:40:00+02:00",
-          "title": "Corsa lungo il Sile",
-          "body": "Domenica 9:00, passo lento, argine. Dato di scena, non un raduno organizzato fuori dalla demo.",
-          "tags": [
-            "running",
-            "fitness"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cl-008",
-          "source_id": "post-cl-008",
-          "author_name": "Cinema e creatività",
-          "author_role": "club",
-          "published_at": "2026-10-19T17:20:00+02:00",
-          "title": "Corto in H-Farmers",
-          "body": "Sabato dopo le 18, un corto inventato e dieci minuti di discussione. La pellicola non esiste fuori dal JSON.",
-          "tags": [
-            "cinema",
-            "arte"
-          ],
-          "kind": "announcement",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cl-009",
-          "source_id": "post-cl-009",
-          "author_name": "Cinema e creatività",
-          "author_role": "club",
-          "published_at": "2026-10-23T15:45:00+02:00",
-          "title": "Passaggio di luci",
-          "body": "Serve una persona in più sulla luce. Peer help di fotografia, non un contratto.",
-          "tags": [
-            "fotografia",
-            "cinema"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-a4",
+          "author": "Age Fund Desk",
+          "role": "admin",
+          "org": "Age Fund",
+          "at": "2026-10-24T14:00:00+02:00",
+          "text": "FAQ Age Fund aggiornata su Shelf. Serve lettera mentor firmata."
         }
       ]
     },
     {
-      "id": "board-peer",
-      "title": "Peer help",
-      "kind": "peer",
-      "owner_role": "student",
-      "owner_name": "Studenti sintetici",
-      "tags": [
-        "AI",
-        "ambiente",
-        "basket",
-        "calcio",
-        "cinema",
-        "cybersecurity",
-        "data-science",
-        "design",
-        "finanza",
-        "fotografia",
-        "gaming",
-        "musica",
-        "programmazione",
-        "robotica",
-        "startup",
-        "teatro"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-gaming",
+      "name": "Gaming & jam",
+      "tag": "gaming",
+      "description": "Lobby e jam organizzate dai club + peer.",
+      "messages": [
         {
-          "id": "post-ph-001",
-          "source_id": "post-ph-001",
-          "author_name": "Lea Demo",
-          "author_role": "student",
-          "published_at": "2026-10-24T11:05:00+02:00",
-          "title": "Chi ha visto l'errore sul puntatore",
-          "body": "Sto ferma su un segmentation fault dell'esercizio di Programming. Se hai 15 minuti in Digital Lab, scrivi sotto. Nessun file privato è allegato.",
-          "tags": [
-            "programmazione"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-gm1",
+          "author": "Gaming Club",
+          "role": "admin",
+          "org": "Club",
+          "at": "2026-10-24T17:00:00+02:00",
+          "text": "Lobby Rocket League stasera 18:30 Building 5. Bring headset."
         },
         {
-          "id": "post-ph-002",
-          "source_id": "post-ph-002",
-          "author_name": "Nico Demo",
-          "author_role": "student",
-          "published_at": "2026-10-23T20:12:00+02:00",
-          "title": "Appunti di finanza, due pagine",
-          "body": "Ho riscritto a mano lo schema ricavi-costi del pitch. Lo lascio nello scaffale come quaderno condiviso, non è una dispensa ufficiale.",
-          "tags": [
-            "finanza",
-            "startup"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-gm2",
+          "author": "Sam K.",
+          "role": "student",
+          "at": "2026-10-24T17:20:00+02:00",
+          "text": "Ci sono! Cerco duo ranked."
         },
         {
-          "id": "post-ph-003",
-          "source_id": "post-ph-003",
-          "author_name": "Sara Demo",
-          "author_role": "student",
-          "published_at": "2026-10-22T21:18:00+02:00",
-          "title": "Prove di basso",
-          "body": "Cerco una sala quieta per 40 minuti di scale. La Serra dopo le 18 è già piena. Idee?",
-          "tags": [
-            "musica"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-gm3",
+          "author": "Noemi G.",
+          "role": "student",
+          "at": "2026-10-24T17:50:00+02:00",
+          "text": "Jam Unity beginners dopo la lobby. Porto snack."
         },
         {
-          "id": "post-ph-004",
-          "source_id": "post-ph-004",
-          "author_name": "Pietro Demo",
-          "author_role": "student",
-          "published_at": "2026-10-21T16:42:00+02:00",
-          "title": "Password manager, dubbio",
-          "body": "Domanda di cybersecurity da principiante: meglio una passphrase lunga o un gestore. Risposte pubbliche, niente segreti veri nel thread.",
-          "tags": [
-            "cybersecurity"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-ph-005",
-          "source_id": "post-ph-005",
-          "author_name": "Irene Demo",
-          "author_role": "student",
-          "published_at": "2026-10-24T08:05:00+02:00",
-          "title": "Griglia per un poster",
-          "body": "Devo chiudere un poster UX per domani. Cerco occhi sul contrasto, non un redesign completo.",
-          "tags": [
-            "UX-UI",
-            "design"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-ph-006",
-          "source_id": "post-ph-006",
-          "author_name": "Omar Demo",
-          "author_role": "student",
-          "published_at": "2026-10-23T19:28:00+02:00",
-          "title": "Dataset per un piccolo modello",
-          "body": "Qualcuno ha un CSV sintetico già pulito per provare una regressione? Non caricare dati di persone vere.",
-          "tags": [
-            "AI",
-            "data-science"
-          ],
-          "kind": "peer_help",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-001",
-          "source_id": "post-sg-001",
-          "author_name": "Lea Demo",
-          "author_role": "student",
-          "published_at": "2026-10-22T18:00:00+02:00",
-          "title": "Gruppo Programming, mercoledì 14:30",
-          "body": "Dopo la lezione 10:00–13:30 restiamo in lab fino alle 15:30. Quattro posti. È un gruppo studio, non una classe parallela.",
-          "tags": [
-            "programmazione"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-002",
-          "source_id": "post-sg-002",
-          "author_name": "Nico Demo",
-          "author_role": "student",
-          "published_at": "2026-10-23T18:50:00+02:00",
-          "title": "One Various Calculus, giovedì sera",
-          "body": "Ripassiamo il foglio del venerdì 12:00. Building 3, tavolo in biblioteca, 18:30. Portate il grafico, non la soluzione di un compito reale.",
-          "tags": [
-            "data-science"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-003",
-          "source_id": "post-sg-003",
-          "author_name": "Sara Demo",
-          "author_role": "student",
-          "published_at": "2026-10-24T09:40:00+02:00",
-          "title": "Tavolo finanza prima del pitch",
-          "body": "Domenica 17:00, tre persone, conti di un caso inventato. Se la finanza non ti piace, questo post scende nel feed.",
-          "tags": [
-            "finanza"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-004",
-          "source_id": "post-sg-004",
-          "author_name": "Pietro Demo",
-          "author_role": "student",
-          "published_at": "2026-10-21T19:00:00+02:00",
-          "title": "Schemi di basket",
-          "body": "Prima del palazzetto di giovedì guardiamo due schemi su carta. Nessun allenatore, solo studenti.",
-          "tags": [
-            "basket",
-            "sport"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-005",
-          "source_id": "post-sg-005",
-          "author_name": "Irene Demo",
-          "author_role": "student",
-          "published_at": "2026-10-20T11:20:00+02:00",
-          "title": "Game jam di lettura",
-          "body": "Leggiamo insieme le regole di un gioco da tavolo del club, sabato 11:00. Gaming leggero, principianti benvenuti.",
-          "tags": [
-            "gaming"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-sg-006",
-          "source_id": "post-sg-006",
-          "author_name": "Omar Demo",
-          "author_role": "student",
-          "published_at": "2026-10-19T19:30:00+02:00",
-          "title": "Lettura scena teatro",
-          "body": "Due pagine di un testo di scena, martedì 19:00 in auditorium vuoto. Si legge ad alta voce e ci si ferma.",
-          "tags": [
-            "teatro",
-            "arte"
-          ],
-          "kind": "study_group",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cs-001",
-          "source_id": "post-cs-001",
-          "author_name": "Irene Demo",
-          "author_role": "student",
-          "published_at": "2026-10-24T07:10:00+02:00",
-          "title": "Treviso → campus, martedì 14:00",
-          "body": "Ho due posti per arrivare prima di Business English. Partenza sintetica da Treviso centro. Non è un servizio taxi e non si paga in app.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "car_share",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cs-002",
-          "source_id": "post-cs-002",
-          "author_name": "Omar Demo",
-          "author_role": "student",
-          "published_at": "2026-10-23T22:05:00+02:00",
-          "title": "Dopo il corto, verso Mestre",
-          "body": "Sabato a fine proiezione (dopo le 18) torno verso Mestre. Un posto. Combinazione solo in questo thread pubblico.",
-          "tags": [
-            "cinema"
-          ],
-          "kind": "car_share",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cs-003",
-          "source_id": "post-cs-003",
-          "author_name": "Lea Demo",
-          "author_role": "student",
-          "published_at": "2026-10-22T20:40:00+02:00",
-          "title": "Campi, rientro 21:30",
-          "body": "Dopo il calcetto delle 20 posso lasciare una persona a Roncade stazione. Il passaggio è fittizio, niente numero di telefono vero.",
-          "tags": [
-            "calcio",
-            "sport"
-          ],
-          "kind": "car_share",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-cs-004",
-          "source_id": "post-cs-004",
-          "author_name": "Nico Demo",
-          "author_role": "student",
-          "published_at": "2026-10-21T13:25:00+02:00",
-          "title": "Prove musicali, giovedì",
-          "body": "Vengo da Venezia, giovedì 18:15, un posto se hai lo strumento piccolo. Basso escluso, non entra.",
-          "tags": [
-            "musica"
-          ],
-          "kind": "car_share",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-tp-001",
-          "source_id": "post-tp-001",
-          "author_name": "Sara Demo",
-          "author_role": "student",
-          "published_at": "2026-10-18T15:12:00+02:00",
-          "title": "La Serra al pomeriggio",
-          "body": "Tra le 15 e le 17 il tavolo lungo è più libero che a pranzo. Osservazione dei personaggi sintetici, non una regola del locale.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-tp-002",
-          "source_id": "post-tp-002",
-          "author_name": "Pietro Demo",
-          "author_role": "student",
-          "published_at": "2026-10-20T08:55:00+02:00",
-          "title": "Stampante della biblioteca",
-          "body": "Il codice ospite del dataset è DEMO-000, e non stampa davvero. Se ti serve una copia, chiedi allo Student Office simulato.",
-          "tags": [
-            "design"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-tp-003",
-          "source_id": "post-tp-003",
-          "author_name": "Omar Demo",
-          "author_role": "student",
-          "published_at": "2026-10-22T07:35:00+02:00",
-          "title": "Bici sull'argine",
-          "body": "La pista lungo il Sile nel JSON è pianeggiante. Porta una luce se esci dopo le 18. Non è un bollettino meteo.",
-          "tags": [
-            "running",
-            "ambiente"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
-        },
-        {
-          "id": "post-tp-004",
-          "source_id": "post-tp-004",
-          "author_name": "Irene Demo",
-          "author_role": "student",
-          "published_at": "2026-10-23T10:48:00+02:00",
-          "title": "Braccio robotico, reset",
-          "body": "Se il braccio del lab resta a metà corsa, il pulsante rosso di scena lo rimette a zero. È un tip del dataset, non un manuale del produttore.",
-          "tags": [
-            "robotica"
-          ],
-          "kind": "tip",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-gm4",
+          "author": "Tommaso B.",
+          "role": "student",
+          "at": "2026-10-24T18:15:00+02:00",
+          "text": "Qualcuno ha un cavo HDMI di scorta? Il monitor del club ne mangia uno a settimana."
         }
       ]
     },
     {
-      "id": "board-shelf",
-      "title": "Scaffale",
-      "kind": "shelf",
-      "owner_role": "student",
-      "owner_name": "Scaffale condiviso",
-      "tags": [
-        "cinema",
-        "finanza",
-        "fotografia",
-        "programmazione"
-      ],
-      "synthetic": true,
-      "posts": [
+      "id": "board-tips",
+      "name": "Tips & lifehacks",
+      "tag": "tips",
+      "description": "Consigli peer su campus, lezioni, cibo, focus.",
+      "messages": [
         {
-          "id": "post-sh-001",
-          "source_id": "post-sh-001",
-          "author_name": "Lea Demo",
-          "author_role": "student",
-          "published_at": "2026-10-19T13:40:00+02:00",
-          "title": "Manuale C in prestito",
-          "body": "Lascio un manuale di C sullo scaffale in biblioteca per una settimana. Si condivide, non si vende. Il budget della scrivania resta spento.",
-          "tags": [
-            "programmazione"
-          ],
-          "kind": "share",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-t1",
+          "author": "Giulia R.",
+          "role": "student",
+          "at": "2026-10-24T09:30:00+02:00",
+          "text": "Mensa: il turno 12:40 e il piu corto il mercoledi (giorno Programming)."
         },
         {
-          "id": "post-sh-002",
-          "source_id": "post-sh-002",
-          "author_name": "Nico Demo",
-          "author_role": "student",
-          "published_at": "2026-10-21T11:11:00+02:00",
-          "title": "Quaderno dei pitch",
-          "body": "Quaderno con schemi di conto economico finti. Prendilo e riportalo. Age Fund non lo rivende.",
-          "tags": [
-            "finanza",
-            "startup"
-          ],
-          "kind": "share",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-t2",
+          "author": "Marco T.",
+          "role": "student",
+          "at": "2026-10-24T10:00:00+02:00",
+          "text": "Stampante Building 3: coda corta prima delle 09:15."
         },
         {
-          "id": "post-sh-003",
-          "source_id": "post-sh-003",
-          "author_name": "Sara Demo",
-          "author_role": "student",
-          "published_at": "2026-10-22T16:16:00+02:00",
-          "title": "Treppiede per H-Farmers",
-          "body": "Treppiede disponibile sabato per il corto. Prenotalo con un messaggio pubblico, non in privato.",
-          "tags": [
-            "fotografia",
-            "cinema"
-          ],
-          "kind": "share",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-t3",
+          "author": "Student Life",
+          "role": "admin",
+          "org": "Student Life",
+          "at": "2026-10-24T10:20:00+02:00",
+          "text": "Hydration stations: H-Farmers e Argine. Portate la borraccia."
         },
         {
-          "id": "post-sh-004",
-          "source_id": "post-sh-004",
-          "author_name": "Pietro Demo",
-          "author_role": "student",
-          "published_at": "2026-10-24T08:20:00+02:00",
-          "title": "Caricatore USB-C",
-          "body": "Un caricatore di scorta al bancone Reception, etichetta DEMO. Se lo prendi, rimettilo entro sera.",
-          "tags": [
-            "networking"
-          ],
-          "kind": "share",
-          "synthetic": true,
-          "visibility": "public"
+          "id": "msg-t4",
+          "author": "Chiara M.",
+          "role": "student",
+          "at": "2026-10-24T12:30:00+02:00",
+          "text": "Per Business English: sedersi in seconda fila aiuta per i roleplay."
+        },
+        {
+          "id": "msg-t5",
+          "author": "Leo W.",
+          "role": "student",
+          "at": "2026-10-24T15:45:00+02:00",
+          "text": "Focus tip: silenzio totale in Biblioteca zona nord dopo le 18."
+        },
+        {
+          "id": "msg-t6",
+          "author": "Anna B.",
+          "role": "student",
+          "at": "2026-10-24T16:20:00+02:00",
+          "text": "Se perdete il badge: Reception fa duplicato demo in 20 minuti (sintetico)."
         }
       ]
     }

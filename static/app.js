@@ -1,6 +1,4 @@
-const CAPTION = "Esri World Imagery sul campus H-FARM, La Serra, Roncade (45.5665, 12.4305). I pin restano lo schema del dataset, non un rilievo. Nessuna chiave Google.";
-const CAMPUS_CENTER = [45.5665, 12.4305];
-const CAMPUS_ZOOM = 18;
+const CAPTION = "Esri World Imagery · H-FARM College / Campus, Roncade (La Serra · Via Sile). Satellite di default; pin schematici sugli edifici del dataset. Non è un rilievo ufficiale.";
 const KIND = { user: "persona", preference: "pref", event: "evento", place: "luogo", email: "mail" };
 
 const state = {
@@ -24,30 +22,93 @@ const state = {
   deskUser: null,
   screen: "access",
   flashNotice: false,
-  view: "community",
-  recommendations: [],
-  posts: [],
   boards: [],
-  contacts: [],
+  activeBoardId: null,
+  activeBoard: null,
   calendar: null,
-  agenda: [],
-  feedback: [],
-  proposal: null,
-  chat: [],
-  calendarMode: "month",
-  calendarAnchor: null,
-  boardFilter: "",
-  eventModalId: null,
+  deskPanel: "home",
+  chatBusy: false,
+  boardFilter: "Tutti",
+  boardSearch: "",
+  boardStatus: "programmati",
+  interestDraft: new Set(),
+  enrolledIds: new Set(),
+  boardPosts: [],
+  sourceFilter: "Tutti",
 };
 
-const SESSION_KEY = "hos.session.v1";
+const SESSION_KEY = "hos.session.v4";
+const SESSION_LEGACY_KEYS = ["hos.session.v3", "hos.session.v2", "hos.session"];
 const DEMO_LIKES = ["cinema", "finanza", "gaming", "programmazione"];
+
+const INTEREST_GROUPS = [
+  { id: "ai", label: "AI e tecnologia", icon: "◆", tags: ["AI", "data-science", "programmazione", "robotica", "cybersecurity"] },
+  { id: "startup", label: "Startup e business", icon: "↗", tags: ["startup", "imprenditoria", "marketing", "finanza", "networking"] },
+  { id: "sport", label: "Sport e movimento", icon: "●", tags: ["sport", "fitness", "calcio", "basket", "running"] },
+  { id: "musica", label: "Musica", icon: "♪", tags: ["musica"] },
+  { id: "cinema", label: "Cinema e creatività", icon: "✦", tags: ["cinema", "arte", "fotografia", "teatro", "design", "UX-UI"] },
+  { id: "gaming", label: "Gaming", icon: "+", tags: ["gaming"] },
+  { id: "sosten", label: "Sostenibilità", icon: "❀", tags: ["sostenibilita", "ambiente"] },
+  { id: "culture", label: "Culture e nuove amicizie", icon: "◎", tags: ["networking", "teatro"] },
+];
+
+const FEEDBACK_CHIPS = [
+  "Ottimo evento",
+  "Orario scomodo",
+  "Location poco chiara",
+  "Servirebbero piu posti",
+  "Docente / host chiaro",
+  "Vorrei un follow-up",
+];
+const SOURCE_TYPES = [
+  { id: "club", label: "Club", css: "src-club" },
+  { id: "life", label: "Eventi Student Life", css: "src-life" },
+  { id: "office", label: "Messaggi Student Office", css: "src-office" },
+  { id: "faculty", label: "Messaggi docenti", css: "src-faculty" },
+];
+const SOURCE_BY_ID = Object.fromEntries(SOURCE_TYPES.map((s) => [s.id, s]));
+const CHATTA_RECIPIENTS = [
+  { email: "life@campus.demo", name: "Student Life", keys: ["student life", "aperitivo", "evento", "club", "big hall", "serata", "iscriv"] },
+  { email: "reception@campus.demo", name: "Student Office", keys: ["student office", "reception", "badge", "documento", "orari", "locker", "ufficio"] },
+  { email: "age.fund@campus.demo", name: "Age Fund Desk", keys: ["age fund", "grant", "bando", "fond"] },
+  { email: "bianchi@faculty.demo", name: "Prof. Bianchi (Business English)", keys: ["bianchi", "business english", "inglese"] },
+  { email: "rossi@faculty.demo", name: "Prof. Rossi (AI Data Science)", keys: ["rossi", "data science", "ai ", "machine learning"] },
+  { email: "verdi@faculty.demo", name: "Prof. Verdi (Calculus)", keys: ["verdi", "calculus", "calcolo", "serie"] },
+];
+const SURVEY_KEY = "hos.surveys.v2";
+const SURVEY_INTERESTS = [
+  "AI e tecnologia",
+  "Startup e business",
+  "Sport e movimento",
+  "Musica",
+  "Cinema e creatività",
+  "Gaming",
+  "Sostenibilità",
+  "Culture e amicizie",
+];
+const SURVEY_WANTS = [
+  "Eventi Student Life",
+  "Workshop / skill",
+  "Sport e benessere",
+  "Supporto Student Office",
+  "Incontri con docenti",
+];
+const SURVEY_TO = [
+  { id: "life", label: "Student Life" },
+  { id: "office", label: "Student Office" },
+  { id: "both", label: "Entrambi" },
+];
+let bootReady = null;
+let bootResolve = null;
+bootReady = new Promise((resolve) => { bootResolve = resolve; });
 
 let boardLoad = 0;
 let campusMap = null;
 let pinLayer = null;
 let pinCloseTimer = null;
+let mapFitted = false;
 
+const CAMPUS_CENTER = [45.5665, 12.4305]; // H-FARM College / Campus · Nominatim 2026-10-24
 const SPORT_TAGS = new Set(["sport", "fitness", "calcio", "basket", "running", "ambiente", "sostenibilita"]);
 const PIN_KIND = {
   mandatory: "Mandatory",
@@ -73,37 +134,20 @@ window.addEventListener("hashchange", () => {
 });
 
 document.getElementById("access-form").addEventListener("submit", submitAccess);
-document.getElementById("like-btn").addEventListener("click", () => decideCurrent("like"));
-document.getElementById("dislike-btn").addEventListener("click", () => decideCurrent("dislike"));
-document.getElementById("skip-btn").addEventListener("click", () => decideCurrent("skip"));
-document.getElementById("pref-grid").addEventListener("click", (event) => {
-  const button = event.target.closest("[data-tag][data-value]");
-  if (!button || !state.session) return;
-  setTagChoice(button.dataset.tag, button.dataset.value);
-  renderSwipe();
-});
-document.getElementById("assistant-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const input = document.getElementById("assistant-question");
-  askAssistant(input.value);
-  input.value = "";
-});
-document.getElementById("feedback-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  sendFeedback();
-});
-document.getElementById("feedback-event").addEventListener("change", () => {
-  const select = document.getElementById("feedback-event");
-  const event = state.events.find((item) => item.id === select.value);
-  if (event?.starts_at) document.getElementById("feedback-date").value = event.starts_at.slice(0, 10);
-  feedbackSubject();
-});
-document.getElementById("feedback-date").addEventListener("change", feedbackSubject);
+document.getElementById("like-btn").addEventListener("click", () => decideCurrent(true));
+document.getElementById("dislike-btn").addEventListener("click", () => decideCurrent(false));
+document.getElementById("skip-btn")?.addEventListener("click", () => decideCurrent("skip"));
 document.getElementById("enter-map").addEventListener("click", () => enterDesk());
 document.getElementById("demo-likes").addEventListener("click", useDemoLikes);
+document.getElementById("reset-onboarding")?.addEventListener("click", resetOnboarding);
 wireSwipe();
+wireAssistantForm();
+wireFeedbackForm();
+wirePersonalize();
+wireChattaForm();
+wireSurveyUI();
 
-document.getElementById("formula").addEventListener("change", (event) => {
+document.getElementById("formula")?.addEventListener("change", (event) => {
   if (state.busy) {
     event.target.value = state.formula;
     return;
@@ -111,144 +155,79 @@ document.getElementById("formula").addEventListener("change", (event) => {
   state.formula = event.target.value;
   if (state.selectedId) refreshStudent();
 });
+document.getElementById("restart-cards")?.addEventListener("click", restartPreferenceCards);
+const accessSubmitBtn = document.querySelector("#access-form button[type='submit']");
+if (accessSubmitBtn) {
+  accessSubmitBtn.disabled = true;
+  accessSubmitBtn.dataset.wait = "1";
+}
 
-wirePersonalize();
 boot();
 
-function wirePersonalize() {
-  const dialog = document.getElementById("personalize-modal");
-  if (dialog && dialog.dataset.wired !== "1") {
-    dialog.dataset.wired = "1";
-    dialog.addEventListener("click", (event) => {
-      const chip = event.target.closest("[data-chip]");
-      if (chip) {
-        event.preventDefault();
-        togglePersonalChip(chip.dataset.chip);
-        return;
-      }
-      if (event.target.closest("[data-personalize='save']")) {
-        event.preventDefault();
-        savePersonalize();
-      }
-    });
-  }
-  for (const button of document.querySelectorAll("[data-open='personalize']")) {
-    if (button.dataset.wired === "1") continue;
-    button.dataset.wired = "1";
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      openPersonalize();
-    });
-  }
-}
-
-function openPersonalize() {
-  renderPersonalizeChips();
-  const dialog = document.getElementById("personalize-modal");
-  const status = document.getElementById("personalize-status");
-  if (status) status.textContent = state.session ? "Tocca un chip per tenerlo o lasciarlo." : "Entra prima, poi i chip restano attivi.";
-  if (dialog && !dialog.open) dialog.showModal();
-}
-
-function renderPersonalizeChips() {
-  const box = document.getElementById("personalize-chips");
-  if (!box) return;
-  const likes = new Set(state.session?.likes || []);
-  box.replaceChildren();
-  const tags = state.tags.length ? state.tags : Object.keys(TAG_NOTES);
-  for (const tag of tags) {
-    box.append(el("button", {
-      type: "button",
-      class: "pref-chip",
-      "data-chip": tag,
-      "aria-pressed": likes.has(tag) ? "true" : "false",
-      text: tag,
-    }));
-  }
-}
-
-function togglePersonalChip(tag) {
-  const status = document.getElementById("personalize-status");
-  if (!state.session) {
-    if (status) status.textContent = "Entra con email e password, poi Personalizza risponde al tap.";
-    return;
-  }
-  const likes = new Set(state.session.likes || []);
-  if (likes.has(tag)) likes.delete(tag);
-  else likes.add(tag);
-  state.session.likes = [...likes];
-  state.session.dislikes = (state.session.dislikes || []).filter((item) => !likes.has(item));
-  state.session.skipped = (state.session.skipped || []).filter((item) => !likes.has(item));
-  saveSession(state.session);
-  renderPersonalizeChips();
-  if (status) status.textContent = likes.has(tag) ? `${tag} scelto.` : `${tag} tolto.`;
-}
-
-async function savePersonalize() {
-  const dialog = document.getElementById("personalize-modal");
-  if (!state.session) return;
-  if (!state.session.likes.length) {
-    const status = document.getElementById("personalize-status");
-    if (status) status.textContent = "Tieni almeno un interesse.";
-    return;
-  }
-  state.session.prefsConfirmed = true;
-  saveSession(state.session);
-  if (dialog?.open) dialog.close();
-  state.deskUser = deskUserFromSession();
-  state.selectedId = state.selectedId || "usr-desk";
-  if (state.screen !== "desk") {
-    showScreen("desk");
-    showView("community");
-  }
-  try {
-    await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
-    await refreshStudent();
-  } catch (error) {
-    state.error = error.message || "Preferenze non salvate.";
-    render();
-  }
-}
-
 async function boot() {
-  wirePersonalize();
   try {
-    const [health, users, events, places, tags] = await Promise.all([
+    const [health, users, events, places, tags, boards, calendar] = await Promise.all([
       api("/health"),
       api("/users"),
       api("/events"),
       api("/places"),
       api("/tags"),
+      api("/community/boards"),
+      api("/calendar"),
     ]);
     state.health = health;
     state.users = users.users;
     state.events = events.events;
     state.places = places.places;
-    state.tags = tags.tags;
+    state.tags = normalizeTagList(tags && tags.tags);
+    state.boards = boards.boards || [];
+    state.calendar = calendar;
     state.session = loadSession();
-    renderPersonalizeChips();
+    if (state.session) sanitizeSessionTags(state.session, true);
     paintDate();
-    const gate = document.getElementById("gate-status");
-    if (gate) gate.textContent = "";
-    if (state.session && state.session.prefsConfirmed && state.session.likes.length) {
+    const readyBtn = document.querySelector("#access-form button[type='submit']");
+    if (readyBtn) {
+      readyBtn.disabled = false;
+      delete readyBtn.dataset.wait;
+    }
+    if (state.session) {
       state.deskUser = deskUserFromSession();
       const requested = location.hash.replace("#", "");
       state.selectedId = state.users.some((user) => user.id === requested) ? requested : "usr-desk";
       if (state.selectedId !== "usr-desk") document.getElementById("roster").hidden = false;
       showScreen("desk");
-      showView("community");
-      await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
-      await refreshStudent();
-    } else if (state.session) {
-      showScreen("prefs");
+      paintExternalLinks();
+      focusSection("bacheca");
+      if ((state.session.likes || []).length) {
+        try {
+          await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
+        } catch (_) { /* ignore stale profile */ }
+        await refreshStudent();
+      } else {
+        state.matches = [];
+        state.busy = null;
+        render();
+      }
+      await ensureCommunitySeed();
+      renderFilterPills();
+      renderIgFeed();
+      if (!(state.session.likes || []).length) {
+        window.setTimeout(() => openPersonalizeModal(true), 400);
+      }
     } else {
       showScreen("access");
     }
   } catch (error) {
-    state.error = error.message || "H-OS non risponde.";
-    const gate = document.getElementById("gate-status");
-    if (gate) gate.textContent = state.error;
-    showScreen(state.session ? "prefs" : "access");
+    state.error = error.message || "H-ELP non risponde.";
+    if (!state.tags.length) state.tags = normalizeTagList([]);
+    showScreen("access");
+    const err = document.getElementById("error");
+    if (err) {
+      err.hidden = false;
+      err.textContent = state.error;
+    }
+  } finally {
+    if (bootResolve) bootResolve();
   }
 }
 
@@ -256,7 +235,7 @@ async function refreshStudent() {
   const requestedId = state.selectedId;
   const generation = ++boardLoad;
   const person = selected();
-  if (person) document.title = `H-OS · ${person.name}`;
+  if (person) document.title = `H-ELP · ${person.name}`;
   state.busy = "match";
   state.error = null;
   state.idleReason = null;
@@ -266,18 +245,13 @@ async function refreshStudent() {
   state.method = null;
   render();
   try {
-    const [match, actions, board, recs, feed, calendar, agenda, feedback] = await Promise.all([
+    const [match, actions, board] = await Promise.all([
       api("/match", {
         method: "POST",
         body: JSON.stringify({ user_id: requestedId, limit: 4, formula: state.formula }),
       }),
       api(`/agent/actions?user_id=${encodeURIComponent(requestedId)}`),
       api(`/bacheca?user_id=${encodeURIComponent(requestedId)}`),
-      api(`/recommendations?user_id=${encodeURIComponent(requestedId)}&limit=5`),
-      api(`/community?user_id=${encodeURIComponent(requestedId)}`),
-      api(`/calendar?user_id=${encodeURIComponent(requestedId)}`),
-      api(`/agenda?user_id=${encodeURIComponent(requestedId)}`),
-      api("/feedback"),
     ]);
     if (generation !== boardLoad || state.selectedId !== requestedId) return;
     state.matches = match.matches;
@@ -285,15 +259,8 @@ async function refreshStudent() {
     state.displayBy = match.display_by;
     state.actions = actions.actions;
     state.notices = board.notices;
-    state.recommendations = recs.recommendations || [];
-    state.posts = feed.posts || [];
-    state.boards = feed.boards || [];
-    state.contacts = feed.contacts || [];
-    state.calendar = calendar;
-    state.agenda = agenda.registrations || [];
-    state.feedback = feedback.feedback || [];
     history.replaceState(null, "", `#${requestedId}`);
-    document.title = `H-OS · ${selected().name}`;
+    document.title = `H-ELP · ${selected().name}`;
   } catch (error) {
     if (generation !== boardLoad || state.selectedId !== requestedId) return;
     state.error = friendlyError(error);
@@ -396,10 +363,39 @@ function onClick(event) {
   if (!target) return;
   const action = target.dataset.action;
   const id = target.dataset.id;
-  if (state.busy && !["source", "prefs", "section", "ai", "ai-close", "ask-suggest", "cal-mode", "cal-shift", "cal-today", "cal-day", "board-filter", "event-open", "event-ask"].includes(action)) return;
+  if (state.busy && action !== "source") return;
   if (action === "match") refreshStudent();
-  else if (action === "section") showView(id);
-  else if (action === "prefs") showScreen("prefs");
+  else if (action === "section") {
+    focusSection(id);
+    document.body.classList.remove("hy-rail-open");
+  } else if (action === "chatta-suggest") {
+    suggestChattaRecipient();
+  } else if (action === "survey-save") {
+    saveSurvey(id);
+  } else if (action === "open-survey") {
+    openSurveyDialog(true);
+  } else if (action === "close-survey") {
+    openSurveyDialog(false);
+  } else if (action === "survey-submit") {
+    submitInterestSurvey();
+  }
+  else if (action === "prefs" || action === "personalize") openPersonalizeModal(true);
+  else if (action === "filter-pill") {
+    state.sourceFilter = id || "Tutti";
+    state.boardFilter = id || "Tutti";
+    renderFilterPills();
+    renderIgFeed();
+  } else if (action === "toggle-interest") {
+    toggleInterestDraft(id);
+  } else if (action === "scopri") {
+    if (id) openEventDetail(id);
+  } else if (action === "event-enroll") {
+    if (id) enrollEvent(id);
+  } else if (action === "event-unroll") {
+    if (id) unrollEvent(id);
+  } else if (action === "event-ask") {
+    if (id) askAboutEvent(id);
+  }
   else if (action === "cohort") document.getElementById("roster").hidden = !document.getElementById("roster").hidden;
   else if (action === "you") {
     const panel = document.getElementById("you-panel");
@@ -417,57 +413,63 @@ function onClick(event) {
     document.getElementById(`card-${id}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   } else if (action === "source") openSource(id);
   else if (action === "reset") resetDemo();
-  else if (action === "ai" || action === "ai-close") toggleAssistant(action === "ai");
-  else if (action === "ask-suggest") {
-    setAssistant(true);
-    askAssistant(id);
+  else if (action === "stub" || action === "close-stub") toggleStub(action === "stub");
+  else if (action === "open-ai") openAiOverlay(true);
+  else if (action === "open-map") openMapAt(id);
+  else if (action === "close-ai") openAiOverlay(false);
+  else if (action === "ext-canvas" || action === "ext-pronote") {
+    const href = target.getAttribute("href") || "";
+    if (!href || href === "#") {
+      event.preventDefault();
+      state.error = action === "ext-canvas"
+        ? "Aggiungi il link Canvas in accesso (facoltativo)."
+        : "Aggiungi il link Pronote in accesso (facoltativo).";
+      const err = document.getElementById("error");
+      if (err) { err.hidden = false; err.textContent = state.error; }
+    }
   }
-  else if (action === "propose") proposeRegistration(id);
-  else if (action === "approve-reg") approveRegistration();
-  else if (action === "reject-reg") rejectRegistration();
-  else if (action === "feedback-chip") {
-    const pressed = target.getAttribute("aria-pressed") === "true";
-    target.setAttribute("aria-pressed", pressed ? "false" : "true");
+  else if (action === "open-board" || action === "ig-tab") {
+    focusSection("bacheca");
+    showIgTab("feed");
   }
-  else if (action === "cal-mode") {
-    state.calendarMode = target.dataset.mode === "week" ? "week" : "month";
-    renderCalendarView();
+}
+
+function showIgTab(which) {
+  const feed = document.getElementById("ig-feed-pane");
+  if (feed) feed.hidden = false;
+  const dms = document.getElementById("ig-dm-pane");
+  if (dms) dms.hidden = true;
+  for (const tab of document.querySelectorAll(".ig-tab")) {
+    tab.setAttribute("aria-selected", String(tab.dataset.id === "feed"));
   }
-  else if (action === "cal-shift") shiftCalendar(Number(id));
-  else if (action === "cal-today") {
-    state.calendarAnchor = demoDay();
-    renderCalendarView();
-  }
-  else if (action === "cal-day") {
-    state.calendarAnchor = id;
-    renderCalendarView();
-  }
-  else if (action === "board-filter") {
-    state.boardFilter = id || "";
-    renderCommunity();
-  }
-  else if (action === "event-open") openEventModal(id);
-  else if (action === "event-enroll") enrollFromModal();
-  else if (action === "event-ask") askFromModal();
+  renderIgFeed();
 }
 
 function render() {
   const error = document.getElementById("error");
-  error.hidden = !state.error;
-  error.textContent = state.error || "";
-  document.getElementById("clock").textContent = state.health
-    ? `Demo ${when(state.health.demo_now)}`
-    : "Orologio demo";
-  document.getElementById("mode").textContent = modeLabel();
+  if (error) {
+    error.hidden = !state.error;
+    error.textContent = state.error || "";
+  }
+  const modeEl = document.getElementById("mode");
+  if (modeEl) modeEl.textContent = modeLabel();
   const matchBtn = document.getElementById("match-btn");
   const tickBtn = document.getElementById("tick-btn");
-  matchBtn.disabled = Boolean(state.busy);
-  tickBtn.disabled = Boolean(state.busy);
-  matchBtn.textContent = state.busy === "match" ? "Abbino…" : "Abbina";
-  tickBtn.textContent = state.busy === "tick" ? "Leggo…" : "Tic dell'agente";
+  if (matchBtn) {
+    matchBtn.disabled = Boolean(state.busy);
+    matchBtn.textContent = state.busy === "match" ? "Abbino…" : "Abbina";
+  }
+  if (tickBtn) {
+    tickBtn.disabled = Boolean(state.busy);
+    tickBtn.textContent = state.busy === "tick" ? "Leggo…" : "Tic dell'agente";
+  }
   const person = selected();
-  document.getElementById("map-title").textContent = person ? person.name : "Mappa";
-  document.getElementById("board-title").textContent = person ? `Bacheca di ${person.name.split(" ")[0]}` : "Bacheca";
+  const mapTitle = document.getElementById("map-title");
+  if (mapTitle) mapTitle.textContent = person ? person.name : "Campus";
+  const homeTitle = document.getElementById("home-title");
+  if (homeTitle) homeTitle.textContent = person ? `Ciao, ${person.name.split(" ")[0]}` : "La tua scrivania";
+  const boardTitle = document.getElementById("board-title");
+  if (boardTitle && state.deskPanel === "bacheca") boardTitle.textContent = "La bacheca del campus";
   paintDate();
   paintYou();
   renderRoster();
@@ -475,18 +477,12 @@ function render() {
   renderTray();
   renderCork();
   renderDock();
-  renderCommunity();
-  renderScelto();
-  renderClub();
-  renderCalendarView();
-  if (document.getElementById("event-modal")?.open) paintEventModal();
-  renderBookings();
-  renderShelf();
-  renderContacts();
-  renderLinks();
-  renderFeedback();
-  renderSettings();
-  renderChat();
+  renderHome();
+  paintPrefsSummary();
+  paintExternalLinks();
+  renderCalendar();
+  renderFilterPills();
+  renderIgFeed();
 }
 
 function renderRoster() {
@@ -526,7 +522,7 @@ function renderRoster() {
   }
   const note = el("div", { class: "fine-print" });
   note.append(
-    el("div", { text: "Persone, eventi e mail sono inventati. L'accesso è locale: la password non viene salvata. Canvas e Pronote non sono collegati. MIT, su GitHub. Ispirazione, non installata: GBrain, Cognee, PipesHub, Paperclip, LangGraph, OpenInstinct." }),
+    el("div", { text: "Persone, eventi e mail sono inventati. L'accesso è locale: la password non viene salvata. Canvas e Pronote non sono collegati. MIT, su GitHub. Pattern aperti: GBrain, PipesHub, OpenInstinct. Nessuno dei tre è installato." }),
     el("button", {
       class: "ghost",
       type: "button",
@@ -541,7 +537,11 @@ function placeLatLng(place) {
   const x = Number(place.x);
   const y = Number(place.y);
   if (!Number.isFinite(x) || !Number.isFinite(y)) return CAMPUS_CENTER.slice();
-  return [CAMPUS_CENTER[0] + (320 - y) * 0.0000042, CAMPUS_CENTER[1] + (x - 500) * 0.0000055];
+  // Schematic x/y from places.json, anchored on H-FARM College satellite footprint.
+  return [
+    CAMPUS_CENTER[0] + (300 - y) * 0.0000058,
+    CAMPUS_CENTER[1] + (x - 500) * 0.0000072,
+  ];
 }
 
 function eventCategory(event) {
@@ -561,18 +561,40 @@ function ensureMap() {
     return false;
   }
   if (campusMap) return true;
-  campusMap = L.map(node, { scrollWheelZoom: true }).setView(CAMPUS_CENTER, CAMPUS_ZOOM);
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+  campusMap = L.map(node, {
+    center: CAMPUS_CENTER,
+    zoom: 18,
+    minZoom: 16,
     maxZoom: 19,
-    attribution: 'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-  }).addTo(campusMap);
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+    scrollWheelZoom: true,
+    zoomControl: true,
+    attributionControl: true,
+  });
+  campusMap.setView(CAMPUS_CENTER, 18, { animate: false });
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri — Esri, Maxar, Earthstar Geographics',
+    },
+  );
+  const streets = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    opacity: 0.8,
-  }).addTo(campusMap);
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  });
+  satellite.addTo(campusMap);
+  L.control.layers(
+    { Satellite: satellite, Strade: streets },
+    null,
+    { position: "topright", collapsed: false },
+  ).addTo(campusMap);
+  pinLayer = L.layerGroup().addTo(campusMap);
+  node.dataset.map = "esri-world-imagery";
+  node.setAttribute("aria-label", "Mappa satellite Esri del campus H-FARM College a Roncade.");
   const caption = document.getElementById("map-caption");
   if (caption) caption.textContent = CAPTION;
-  pinLayer = L.layerGroup().addTo(campusMap);
+  const zones = document.getElementById("map-zones");
+  if (zones) zones.textContent = "H-FARM College · La Serra · Via Sile · Campi · Big Hall";
   return true;
 }
 
@@ -687,13 +709,13 @@ function renderPlan() {
       markers.push(marker);
     }
   }
-  if (state.view === "map") window.requestAnimationFrame(frameCampus);
-}
-
-function frameCampus() {
-  if (!campusMap) return;
-  campusMap.invalidateSize();
-  campusMap.setView(CAMPUS_CENTER, CAMPUS_ZOOM, { animate: false });
+  // Keep H-FARM campus framed — never fitBounds to world/low zoom.
+  campusMap.setView(CAMPUS_CENTER, 18, { animate: false });
+  mapFitted = true;
+  window.requestAnimationFrame(() => {
+    campusMap.invalidateSize({ animate: false });
+    campusMap.setView(CAMPUS_CENTER, 18, { animate: false });
+  });
 }
 
 function renderTray() {
@@ -1001,7 +1023,7 @@ function tilt(id) {
 function friendlyError(error) {
   const message = error && error.message ? error.message : "";
   if (!message || message === "Failed to fetch" || message === "NetworkError when attempting to fetch resource.") {
-    return "H-OS non risponde. Controlla che il server sia acceso, poi premi Abbina.";
+    return "H-ELP non risponde. Controlla che il server sia acceso, poi premi Abbina.";
   }
   return message;
 }
@@ -1039,9 +1061,13 @@ function el(tag, attrs = {}, children = []) {
 function showScreen(name) {
   state.screen = name;
   document.getElementById("screen-access").hidden = name !== "access";
+  // prefs screen kept as fallback; primary UX is modal on desk
   document.getElementById("screen-prefs").hidden = name !== "prefs";
   document.getElementById("screen-desk").hidden = name !== "desk";
-  if (name === "prefs") renderSwipe();
+  if (name === "prefs") {
+    // Prefer modal when desk can show; else legacy sheet
+    renderSwipe();
+  }
 }
 
 function nameFromEmail(email) {
@@ -1057,12 +1083,23 @@ function nameFromEmail(email) {
 
 function displayName(session) {
   if (!session) return "";
+  if (session.nickname && String(session.nickname).trim()) return String(session.nickname).trim();
   return [session.nome, session.cognome].filter(Boolean).join(" ");
 }
 
 function loadSession() {
   try {
-    const raw = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    let raw = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    if (!raw) {
+      for (const key of SESSION_LEGACY_KEYS) {
+        const legacy = JSON.parse(localStorage.getItem(key) || "null");
+        if (legacy && typeof legacy.email === "string") {
+          raw = legacy;
+          localStorage.removeItem(key);
+          break;
+        }
+      }
+    }
     if (!raw || typeof raw.email !== "string") return null;
     if ("password" in raw) delete raw.password;
     if (typeof raw.nome !== "string" || !raw.nome.trim()) {
@@ -1072,16 +1109,63 @@ function loadSession() {
     } else if (typeof raw.cognome !== "string") {
       raw.cognome = "";
     }
+    raw.nickname = typeof raw.nickname === "string" ? raw.nickname.trim() : "";
     raw.likes = Array.isArray(raw.likes) ? raw.likes : [];
     raw.dislikes = Array.isArray(raw.dislikes) ? raw.dislikes : [];
     raw.skipped = Array.isArray(raw.skipped) ? raw.skipped : [];
-    raw.prefsConfirmed = Boolean(raw.prefsConfirmed);
     raw.canvas_id = raw.canvas_link || raw.canvas_id || "";
     raw.pronote_id = raw.pronote_link || raw.pronote_id || "";
     return raw;
   } catch {
     return null;
   }
+}
+
+function normalizeTagList(tags) {
+  const fromApi = Array.isArray(tags) ? tags.filter((t) => typeof t === "string" && t.trim()) : [];
+  if (fromApi.length) return fromApi;
+  return Object.keys(TAG_NOTES);
+}
+
+function sanitizeSessionTags(session, persist) {
+  if (!session) return session;
+  const known = new Set(state.tags.length ? state.tags : Object.keys(TAG_NOTES));
+  const clean = (list) => (Array.isArray(list) ? list.filter((tag) => known.has(tag)) : []);
+  session.likes = clean(session.likes);
+  session.dislikes = clean(session.dislikes);
+  session.skipped = clean(session.skipped);
+  if (!session.likes.length) {
+    const pool = state.tags.length ? state.tags : Object.keys(TAG_NOTES);
+    const pending = pool.filter((tag) => (
+      !session.likes.includes(tag)
+      && !session.dislikes.includes(tag)
+      && !(session.skipped || []).includes(tag)
+    ));
+    if (!pending.length) {
+      session.dislikes = [];
+      session.skipped = [];
+    }
+  }
+  if (persist) saveSession(session);
+  return session;
+}
+
+function ensurePreferenceDeck() {
+  if (!state.session) return;
+  if (!state.tags.length) state.tags = normalizeTagList([]);
+  sanitizeSessionTags(state.session, true);
+}
+
+function restartPreferenceCards() {
+  if (!state.session) return;
+  state.session.likes = [];
+  state.session.dislikes = [];
+  state.session.skipped = [];
+  swipeBusy = false;
+  saveSession(state.session);
+  ensurePreferenceDeck();
+  showScreen("prefs");
+  renderSwipe();
 }
 
 function saveSession(session) {
@@ -1099,7 +1183,6 @@ function profileBody() {
     email: session.email,
     canvas_id: session.canvas_id || "",
     pronote_id: session.pronote_id || "",
-    nickname: session.nome,
     likes: session.likes,
     dislikes: session.dislikes || [],
   };
@@ -1124,49 +1207,73 @@ function passwordOk(value) {
     && /[^A-Za-z0-9]/.test(value);
 }
 
-function submitAccess(event) {
+async function submitAccess(event) {
   event.preventDefault();
   const nickname = document.getElementById("nickname").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const errors = {};
-  if (nickname.length < 2) errors.nickname = "Scrivi un nickname di almeno 2 caratteri.";
-  if (!/^[^@\s]+@[^@\s]+$/.test(email)) errors.email = "L'email deve contenere @. Il dominio può essere finto.";
+  if (nickname.length < 2) errors.nickname = "Scegli un nickname di almeno 2 caratteri.";
+  if (!/^[^@\s]+@[^@\s]+$/.test(email)) errors.email = "L'email scolastica deve contenere @. Il dominio può essere finto.";
   if (!passwordOk(password)) errors.password = "Servono 8 caratteri, maiuscola, minuscola, numero e simbolo.";
   if (!document.getElementById("terms").checked) errors.terms = "Accetta i termini per entrare.";
   for (const node of document.querySelectorAll(".field-error")) node.textContent = errors[node.dataset.for] || "";
   if (Object.keys(errors).length) return;
-  document.getElementById("password").value = "";
-  const previous = state.session;
-  saveSession({
-    nome: nickname,
-    cognome: "",
-    email,
-    canvas_id: document.getElementById("canvas-link").value.trim(),
-    pronote_id: document.getElementById("pronote-link").value.trim(),
-    likes: previous?.likes || [],
-    dislikes: previous?.dislikes || [],
-    skipped: previous?.skipped || [],
-    prefsConfirmed: false,
-  });
-  showScreen("prefs");
+  const submitBtn = document.querySelector("#access-form button[type='submit']");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Carico i tag…";
+  }
+  try {
+    if (bootReady) await Promise.race([bootReady, new Promise((r) => setTimeout(r, 8000))]);
+    if (!state.tags.length) state.tags = normalizeTagList([]);
+    document.getElementById("password").value = "";
+    const named = nameFromEmail(email);
+    saveSession({
+      nickname,
+      nome: named.nome,
+      cognome: named.cognome,
+      email,
+      canvas_id: document.getElementById("canvas-link").value.trim(),
+      pronote_id: document.getElementById("pronote-link").value.trim(),
+      likes: [],
+      dislikes: [],
+      skipped: [],
+    });
+    for (const key of SESSION_LEGACY_KEYS) localStorage.removeItem(key);
+    swipeBusy = false;
+    ensurePreferenceDeck();
+    try { paintExternalLinks(); } catch (_) {}
+    await enterDesk();
+    try { openPersonalizeModal(true); } catch (modalErr) {
+      console.warn("personalize modal", modalErr);
+      showScreen("desk");
+      focusSection("bacheca");
+    }
+  } catch (error) {
+    console.error("submitAccess", error);
+    state.error = (error && error.message) || "Accesso non completato.";
+    const err = document.getElementById("error");
+    if (err) { err.hidden = false; err.textContent = state.error; }
+    // Still try to land on desk if session was saved
+    if (state.session) {
+      try { await enterDesk(); } catch (_) { showScreen("desk"); }
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Entra";
+    }
+  }
 }
 
 function pendingTags() {
   const session = state.session || { likes: [], dislikes: [], skipped: [] };
-  const skipped = session.skipped || [];
-  return state.tags.filter((tag) => !session.likes.includes(tag) && !session.dislikes.includes(tag) && !skipped.includes(tag));
-}
-
-function setTagChoice(tag, value) {
-  const session = state.session;
-  session.likes = session.likes.filter((item) => item !== tag);
-  session.dislikes = (session.dislikes || []).filter((item) => item !== tag);
-  session.skipped = (session.skipped || []).filter((item) => item !== tag);
-  if (value === "yes" || value === "like") session.likes.push(tag);
-  else if (value === "no" || value === "dislike") session.dislikes.push(tag);
-  else session.skipped.push(tag);
-  saveSession(session);
+  return state.tags.filter((tag) => (
+    !session.likes.includes(tag)
+    && !session.dislikes.includes(tag)
+    && !(session.skipped || []).includes(tag)
+  ));
 }
 
 const TAG_NOTES = {
@@ -1180,7 +1287,7 @@ const TAG_NOTES = {
   gaming: ["codice", "Partite, jam e il tavolo che non si libera."],
   arte: ["cultura", "Mostre, aule e il lavoro appeso al muro."],
   fotografia: ["cultura", "Uscite, rullini e il ritaglio di un pomeriggio."],
-  cinema: ["cultura", "Proiezioni, H-Farmers e la fila per una sedia."],
+  cinema: ["cultura", "Proiezioni, corte e la fila per una sedia."],
   musica: ["cultura", "Prove, palchi piccoli e il volume giusto."],
   teatro: ["cultura", "Letture, scene e chi entra in ritardo."],
   sport: ["corpo", "Campi, orari e la voglia di muoversi."],
@@ -1206,9 +1313,18 @@ const TAG_MARKS = {
 };
 
 function renderSwipe() {
-  const pending = pendingTags();
+  if (!state.tags.length) state.tags = normalizeTagList([]);
+  if (state.session) sanitizeSessionTags(state.session, false);
+  let pending = pendingTags();
+  if (!pending.length && state.session && !(state.session.likes || []).length) {
+    state.session.dislikes = [];
+    state.session.skipped = [];
+    saveSession(state.session);
+    pending = pendingTags();
+  }
   const tag = pending[0] || "";
   const card = document.getElementById("swipe-card");
+  if (!card) return;
   card.dataset.tag = tag;
   card.classList.remove("toward-like", "toward-dislike", "is-dragging");
   card.style.transform = "";
@@ -1218,47 +1334,258 @@ function renderSwipe() {
   document.getElementById("swipe-kind").textContent = tag ? kind : "fine";
   document.getElementById("swipe-blurb").textContent = tag
     ? (note ? note[1] : "Tag del dataset sintetico.")
-    : "Carte finite. Apri la community se hai almeno un Interessa.";
+    : ((state.session?.likes.length || 0)
+      ? "Hai almeno un interesse. Premi «Entra in Bacheca» per aprire la Bacheca."
+      : "Nessuna carta utile: premi «Ricomincia carte» oppure scegli il profilo demo.");
   document.getElementById("swipe-mark").innerHTML = TAG_MARKS[kind] || TAG_MARKS.codice;
   const likes = state.session?.likes.length || 0;
   const dislikes = state.session?.dislikes.length || 0;
+  const skipped = state.session?.skipped?.length || 0;
   const total = state.tags.length;
-  const at = tag ? Math.min(likes + dislikes + 1, total) : total;
-  document.getElementById("swipe-progress").textContent = total ? `${at} di ${total}` : "";
+  const at = tag ? Math.min(likes + dislikes + skipped + 1, total) : total;
+  document.getElementById("swipe-progress").textContent = total ? `${at} di ${total}` : "Tag non caricati";
   const meter = document.getElementById("swipe-meter");
   if (meter) meter.style.width = total ? `${Math.round((at / total) * 100)}%` : "0";
-  const skipped = state.session?.skipped?.length || 0;
-  document.getElementById("swipe-counts").textContent = `${likes} mi piace · ${dislikes} scartati · ${skipped} saltati`;
-  document.getElementById("enter-map").disabled = likes === 0;
+  document.getElementById("swipe-counts").textContent = `${likes} interessa · ${dislikes} no · ${skipped} salta`;
+  const enter = document.getElementById("enter-map");
+  if (enter) enter.disabled = likes === 0;
   document.getElementById("like-btn").disabled = !tag;
   document.getElementById("dislike-btn").disabled = !tag;
-  document.getElementById("skip-btn").disabled = !tag;
-  renderPrefGrid();
-  renderPrefPreview();
+  const skipBtn = document.getElementById("skip-btn");
+  if (skipBtn) skipBtn.disabled = !tag;
 }
 
 function toggleStub(open) {
   const panel = document.getElementById("agent-stub");
   const button = document.getElementById("agent-bubble");
   if (!panel || !button) return;
-  const show = open ? panel.hidden : false;
+  const show = open === true ? true : open === false ? false : panel.hidden;
   panel.hidden = !show;
   button.setAttribute("aria-expanded", show ? "true" : "false");
+  if (show) {
+    const thread = document.getElementById("assistant-thread");
+    if (thread && !thread.dataset.seeded) {
+      thread.dataset.seeded = "1";
+      appendAssistantBubble(
+        "assistant",
+        "Ciao! Sono l'assistente a regole di H-ELP (dataset locale, Gemma 4 non collegato). Chiedimi un evento, la mappa o l'agenda.",
+      );
+    }
+  }
+}
+
+function wireAssistantForm() {
+  const form = document.getElementById("assistant-form");
+  if (!form || form.dataset.wired) return;
+  form.dataset.wired = "1";
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = document.getElementById("assistant-input");
+    const question = (input && input.value || "").trim();
+    if (!question) return;
+    input.value = "";
+    answerAssistant(question);
+  });
+  document.querySelectorAll("[data-assist-q]").forEach((button) => {
+    button.addEventListener("click", () => answerAssistant(button.dataset.assistQ));
+  });
+}
+
+function appendAssistantBubble(role, text, sourceId) {
+  const thread = document.getElementById("assistant-thread");
+  if (!thread) return;
+  const bubble = el("div", { class: "assist-bubble from-" + role }, [
+    el("p", { text }),
+    sourceId ? el("small", { class: "source-ref", text: "Fonte · " + sourceId }) : null,
+  ]);
+  thread.append(bubble);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function answerAssistant(question) {
+  appendAssistantBubble("student", question);
+  // Prefer local Chatta routing so H-ELP can open the compose flow
+  if (/email|scrivi a|contatta|chatta|messaggio a|destinatario|ufficio|prof\.?\s|docente/.test(String(question || "").toLowerCase())) {
+    const local = localCampusAnswer(question);
+    appendAssistantBubble("assistant", local.reply, local.sourceId);
+    if (local.openChatta) {
+      openAiOverlay(false);
+      focusSection("chatta");
+      const intent = document.getElementById("chatta-intent");
+      if (intent && !intent.value.trim()) intent.value = question;
+      suggestChattaRecipient();
+    }
+    return;
+  }
+  try {
+    const res = await fetch("/assistant/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        likes: (state.session && state.session.likes) || [],
+        user_id: state.selectedId || null,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      appendAssistantBubble("assistant", data.reply || data.answer || "Nessuna risposta.", data.source_id || (data.sources && data.sources[0]) || null);
+      if (Array.isArray(data.sources) && data.sources.length > 1) {
+        appendAssistantBubble("assistant", "Altre fonti: " + data.sources.slice(1, 4).join(", "), null);
+      }
+      return;
+    }
+  } catch (_) { /* fall through to local brain */ }
+  const local = localCampusAnswer(question);
+  appendAssistantBubble("assistant", local.reply, local.sourceId);
+  if (local.openChatta) {
+    openAiOverlay(false);
+    focusSection("chatta");
+    const intent = document.getElementById("chatta-intent");
+    if (intent && !intent.value.trim()) intent.value = question;
+    suggestChattaRecipient();
+  }
+}
+
+function localCampusAnswer(question) {
+  const q = question.toLocaleLowerCase("it-IT");
+  const likes = (state.session && state.session.likes) || [];
+  const words = q.split(/[^a-z0-9àèéìòù]+/i).filter((w) => w.length > 2);
+  const scoreText = (text) => {
+    const t = String(text || "").toLocaleLowerCase("it-IT");
+    return words.reduce((n, w) => n + (t.includes(w) ? 1 : 0), 0);
+  };
+
+  // Lessons / calendar — prefer canonical series id (les-be)
+  if (/lezione|calendario|agenda|orario|business english|programming|calculus|business|english/.test(q)) {
+    const items = (state.calendar && (state.calendar.items || state.calendar.lessons)) || [];
+    const ranked = items
+      .map((row) => {
+        const title = String(row.title || "").toLocaleLowerCase("it-IT");
+        let s = scoreText(row.title + " " + (row.blurb || "") + " " + (row.location || ""));
+        if (title && q.includes(title)) s += 8;
+        if (/lezione|orario/.test(q) && row.kind === "lezione") s += 2;
+        if (/business english/.test(q) && /business english/.test(title)) s += 10;
+        return { row, s };
+      })
+      .sort((a, b) => b.s - a.s);
+    const hit = (ranked[0] && ranked[0].s > 0 ? ranked[0].row : null) || items.find((r) => !r.past);
+    if (hit) {
+      const sourceId = hit.series_id || (String(hit.id || "").startsWith("les-") ? String(hit.id).split("-").slice(0, 2).join("-") : hit.id) || "calendar";
+      return {
+        reply: `${hit.kind === "evento" ? "Evento" : "Lezione"} «${hit.title}»: ${hit.weekday || hit.date || ""} ${hit.start || ""}–${hit.end || ""} · ${hit.location || "Campus"}.${hit.blurb ? " " + hit.blurb : ""}`,
+        sourceId,
+      };
+    }
+  }
+
+  // Recommendations from matches / likes
+  if (/consigli|recommend|interess|per me|cosa fare|stasera|dopo le/.test(q)) {
+    const top = state.matches[0];
+    if (top) {
+      return {
+        reply: `Ti consiglio «${top.title}» (score ${(top.score || 0).toFixed(2)} su tag ${likes.slice(0, 4).join(", ") || "preferenze"}). ${top.why || top.display_text || ""}`,
+        sourceId: top.event_id,
+      };
+    }
+    const evening = ((state.calendar && state.calendar.events) || []).filter((r) => !r.past);
+    if (evening[0]) {
+      return {
+        reply: `Nessun match personale ancora. Evento serale in agenda: «${evening[0].title}» ${evening[0].date} ${evening[0].start}–${evening[0].end} · ${evening[0].location || "Campus"}.`,
+        sourceId: evening[0].id || "calendar-event",
+      };
+    }
+  }
+
+  // Map / place
+  if (/mappa|campus|h-farm|satellite|dove|edificio|serra|biblioteca|digital lab|big hall/.test(q)) {
+    const place = (state.places || []).map((p) => ({ p, s: scoreText(p.name + " " + (p.blurb || "")) })).sort((a, b) => b.s - a.s)[0];
+    if (place && place.s > 0) {
+      return {
+        reply: `Luogo nel dataset: «${place.p.name}» (${place.p.id || "place"}). ${place.p.blurb || "Pin schematico sulla mappa satellite H-FARM College."}`,
+        sourceId: place.p.id || "place",
+      };
+    }
+    return {
+      reply: "La mappa satellite (Esri) è centrata su H-FARM College, Roncade / La Serra (~45.5665, 12.4305), zoom campus. I pin sono schematici sugli edifici del dataset.",
+      sourceId: "map-hfarm",
+    };
+  }
+
+  // Chatta / email to staff
+  if (/email|scrivi a|contatta|chatta|messaggio a|ufficio|prof\.?|docente|destinatario/.test(q)) {
+    const rec = routeChattaRecipient(q);
+    return {
+      reply: "Per questa richiesta il destinatario giusto è " + rec.name + " <" + rec.email + ">. Apri Chatta dal menu (tendina) oppure dimmi pure il testo e preparo oggetto e corpo.",
+      sourceId: "chatta",
+      openChatta: true,
+    };
+  }
+
+  // Community boards
+  if (/bacheca|community|student office|student life|age fund|club/.test(q)) {
+    const boards = state.boards || [];
+    const msgs = boards.flatMap((b) => (b.messages || []).map((m) => ({ ...m, board: b.name, boardId: b.id })));
+    const hit = msgs.map((m) => ({ m, s: scoreText(m.text + " " + m.author + " " + (m.org || "")) })).sort((a, b) => b.s - a.s)[0];
+    if (hit && hit.s > 0) {
+      return {
+        reply: `In «${hit.m.board}», ${hit.m.org || hit.m.role || "utente"} ${hit.m.author}: «${hit.m.text}»`,
+        sourceId: hit.m.id || hit.m.boardId,
+      };
+    }
+  }
+
+  // Event title search
+  const events = state.events || [];
+  const rankedEv = events
+    .map((ev) => ({
+      ev,
+      s: scoreText((ev.title || "") + " " + (ev.blurb || ev.description || "") + " " + ((ev.tags || []).join(" "))),
+    }))
+    .filter((x) => x.s > 0)
+    .sort((a, b) => b.s - a.s);
+  if (rankedEv[0]) {
+    const ev = rankedEv[0].ev;
+    const where = ev.location_name || (ev.location && ev.location.building) || ev.building || "campus";
+    return {
+      reply: `Trovato nel dataset: «${ev.title}» (${ev.id}). Dove: ${where}. ${(ev.blurb || ev.description || "").slice(0, 180)}`,
+      sourceId: ev.id,
+    };
+  }
+
+  if (/come funzion|pipeline|brain|librarian|gemma/.test(q)) {
+    return {
+      reply: "Flusso: Library (JSON eventi/community) → Librarian (validazione fonti) → Campus Brain (match tag) → Agent (bozza) → Human Approval → Action. Gemma 4 narra solo se GEMINI_API_KEY è configurata; altrimenti risposte dataset-grounded locali con citazione id.",
+      sourceId: "architecture",
+    };
+  }
+
+  return {
+    reply: `Non ho trovato un record preciso per «${question.slice(0, 80)}». Nel corpus: ${events.length} eventi, ${(state.boards || []).length} canali, ${((state.calendar && state.calendar.items) || []).length} voci calendario. Prova con un titolo evento, una lezione (Business English / Programming / Calculus) o «consigliami».`,
+    sourceId: "corpus-stats",
+  };
 }
 
 let swipeBusy = false;
 
-function decideCurrent(choice) {
+function decideCurrent(like) {
   const card = document.getElementById("swipe-card");
   const tag = card.dataset.tag;
-  const mode = choice === true || choice === "like" ? "like" : choice === "skip" ? "skip" : "dislike";
   if (!tag || !state.session || swipeBusy) return;
+  const mode = like === "skip" ? "skip" : (like ? "like" : "dislike");
   const commit = () => {
-    setTagChoice(tag, mode);
+    state.session.likes = state.session.likes.filter((item) => item !== tag);
+    state.session.dislikes = state.session.dislikes.filter((item) => item !== tag);
+    state.session.skipped = (state.session.skipped || []).filter((item) => item !== tag);
+    if (mode === "like") state.session.likes.push(tag);
+    else if (mode === "dislike") state.session.dislikes.push(tag);
+    else state.session.skipped.push(tag);
+    saveSession(state.session);
     swipeBusy = false;
-    const finished = pendingTags().length === 0 && state.session.likes.length > 0;
     renderSwipe();
-    if (finished) enterDesk();
+    if (!pendingTags().length && state.session.likes.length) {
+      window.setTimeout(() => enterDesk(), 220);
+    }
   };
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce || mode === "skip") {
@@ -1271,35 +1598,67 @@ function decideCurrent(choice) {
   window.setTimeout(commit, 170);
 }
 
+function resetOnboarding() {
+  localStorage.removeItem(SESSION_KEY);
+  for (const key of SESSION_LEGACY_KEYS) localStorage.removeItem(key);
+  state.session = null;
+  state.deskUser = null;
+  state.selectedId = null;
+  state.matches = [];
+  state.actions = [];
+  state.notices = [];
+  history.replaceState(null, "", location.pathname);
+  showScreen("access");
+}
+
 function useDemoLikes() {
   if (!state.session) return;
   state.session.likes = DEMO_LIKES.filter((tag) => state.tags.includes(tag));
   state.session.dislikes = (state.session.dislikes || []).filter((tag) => !state.session.likes.includes(tag));
   state.session.skipped = (state.session.skipped || []).filter((tag) => !state.session.likes.includes(tag));
-  state.session.prefsConfirmed = true;
   saveSession(state.session);
   enterDesk();
 }
 
 async function enterDesk() {
-  if (!state.session || !state.session.likes.length) return;
-  state.session.prefsConfirmed = true;
-  saveSession(state.session);
+  if (!state.session) return;
   state.deskUser = deskUserFromSession();
   state.selectedId = "usr-desk";
   showScreen("desk");
-  showView("community");
+  paintExternalLinks();
+  focusSection("bacheca");
   try {
-    await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
-    await refreshStudent();
+    if ((state.session.likes || []).length) {
+      await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
+      await refreshStudent();
+    } else {
+      state.matches = [];
+      state.actions = [];
+      state.notices = [];
+      state.busy = null;
+      render();
+    }
+    await ensureCommunitySeed();
+    focusSection("bacheca");
+    showIgTab("feed");
+    renderFilterPills();
+    renderIgFeed();
+    renderSceltoPerTe();
+    updateAgendaBadge();
   } catch (error) {
     state.error = error.message || "Profilo non registrato.";
-    render();
+    state.busy = null;
+    try { render(); } catch (_) {}
+    focusSection("bacheca");
+    renderFilterPills();
+    renderIgFeed();
+    renderSceltoPerTe();
   }
 }
 
 function signOut() {
   localStorage.removeItem(SESSION_KEY);
+  for (const key of SESSION_LEGACY_KEYS) localStorage.removeItem(key);
   state.session = null;
   state.deskUser = null;
   state.selectedId = null;
@@ -1309,52 +1668,119 @@ function signOut() {
   showScreen("access");
 }
 
-function showView(id) {
-  const alias = { bacheca: "community", community: "community", mappa: "map", map: "map", calendario: "calendar", calendar: "calendar", agenda: "calendar", prenotazioni: "bookings", bookings: "bookings", feedback: "feedback", voci: "feedback", contatti: "contacts", contacts: "contacts", canvas: "canvas", pronote: "pronote", shelf: "shelf", personalizzazioni: "settings", settings: "settings", club: "club" };
-  const view = alias[id] || "community";
-  state.view = view;
-  for (const section of document.querySelectorAll(".stage .view")) {
-    section.hidden = section.dataset.view !== view;
-  }
-  for (const button of document.querySelectorAll(".help-nav button, .rail button[data-action='section']")) {
-    const target = alias[button.dataset.id] || button.dataset.id;
-    if (target === view) button.setAttribute("aria-current", "true");
-    else button.removeAttribute("aria-current");
-  }
-  const dateBtn = document.getElementById("demo-date");
-  if (dateBtn) dateBtn.setAttribute("aria-pressed", view === "calendar" ? "true" : "false");
-  const gear = document.querySelector(".head-gear");
-  if (gear) gear.setAttribute("aria-pressed", view === "settings" ? "true" : "false");
-  if (view === "map") window.setTimeout(frameCampus, 80);
+
+function scrollBachecaTop() {
+  const pane = document.getElementById("ig-feed-pane");
+  const board = document.getElementById("bacheca");
+  const stage = document.querySelector(".main-stage");
+  if (pane) pane.scrollTop = 0;
+  if (board) board.scrollTop = 0;
+  if (stage) stage.scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
 function focusSection(id) {
-  showView(id);
+  const known = ["bacheca", "mappa", "calendario", "prenotazioni", "feedback", "chatta", "contatti", "shelf", "personalizzazioni", "home"];
+  if (!known.includes(id)) id = "bacheca";
+  state.deskPanel = id;
+  for (const button of document.querySelectorAll(".rail button[data-action='section']")) {
+    button.removeAttribute("aria-current");
+  }
+  const current = document.querySelector(`.rail button[data-id='${id}']`);
+  if (current) current.setAttribute("aria-current", "true");
+  const side = document.querySelector(".side");
+  if (side) side.hidden = false;
+  for (const panelId of known) {
+    const node = document.getElementById(panelId);
+    if (node) node.hidden = panelId !== id;
+  }
+  if (id === "bacheca") {
+    showIgTab("feed");
+    scrollBachecaTop();
+  } else if (id === "mappa") {
+    window.setTimeout(() => {
+      ensureMap();
+      renderPlan();
+      if (campusMap) {
+        campusMap.invalidateSize({ animate: false });
+        campusMap.setView(CAMPUS_CENTER, 18, { animate: false });
+      }
+    }, 40);
+  } else if (id === "personalizzazioni") {
+    paintPrefsSummary();
+  }
+}
+
+function paintExternalLinks() {
+  const session = state.session || {};
+  const canvas = document.getElementById("rail-canvas");
+  const pronote = document.getElementById("rail-pronote");
+  if (canvas) {
+    const href = session.canvas_id || session.canvas_link || "";
+    canvas.href = href || "#";
+    canvas.title = href ? "Apri il tuo Canvas" : "Aggiungi il link Canvas in accesso";
+    canvas.classList.toggle("is-empty", !href);
+  }
+  if (pronote) {
+    const href = session.pronote_id || session.pronote_link || "";
+    pronote.href = href || "#";
+    pronote.title = href ? "Apri il tuo Pronote" : "Aggiungi il link Pronote in accesso";
+    pronote.classList.toggle("is-empty", !href);
+  }
+}
+
+function paintPrefsSummary() {
+  const node = document.getElementById("prefs-summary");
+  if (!node || !state.session) return;
+  const likes = state.session.likes || [];
+  const dislikes = state.session.dislikes || [];
+  const skipped = state.session.skipped || [];
+  node.textContent = likes.length
+    ? `Interessa: ${likes.join(", ")}. No: ${dislikes.slice(0, 8).join(", ") || "—"}. Salta: ${skipped.length}.`
+    : "Nessun interesse ancora: usa «Personalizza la tua bacheca».";
+}
+
+function openAiOverlay(show) {
+  const overlay = document.getElementById("ai-overlay");
+  if (!overlay) return;
+  overlay.hidden = !show;
+  if (show) {
+    const thread = document.getElementById("assistant-thread");
+    if (thread && !thread.dataset.seeded) {
+      thread.dataset.seeded = "1";
+      appendAssistantBubble(
+        "assistant",
+        "Ciao! Sono l'agente H-ELP (dataset locale). Posso consigliarti eventi dai tuoi tag, spiegare mappa/calendario e citare le fonti. Gemma 4 resta opzionale.",
+      );
+    }
+    document.getElementById("assistant-input")?.focus();
+  }
 }
 
 function paintDate() {
-  const stack = document.getElementById("demo-date");
-  if (!stack || !state.health?.demo_now) return;
-  const parts = new Intl.DateTimeFormat("en-GB", {
+  const clock = document.getElementById("clock");
+  if (!clock) return;
+  const stamp = state.health?.demo_now ? new Date(state.health.demo_now) : new Date();
+  clock.textContent = new Intl.DateTimeFormat("it-IT", {
     timeZone: "Europe/Rome",
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  }).formatToParts(new Date(state.health.demo_now));
-  const pick = (type) => parts.find((part) => part.type === type)?.value || "—";
-  document.getElementById("date-d").textContent = pick("day");
-  document.getElementById("date-m").textContent = pick("month");
-  document.getElementById("date-y").textContent = pick("year");
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(stamp);
 }
 
 function paintYou() {
-  const button = document.getElementById("you-btn");
+  const button = document.getElementById("you-btn") || document.getElementById("settings-btn");
   if (!button) return;
   const session = state.session;
   const name = displayName(session);
   button.setAttribute("aria-label", name || "Il tuo accesso");
-  document.getElementById("you-name").textContent = name;
-  document.getElementById("you-email").textContent = session ? session.email : "";
+  const youName = document.getElementById("you-name");
+  const youEmail = document.getElementById("you-email");
+  if (youName) youName.textContent = name;
+  if (youEmail) youEmail.textContent = session ? session.email : "";
   const links = document.getElementById("you-links");
   if (links) {
     const bits = [];
@@ -1419,718 +1845,1350 @@ function wireSwipe() {
   }, { passive: false });
 }
 
-function renderPrefGrid() {
-  const grid = document.getElementById("pref-grid");
-  if (!grid || !state.session) return;
-  grid.replaceChildren();
-  for (const tag of state.tags) {
-    const choice = state.session.likes.includes(tag) ? "yes" : state.session.dislikes.includes(tag) ? "no" : state.session.skipped?.includes(tag) ? "skip" : "";
-    const row = el("div", { class: "pref-row-edit" });
-    row.append(el("strong", { text: tag }));
-    const actions = el("div", {});
-    for (const [value, label, extra] of [["yes", "Interessa", ""], ["no", "Non interessa", "no"], ["skip", "Salta", ""]]) {
-      actions.append(el("button", {
-        type: "button",
-        class: extra,
-        "data-tag": tag,
-        "data-value": value,
-        "aria-pressed": choice === value ? "true" : "false",
-        text: label,
-      }));
+
+async function ensureCommunitySeed() {
+  try {
+    if (!state.boards.length) {
+      const boards = await api("/community/boards");
+      state.boards = boards.boards || [];
     }
-    row.append(actions);
-    grid.append(row);
+    if (!state.calendar) {
+      state.calendar = await api("/calendar");
+    }
+    await loadBoardPosts();
+    renderHome();
+    renderCalendar();
+  } catch (error) {
+    console.warn(error);
   }
 }
 
-function renderPrefPreview() {
-  const node = document.getElementById("pref-preview");
-  if (!node || !state.session) return;
-  const likes = new Set(state.session.likes);
-  const ranked = state.events
-    .map((event) => ({ event, shared: (event.tags || []).filter((tag) => likes.has(tag)).length }))
-    .filter((row) => row.shared > 0)
-    .sort((a, b) => b.shared - a.shared || a.event.id.localeCompare(b.event.id))
-    .slice(0, 3);
-  node.replaceChildren(el("p", { class: "meta", text: ranked.length ? "Anteprima dal dataset, prima di entrare." : "Segna almeno un Interessa per vedere i consigli." }));
-  for (const row of ranked) {
-    node.append(el("p", { text: `${row.event.title} · ${row.event.id} · tag in comune ${row.shared}` }));
+async function loadBoardPosts() {
+  const ids = ["board-generale", "board-eventi", "board-annunci"];
+  const posts = [];
+  for (const bid of ids) {
+    try {
+      const detail = await api(`/community/boards/${bid}`);
+      const board = detail.board || detail;
+      for (const msg of board.messages || []) {
+        const src = classifyMessageSource(msg);
+        if (!src) continue; // skip peer student chatter
+        posts.push({
+          kind: "message",
+          id: msg.id,
+          title: msg.author || src.label,
+          text: msg.text || "",
+          author: msg.author || "",
+          org: msg.org || "",
+          at: msg.at || "",
+          source: src.id,
+          sourceLabel: src.label,
+        });
+      }
+    } catch (err) {
+      console.warn("board", bid, err);
+    }
   }
+  // Deduplicate by id
+  const seen = new Set();
+  state.boardPosts = posts.filter((p) => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
 }
 
-function renderScelto() {
-  const node = document.getElementById("scelto-list");
-  if (!node) return;
-  node.replaceChildren();
-  if (!state.recommendations.length) {
-    node.append(el("p", { class: "meta", text: "I consigli compaiono dopo l'accesso, dalle tue preferenze." }));
+function classifyMessageSource(msg) {
+  const org = String(msg.org || "").toLowerCase();
+  const author = String(msg.author || "").toLowerCase();
+  const role = String(msg.role || "").toLowerCase();
+  if (org.includes("student office") || author.includes("student office")) return SOURCE_BY_ID.office;
+  if (org.includes("student life") || author.includes("student life")) return SOURCE_BY_ID.life;
+  if (org.includes("faculty") || org.includes("docent") || /^prof\.?\s/.test(author) || author.startsWith("prof ")) return SOURCE_BY_ID.faculty;
+  if (org.includes("club") || author.includes("club") || org === "age fund" || author.includes("age fund")) return SOURCE_BY_ID.club;
+  if (role === "student") return null;
+  if (role === "admin") return SOURCE_BY_ID.office;
+  return null;
+}
+
+function classifyEventSource(ev) {
+  const host = String(ev.host || ev.organizer || "").toLowerCase();
+  const title = String(ev.title || "").toLowerCase();
+  const tags = (ev.tags || []).map((t) => String(t).toLowerCase());
+  const blurb = String(ev.blurb || ev.description || "").toLowerCase();
+  const hay = `${host} ${title} ${tags.join(" ")} ${blurb}`;
+  if (/student office|reception|badge|welcome week/.test(hay)) return SOURCE_BY_ID.office;
+  if (/\bprof\b|docente|faculty|office hours|lezione|business english|calculus/.test(hay)) return SOURCE_BY_ID.faculty;
+  if (/club|meetup studenti|jam|coding club|gaming|sfida a squadre|peer/.test(hay)) return SOURCE_BY_ID.club;
+  if (/student life|community night|aperitivo|cinema|serata|workshop creativo|talk con ospiti/.test(hay)) return SOURCE_BY_ID.life;
+  // Heuristic by title family from seed generator
+  if (title.startsWith("meetup") || title.startsWith("sfida") || title.includes("collaborativo")) return SOURCE_BY_ID.club;
+  if (title.startsWith("talk") || title.startsWith("sessione")) return SOURCE_BY_ID.faculty;
+  if (title.startsWith("laboratorio") || title.startsWith("workshop") || title.startsWith("community")) return SOURCE_BY_ID.life;
+  // Stable fallback by id hash → mostly Student Life + some Club
+  let h = 0;
+  const s = String(ev.id || title || "x");
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % 5 === 0 ? SOURCE_BY_ID.club : SOURCE_BY_ID.life;
+}
+
+function wireChatForm() {
+  /* student-to-student chat removed — bacheca only */
+}
+
+async function openBoard(boardId) {
+  /* no-op: messaging boards hidden; keep id for seed data only */
+  state.activeBoardId = boardId || state.activeBoardId;
+}
+
+
+const POSTER_PALETTES = [
+  ["#1f5c45", "#163f30"],
+  ["#2a6b52", "#1a4030"],
+  ["#3d6b4f", "#1f3d30"],
+  ["#4a7a5c", "#243f32"],
+  ["#5f8a6a", "#2a4a38"],
+  ["#6b9a78", "#315240"],
+];
+
+function posterStyle(key, title) {
+  let h = 0;
+  const s = String(key || title || "x");
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  const [a, b] = POSTER_PALETTES[h % POSTER_PALETTES.length];
+  return `background-image:linear-gradient(160deg, ${a}, ${b})`;
+}
+
+function groupForTag(tag) {
+  for (const g of INTEREST_GROUPS) {
+    if (g.tags.includes(tag)) return g.label;
+  }
+  return null;
+}
+
+function eventGroups(event) {
+  const labels = new Set();
+  for (const tag of event.tags || []) {
+    const g = groupForTag(tag);
+    if (g) labels.add(g);
+  }
+  return [...labels];
+}
+
+function dateBadge(iso) {
+  if (!iso) return { day: "—", mon: "" };
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { day: "—", mon: "" };
+  const day = String(d.getDate());
+  const mon = new Intl.DateTimeFormat("it-IT", { month: "short", timeZone: "Europe/Rome" }).format(d).replace(".", "").toUpperCase();
+  return { day, mon };
+}
+
+function timeRange(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const start = new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }).format(d);
+  const endD = new Date(d.getTime() + 60 * 60 * 1000);
+  const end = new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }).format(endD);
+  return `${start} – ${end}`;
+}
+
+
+function isEventCancelled(ev) {
+  if (!ev) return false;
+  if (ev.status === "cancelled" || ev.cancelled === true) return true;
+  const t = String(ev.title || "").toLowerCase();
+  return /\bannullat/.test(t) || t.includes("green challenge");
+}
+
+function isEventPast(ev) {
+  const iso = ev && (ev.ends_at || ev.starts_at);
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  const now = state.health?.demo_now ? new Date(state.health.demo_now) : new Date();
+  return d.getTime() < now.getTime();
+}
+
+function matchReasonFor(ev) {
+  const likes = new Set(state.session?.likes || []);
+  if (!likes.size) return "";
+  const hit = [];
+  for (const g of INTEREST_GROUPS) {
+    if (g.tags.some((t) => likes.has(t)) && eventGroups(ev).includes(g.label)) hit.push(g.label);
+  }
+  if (!hit.length) return "";
+  if (hit.length === 1) return `Perché ti interessa ${hit[0]}.`;
+  return `Perché ti interessa ${hit.slice(0, -1).join(", ")} e ${hit[hit.length - 1]}.`;
+}
+
+function renderSceltoPerTe() {
+  const root = document.getElementById("scelto-per-te");
+  const banner = document.getElementById("interest-banner");
+  if (!root) return;
+  const likes = state.session?.likes || [];
+  if (!likes.length) {
+    root.hidden = true;
+    root.replaceChildren();
+    if (banner) banner.hidden = false;
     return;
   }
-  for (const row of state.recommendations) {
-    const card = el("button", {
-      type: "button",
-      class: "scelto-card",
-      "data-action": "event-open",
-      "data-id": row.event_id,
-    });
-    card.append(
-      el("strong", { text: row.title }),
-      el("span", { text: row.reason || row.source_id || "" }),
-    );
-    node.append(card);
+  if (banner) banner.hidden = true;
+  const ranked = (state.matches || []).map((m) => state.events.find((e) => e.id === m.event_id)).filter(Boolean);
+  let pick = ranked.find((ev) => matchReasonFor(ev)) || null;
+  if (!pick) {
+    pick = (state.events || []).find((ev) => matchReasonFor(ev) && !isEventCancelled(ev) && !isEventPast(ev)) || null;
   }
-}
-
-function renderClub() {
-  const node = document.getElementById("club-feed");
-  if (!node) return;
-  node.replaceChildren();
-  const posts = state.posts.filter((post) => post.board_id === "board-club" || /club/i.test(post.thread_title || ""));
-  if (!posts.length) {
-    node.append(el("p", { class: "meta", text: "Nessun post Club caricato. La mappa satellite resta sul pulsante qui sotto." }));
+  if (!pick) {
+    root.hidden = true;
+    root.replaceChildren();
     return;
   }
-  for (const post of posts.slice(0, 8)) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("p", { class: "board-pill", text: post.thread_title || "Club" }),
-      el("h3", { text: post.title || "Club" }),
-      el("p", { text: post.body || "" }),
-    ]));
-  }
-}
-
-function findListedEvent(eventId) {
-  return state.events.find((item) => item.id === eventId)
-    || state.recommendations.find((item) => item.event_id === eventId)
-    || null;
-}
-
-function openEventModal(eventId) {
-  state.eventModalId = eventId;
-  paintEventModal();
-  const dialog = document.getElementById("event-modal");
-  if (dialog && !dialog.open) dialog.showModal();
-}
-
-function paintEventModal() {
-  const title = document.getElementById("event-modal-title");
-  if (!title) return;
-  const record = findListedEvent(state.eventModalId);
-  title.textContent = record?.title || state.eventModalId || "Evento";
-  const body = document.getElementById("event-modal-body");
-  if (body) body.textContent = record?.description || record?.blurb || record?.reason || "";
-  const sources = document.getElementById("event-sources");
-  if (sources) {
-    sources.replaceChildren();
-    const ids = [...new Set([record?.source_id, record?.id, state.eventModalId].filter(Boolean))];
-    for (const sourceId of ids) {
-      sources.append(el("button", {
-        type: "button",
-        class: "ghost",
-        "data-action": "source",
-        "data-id": sourceId,
-        text: sourceId,
-      }));
-    }
-  }
-  const pending = Boolean(state.proposal && state.proposal.event_id === state.eventModalId);
-  const enroll = document.getElementById("event-enroll");
-  const approve = document.getElementById("event-approve");
-  const reject = document.getElementById("event-reject");
-  if (enroll) enroll.hidden = pending;
-  if (approve) approve.hidden = !pending;
-  if (reject) reject.hidden = !pending;
-}
-
-async function enrollFromModal() {
-  if (!state.eventModalId) return;
-  await proposeRegistration(state.eventModalId);
-  paintEventModal();
-}
-
-function askFromModal() {
-  const record = findListedEvent(state.eventModalId);
-  setAssistant(true);
-  askAssistant(record?.title || "Recommend an event");
-}
-
-function renderCommunity() {
-  const feed = document.getElementById("feed");
-  const perTe = document.getElementById("per-te");
-  if (perTe) {
-    perTe.replaceChildren();
-    if (state.proposal) {
-      const box = el("div", { class: "ig-proposal" });
-      box.append(
-        el("p", { text: `Proposta ${state.proposal.approval_id} per ${state.proposal.event_title}. L'agenda è ancora vuota.` }),
-        el("button", { class: "solid", type: "button", "data-action": "approve-reg", text: "Approva iscrizione simulata" }),
-        el("button", { class: "ghost", type: "button", "data-action": "reject-reg", text: "Rifiuta" }),
-      );
-      perTe.append(box);
-    }
-  }
-  if (!feed) return;
-  feed.replaceChildren();
-  const column = el("div", { class: "ig-column" });
-  const stories = el("div", { class: "ig-stories", "aria-label": "Per te" });
-  if (!state.recommendations.length) {
-    stories.append(el("p", { class: "meta", text: "Nessun consiglio ancora." }));
-  }
-  for (const row of state.recommendations.slice(0, 8)) {
-    const story = el("button", {
+  root.hidden = false;
+  root.replaceChildren(
+    el("div", { class: "scelto-mark", text: "✦" }),
+    el("div", {}, [
+      el("p", { class: "eyebrow", text: "Scelto per te" }),
+      el("strong", { text: pick.title }),
+      el("p", { class: "reason", text: matchReasonFor(pick) }),
+    ]),
+    el("button", {
       type: "button",
-      class: "ig-story",
-      "data-action": "ask-suggest",
-      "data-id": row.title,
-      "aria-label": `Chiedi di ${row.title}`,
-    });
-    story.append(
-      el("span", { class: "ig-avatar", text: (row.title || "?").slice(0, 1).toUpperCase() }),
-      el("span", { class: "ig-story-name", text: row.title }),
-    );
-    stories.append(story);
-  }
-  const labels = el("div", { class: "board-labels", "aria-label": "Etichette della bacheca community" });
-  labels.append(el("button", {
-    type: "button",
-    class: "board-label",
-    "data-action": "board-filter",
-    "data-id": "",
-    "aria-pressed": state.boardFilter ? "false" : "true",
-    text: "Tutte",
-  }));
-  for (const board of state.boards) {
-    labels.append(el("button", {
-      type: "button",
-      class: "board-label",
-      "data-action": "board-filter",
-      "data-id": board.id,
-      "aria-pressed": state.boardFilter === board.id ? "true" : "false",
-      text: board.title,
-    }));
-  }
-  column.append(el("p", { class: "ig-kicker", text: `Community · ${state.boards.length} bacheche` }), labels, stories);
-  const visiblePosts = state.posts.filter((post) => !state.boardFilter || post.board_id === state.boardFilter || post.thread_id === state.boardFilter);
-  for (const post of visiblePosts.slice(0, 18)) {
-    const name = post.author_name || "Campus";
-    const card = el("article", { class: "ig-post" });
-    const who = el("div", { class: "ig-who" });
-    who.append(
-      el("strong", { text: name }),
-      el("p", { class: "ig-meta", text: post.thread_title || "Community" }),
-    );
-    const head = el("header", { class: "ig-post-head" });
-    head.append(
-      el("span", { class: "ig-avatar", text: name.trim().slice(0, 1).toUpperCase() }),
-      who,
-    );
-    if (post.score) head.append(el("span", { class: "ig-score", text: `${post.score}%` }));
-    head.append(el("span", { class: "board-pill", text: post.thread_title || "Community" }));
-    const tone = ["a", "b", "c", "d"][(post.source_id || "").length % 4];
-    const visual = el("div", { class: `ig-visual tone-${tone}` });
-    visual.append(el("p", { text: post.title || "" }));
-    const caption = el("p", {});
-    caption.append(el("strong", { text: name.split("—")[0].trim() }));
-    caption.append(document.createTextNode(` ${post.body || ""}`));
-    card.append(
-      head,
-      visual,
-      el("div", { class: "ig-caption" }, [
-        caption,
-        el("p", { class: "ig-meta", text: `Fonte ${post.source_id}${post.shared_tags?.length ? ` · ${post.shared_tags.join(", ")}` : ""}` }),
-      ]),
-    );
-    column.append(card);
-  }
-  feed.append(column);
+      class: "text-link",
+      text: "Dai un'occhiata ↗",
+      "data-action": "scopri",
+      "data-id": pick.id,
+    }),
+  );
 }
 
-const CAL_MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-const CAL_WEEKDAYS = ["L", "M", "M", "G", "V", "S", "D"];
-
-function campusDay(value) {
-  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
-}
-
-function campusClock(value) {
-  const match = String(value || "").match(/T(\d{2}:\d{2})/);
-  return match ? match[1] : "";
-}
-
-function parseDay(key) {
-  const [y, m, d] = key.split("-").map(Number);
-  return { y, m, d };
-}
-
-function dayKey(y, m, d) {
-  return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-}
-
-function addDays(key, count) {
-  const { y, m, d } = parseDay(key);
-  const utc = new Date(Date.UTC(y, m - 1, d + count));
-  return dayKey(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate());
-}
-
-function addMonths(key, count) {
-  const { y, m, d } = parseDay(key);
-  const utc = new Date(Date.UTC(y, m - 1 + count, 1));
-  const last = new Date(Date.UTC(utc.getUTCFullYear(), utc.getUTCMonth() + 1, 0)).getUTCDate();
-  return dayKey(utc.getUTCFullYear(), utc.getUTCMonth() + 1, Math.min(d, last));
-}
-
-function weekdayMon0(key) {
-  const { y, m, d } = parseDay(key);
-  return (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
-}
-
-function demoDay() {
-  return campusDay(state.health?.demo_now) || "2026-10-24";
-}
-
-function shiftCalendar(direction) {
-  const anchor = state.calendarAnchor || demoDay();
-  state.calendarAnchor = state.calendarMode === "week" ? addDays(anchor, direction * 7) : addMonths(anchor, direction);
-  renderCalendarView();
-}
-
-function calendarEntries() {
-  const rows = [];
-  for (const lesson of state.calendar?.lessons || []) {
-    rows.push({
-      day: campusDay(lesson.start),
-      title: lesson.title,
-      time: `${campusClock(lesson.start)}–${campusClock(lesson.end)}`.replace(/–$/, ""),
-      where: lesson.location || "",
-      kind: "Lezione",
-      tone: "lesson",
-      source_id: lesson.source_id,
-    });
-  }
-  for (const event of state.calendar?.evening_events || []) {
-    rows.push({
-      day: campusDay(event.start),
-      title: event.title,
-      time: campusClock(event.start),
-      where: event.location || "",
-      kind: "Serata",
-      tone: "evening",
-      source_id: event.source_id,
-    });
-  }
-  for (const item of state.calendar?.agenda || []) {
-    rows.push({
-      day: campusDay(item.start),
-      title: item.title || item.event_id,
-      time: campusClock(item.start),
-      where: item.location || "",
-      kind: "Agenda",
-      tone: "agenda",
-      source_id: item.source_id,
-    });
-  }
-  return rows.filter((row) => row.day);
-}
-
-function longDay(key) {
-  const { y, m, d } = parseDay(key);
+function formatWhen(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return String(iso);
   return new Intl.DateTimeFormat("it-IT", {
-    weekday: "long",
+    timeZone: "Europe/Rome",
     day: "numeric",
     month: "long",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(y, m - 1, d, 12)));
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(d);
 }
 
-function renderCalendarView() {
-  const node = document.getElementById("calendar-body");
-  const detail = document.getElementById("calendar-day");
-  const heading = document.getElementById("cal-heading");
-  if (!node || !state.calendar) return;
-  if (!state.calendarAnchor) state.calendarAnchor = demoDay();
-  const anchor = state.calendarAnchor;
-  const mode = state.calendarMode === "week" ? "week" : "month";
-  const monthBtn = document.getElementById("cal-mode-month");
-  const weekBtn = document.getElementById("cal-mode-week");
-  if (monthBtn) monthBtn.setAttribute("aria-pressed", mode === "month" ? "true" : "false");
-  if (weekBtn) weekBtn.setAttribute("aria-pressed", mode === "week" ? "true" : "false");
-  const { y, m } = parseDay(anchor);
-  if (heading) {
-    if (mode === "week") {
-      const start = addDays(anchor, -weekdayMon0(anchor));
-      const end = addDays(start, 6);
-      const startParts = parseDay(start);
-      const endParts = parseDay(end);
-      heading.textContent = start.slice(0, 7) === end.slice(0, 7)
-        ? `${startParts.d}–${endParts.d} ${CAL_MONTHS[endParts.m - 1]} ${endParts.y}`
-        : `${startParts.d} ${CAL_MONTHS[startParts.m - 1]} – ${endParts.d} ${CAL_MONTHS[endParts.m - 1]} ${endParts.y}`;
-    } else {
-      heading.textContent = `${CAL_MONTHS[m - 1].charAt(0).toUpperCase()}${CAL_MONTHS[m - 1].slice(1)} ${y}`;
-    }
-  }
-  const entries = calendarEntries();
-  const byDay = new Map();
-  for (const row of entries) {
-    const list = byDay.get(row.day) || [];
-    list.push(row);
-    byDay.set(row.day, list);
-  }
-  const today = demoDay();
-  node.replaceChildren();
-  const grid = el("div", { class: `iphone-cal ${mode}`, role: "grid", "aria-label": mode === "week" ? "Settimana" : "Mese" });
-  for (const label of CAL_WEEKDAYS) {
-    grid.append(el("div", { class: "cal-dow", text: label }));
-  }
-  const { y: ay, m: am } = parseDay(anchor);
-  const first = dayKey(ay, am, 1);
-  const origin = mode === "week" ? addDays(anchor, -weekdayMon0(anchor)) : addDays(first, -weekdayMon0(first));
-  const count = mode === "week" ? 7 : 42;
-  for (let index = 0; index < count; index += 1) {
-    const key = addDays(origin, index);
-    const inMonth = parseDay(key).m === am;
-    const selected = key === anchor;
-    const dayEntries = byDay.get(key) || [];
-    const button = el("button", {
-      type: "button",
-      class: `cal-day${inMonth || mode === "week" ? "" : " outside"}${selected ? " selected" : ""}${key === today ? " today" : ""}`,
-      "data-action": "cal-day",
-      "data-id": key,
-      "aria-pressed": selected ? "true" : "false",
-      "aria-label": `${longDay(key)}${dayEntries.length ? `, ${dayEntries.length} voci` : ""}`,
-    });
-    button.append(el("span", { class: "cal-num", text: String(Number(key.slice(8))) }));
-    if (mode === "week") {
-      const stack = el("div", { class: "cal-pills" });
-      for (const row of dayEntries.slice(0, 3)) {
-        stack.append(el("span", { class: `cal-pill tone-${row.tone}`, text: row.title }));
-      }
-      if (dayEntries.length > 3) stack.append(el("span", { class: "cal-more", text: `+${dayEntries.length - 3}` }));
-      button.append(stack);
-    } else {
-      const dots = el("span", { class: "cal-dots" });
-      for (const tone of [...new Set(dayEntries.map((row) => row.tone))].slice(0, 3)) {
-        dots.append(el("i", { class: `dot tone-${tone}` }));
-      }
-      button.append(dots);
-    }
-    grid.append(button);
-  }
-  node.append(grid);
-  if (!detail) return;
-  const chosen = byDay.get(anchor) || [];
-  detail.replaceChildren(el("h3", { text: longDay(anchor) }));
-  if (!chosen.length) {
-    detail.append(el("p", { class: "meta", text: "Niente in questo giorno. Tocca un giorno con il puntino per le lezioni, la serata o l'agenda." }));
+function openEventDetail(eventId) {
+  const ev = (state.events || []).find((e) => e.id === eventId);
+  const dlg = document.getElementById("event-modal");
+  const body = document.getElementById("event-modal-body");
+  if (!ev || !dlg || !body) {
+    if (eventId) openSource(eventId);
     return;
   }
-  for (const row of chosen) {
-    detail.append(el("article", { class: "mini-card cal-item" }, [
-      el("p", { class: `board-pill tone-${row.tone}`, text: row.kind }),
-      el("h3", { text: row.title }),
-      el("p", { text: [row.time, row.where].filter(Boolean).join(" · ") }),
-      el("p", { class: "meta", text: row.source_id || "" }),
-    ]));
+  const cancelled = isEventCancelled(ev);
+  const enrolled = state.enrolledIds?.has(ev.id);
+  const place = ev.location_name || ev.building || (ev.location && (ev.location.name || ev.location.building)) || "Campus";
+  const seatsLeft = (ev.capacity != null && ev.going != null)
+    ? Math.max(0, ev.capacity - ev.going)
+    : (ev.capacity != null ? ev.capacity : null);
+  const groups = eventGroups(ev);
+  const sourceIds = [ev.id, ev.source_id].filter(Boolean);
+  const kids = [
+    el("p", { class: "eyebrow", text: `${ev.host || "Student Life"} · EVENTO` }),
+    el("h2", { id: "event-modal-title", text: ev.title }),
+    el("p", { class: "lede", text: ev.description || ev.blurb || "Evento del campus." }),
+  ];
+  if (groups.length) {
+    const tags = el("div", { class: "event-tags" });
+    for (const g of groups.slice(0, 4)) tags.append(el("span", { text: g }));
+    kids.push(tags);
+  }
+  kids.push(el("div", { class: "event-modal-meta" }, [
+    el("div", {}, [el("span", { class: "k", text: "Quando" }), el("span", { text: `${formatWhen(ev.starts_at)}${ev.ends_at ? " – " + timeRange(ev.starts_at).split("–")[1] : ""}` })]),
+    el("div", {}, [el("span", { class: "k", text: "Dove" }), el("span", { text: place })]),
+    el("div", {}, [el("span", { class: "k", text: "Organizzatore" }), el("span", { text: ev.host || "Student Life" })]),
+    el("div", {}, [el("span", { class: "k", text: "Disponibilità" }), el("span", { text: cancelled ? "Annullato" : (seatsLeft != null ? `${seatsLeft} posti disponibili` : "Aperto") })]),
+  ]));
+  const actions = el("div", { class: "event-modal-actions" });
+  if (cancelled) {
+    actions.append(el("button", { type: "button", class: "solid forest", disabled: "disabled", text: "Evento annullato" }));
+  } else if (enrolled) {
+    actions.append(el("button", {
+      type: "button", class: "solid forest", text: "Annulla iscrizione",
+      "data-action": "event-unroll", "data-id": ev.id,
+    }));
+  } else {
+    actions.append(el("button", {
+      type: "button", class: "solid forest", text: "Iscriviti all'evento",
+      "data-action": "event-enroll", "data-id": ev.id,
+    }));
+  }
+  actions.append(el("button", {
+    type: "button", class: "ghost assist", text: "Chiedi all'assistente ✦",
+    "data-action": "event-ask", "data-id": ev.id,
+  }));
+  kids.push(actions);
+  const sources = el("div", { class: "event-sources" }, [
+    el("p", { class: "eyebrow", text: "Documenti e fonti" }),
+    el("div", { class: "src-row" }, sourceIds.map((sid) => el("button", {
+      type: "button",
+      text: sid,
+      "data-action": "source",
+      "data-id": sid,
+      title: sid,
+    }))),
+  ]);
+  kids.push(sources);
+  kids.push(el("p", { class: "micro", text: "Iscrizione simulata. Compare in agenda solo dopo Approva (happy path)." }));
+  body.replaceChildren(...kids);
+  body.className = "event-modal-body";
+  try {
+    if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); }
+    else dlg.setAttribute("open", "");
+  } catch (_) { dlg.setAttribute("open", ""); }
+}
+
+function closeEventModal() {
+  const dlg = document.getElementById("event-modal");
+  if (!dlg) return;
+  try { if (dlg.open) dlg.close(); else dlg.removeAttribute("open"); } catch (_) { dlg.removeAttribute("open"); }
+}
+
+function showHosToast(text) {
+  let t = document.getElementById("hos-toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "hos-toast";
+    t.className = "toast-hos";
+    document.body.appendChild(t);
+  }
+  t.hidden = false;
+  t.textContent = text;
+  clearTimeout(showHosToast._timer);
+  showHosToast._timer = setTimeout(() => { t.hidden = true; }, 2800);
+}
+
+async function enrollEvent(eventId) {
+  if (!state.enrolledIds) state.enrolledIds = new Set();
+  state.enrolledIds.add(eventId);
+  closeEventModal();
+  showHosToast("Iscrizione simulata — conferma con Approva nella bacheca");
+  updateAgendaBadge();
+  try { await tickAgent(); } catch (_) {}
+}
+
+function unrollEvent(eventId) {
+  state.enrolledIds?.delete(eventId);
+  closeEventModal();
+  showHosToast("Iscrizione simulata annullata");
+  updateAgendaBadge();
+  renderIgFeed();
+}
+
+function askAboutEvent(eventId) {
+  const ev = (state.events || []).find((e) => e.id === eventId);
+  closeEventModal();
+  openAiOverlay(true);
+  const input = document.getElementById("assistant-input");
+  if (input && ev) {
+    input.value = `Dimmi di più su «${ev.title}» (${ev.id})`;
+    document.getElementById("assistant-form")?.requestSubmit();
   }
 }
 
-function renderBookings() {
-  const list = document.getElementById("booking-list");
-  const agenda = document.getElementById("agenda-list");
-  if (list) {
-    list.replaceChildren();
-    for (const row of state.recommendations) {
-      list.append(el("article", { class: "mini-card" }, [
-        el("h3", { text: row.title }),
-        el("p", { text: row.reason }),
-        el("button", { class: "leaf", type: "button", "data-action": "propose", "data-id": row.event_id, text: "Proponi iscrizione" }),
-      ]));
-    }
+function updateAgendaBadge() {
+  const badge = document.getElementById("agenda-badge");
+  if (!badge) return;
+  const n = (state.enrolledIds && state.enrolledIds.size) || 0;
+  const pending = (state.actions || []).filter((a) => a.status === "pending").length;
+  badge.textContent = String(n + pending);
+}
+
+
+function renderFilterPills() {
+  const root = document.getElementById("filter-pills");
+  if (!root) return;
+  root.replaceChildren();
+  const labels = ["Tutti", ...SOURCE_TYPES.map((s) => s.label)];
+  const active = state.sourceFilter || state.boardFilter || "Tutti";
+  for (const label of labels) {
+    root.append(el("button", {
+      type: "button",
+      class: `filter-pill${label === active ? " active" : ""}`,
+      "data-action": "filter-pill",
+      "data-id": label,
+      text: label,
+    }));
   }
-  if (agenda) {
-    agenda.replaceChildren(el("h3", { text: "My Agenda" }));
-    if (!state.agenda.length) agenda.append(el("p", { text: "Vuota finché un'approvazione non registra l'iscrizione simulata." }));
-    for (const row of state.agenda) {
-      agenda.append(el("article", { class: "mini-card" }, [
-        el("h3", { text: row.title || row.event_id }),
-        el("p", { class: "meta", text: `${row.status} · ${row.mode} · ${row.source_id}` }),
-      ]));
-    }
+}
+
+function filteredEvents() {
+  const q = (state.boardSearch || "").trim().toLowerCase();
+  let list = (state.events || []).slice();
+  const matchIds = new Set((state.matches || []).map((m) => m.event_id));
+  list.sort((a, b) => {
+    const am = matchIds.has(a.id) ? 0 : 1;
+    const bm = matchIds.has(b.id) ? 0 : 1;
+    if (am !== bm) return am - bm;
+    return String(a.starts_at || "").localeCompare(String(b.starts_at || ""));
+  });
+  const status = state.boardStatus || "programmati";
+  if (status === "conclusi") list = list.filter((ev) => isEventPast(ev) || isEventCancelled(ev));
+  else list = list.filter((ev) => !isEventPast(ev));
+  const srcFilter = state.sourceFilter || state.boardFilter || "Tutti";
+  if (srcFilter && srcFilter !== "Tutti") {
+    list = list.filter((ev) => classifyEventSource(ev).label === srcFilter);
   }
-  const strip = document.getElementById("agenda-strip");
-  if (strip) {
-    strip.replaceChildren(el("h3", { text: "In agenda" }));
-    if (!state.agenda.length) strip.append(el("p", { class: "meta", text: "Vuota finché Approva non registra l'iscrizione simulata." }));
-    for (const row of state.agenda) {
-      strip.append(el("button", {
+  if (q) {
+    list = list.filter((ev) => {
+      const hay = `${ev.title || ""} ${(ev.tags || []).join(" ")} ${ev.location_name || ""} ${ev.host || ""} ${ev.building || ""}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  return list;
+}
+
+function filteredBoardPosts() {
+  const q = (state.boardSearch || "").trim().toLowerCase();
+  const srcFilter = state.sourceFilter || state.boardFilter || "Tutti";
+  const status = state.boardStatus || "programmati";
+  let list = (state.boardPosts || []).slice();
+  if (status === "conclusi") {
+    // messages stay in archive view too
+  }
+  if (srcFilter && srcFilter !== "Tutti") {
+    list = list.filter((p) => p.sourceLabel === srcFilter);
+  }
+  if (q) {
+    list = list.filter((p) => {
+      const hay = `${p.title || ""} ${p.text || ""} ${p.author || ""} ${p.org || ""} ${p.sourceLabel || ""}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  list.sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
+  return list;
+}
+
+function initialsFrom(name) {
+  const parts = String(name || "?").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function buildIgCard({ id, src, author, caption, meta, visualStyle, visualChild, actions, extraClass }) {
+  const attrs = { class: `ig-card ${src.css}${extraClass ? ` ${extraClass}` : ""}` };
+  if (id) attrs.id = id;
+  const card = el("article", attrs);
+  const head = el("div", { class: "ig-card-head" }, [
+    el("div", { class: `ig-avatar ${src.css}`, text: initialsFrom(author || src.label) }),
+    el("div", { class: "ig-who" }, [
+      el("span", { class: `ig-role ${src.css}`, text: src.label }),
+      el("span", { class: "ig-nick", text: author || src.label }),
+    ]),
+  ]);
+  const poster = el("div", { class: "ig-poster" });
+  if (visualStyle) poster.setAttribute("style", visualStyle);
+  if (visualChild) poster.append(visualChild);
+  else poster.append(el("p", { class: "ig-poster-title", text: (caption || "").slice(0, 72) }));
+  const cap = el("p", { class: "ig-caption" });
+  cap.append(el("strong", { text: author || src.label }), document.createTextNode(" " + (caption || "")));
+  const body = el("div", { class: "ig-body" }, [
+    cap,
+    el("p", { class: "ig-meta", text: meta || "" }),
+  ]);
+  const acts = el("div", { class: "ig-actions" });
+  for (const a of actions || []) acts.append(a);
+  card.append(head, poster, body, acts);
+  return card;
+}
+
+function renderIgFeed() {
+  const root = document.getElementById("ig-feed");
+  if (!root) return;
+  root.replaceChildren();
+  root.className = "ig-feed";
+  const posts = filteredBoardPosts();
+  const events = filteredEvents();
+  const count = document.getElementById("event-count");
+  if (count) count.textContent = `${posts.length + events.length} avvisi`;
+
+  for (const notice of (state.notices || []).slice(0, 2)) {
+    const src = SOURCE_BY_ID.office;
+    root.append(buildIgCard({
+      id: `notice-${notice.id || notice.event_title || "n"}`,
+      src,
+      author: "Bacheca campus",
+      caption: notice.event_title || "Avviso",
+      meta: notice.text || "",
+      visualStyle: "background:linear-gradient(135deg,#0b3d91,#6b8fd6)",
+      actions: [
+        el("button", { type: "button", text: "Chatta ↗", "data-action": "section", "data-id": "chatta" }),
+      ],
+      extraClass: "is-message",
+    }));
+  }
+
+  for (const post of posts.slice(0, 20)) {
+    const src = SOURCE_BY_ID[post.source] || SOURCE_BY_ID.office;
+    const author = post.author || post.org || src.label;
+    const whenTxt = post.at
+      ? new Intl.DateTimeFormat("it-IT", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }).format(new Date(post.at))
+      : "";
+    root.append(buildIgCard({
+      id: `post-${post.id}`,
+      src,
+      author,
+      caption: post.text || "",
+      meta: [whenTxt, post.org].filter(Boolean).join(" · "),
+      visualStyle: posterStyle(post.id || author, post.text || src.label),
+      actions: [
+        el("button", { type: "button", text: "Rispondi ↗", "data-action": "section", "data-id": "chatta" }),
+      ],
+      extraClass: "is-message",
+    }));
+  }
+
+  if (!posts.length && !events.length && !(state.notices || []).length) {
+    root.append(el("p", { class: "meta", text: "Nessun avviso per questo filtro. Apri Filtri sotto il feed o personalizza la bacheca." }));
+    renderSceltoPerTe();
+    updateAgendaBadge();
+    return;
+  }
+
+  for (const ev of events.slice(0, 18)) {
+    const src = classifyEventSource(ev);
+    const badge = dateBadge(ev.starts_at);
+    const place = ev.location_name || ev.building || (ev.location && (ev.location.name || ev.location.building)) || "Campus";
+    const mapPlace = findPlaceByName(place);
+    const metaBits = [timeRange(ev.starts_at), place].filter(Boolean).join(" · ");
+    const author = ev.host || src.label;
+    const cancelled = isEventCancelled(ev);
+    const seatsLeft = (ev.capacity != null && ev.going != null)
+      ? Math.max(0, ev.capacity - ev.going)
+      : (ev.capacity != null ? ev.capacity : null);
+    const dateNode = el("div", { class: "ig-date-badge" }, [
+      el("strong", { text: badge.day }),
+      el("span", { text: badge.mon }),
+    ]);
+    const titleOverlay = el("p", { class: "ig-poster-title", text: ev.title });
+    const posterInner = el("div", { class: "ig-poster-inner" });
+    posterInner.append(dateNode, titleOverlay);
+    const actions = [
+      el("button", {
         type: "button",
-        class: "scelto-card",
-        "data-action": "event-open",
-        "data-id": row.event_id,
-      }, [
-        el("strong", { text: row.title || row.event_id }),
-        el("span", { text: `${row.status} · ${row.source_id}` }),
-      ]));
-    }
-  }
-}
-
-function renderShelf() {
-  const node = document.getElementById("shelf-list");
-  if (!node) return;
-  node.replaceChildren();
-  for (const post of state.posts.filter((item) => item.kind === "share")) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: post.title }),
-      el("p", { text: post.body }),
-      el("p", { class: "meta", text: post.source_id }),
-    ]));
-  }
-}
-
-function renderContacts() {
-  const node = document.getElementById("contact-list");
-  if (!node) return;
-  node.replaceChildren();
-  for (const contact of state.contacts) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: contact.name }),
-      el("p", { text: `${contact.role} · ${contact.where || ""}` }),
-      el("p", { class: "meta", text: `${contact.email} · ${contact.note}` }),
-    ]));
-  }
-}
-
-function renderLinks() {
-  const canvas = document.getElementById("canvas-pane");
-  const pronote = document.getElementById("pronote-pane");
-  const session = state.session;
-  if (canvas) {
-    canvas.textContent = session?.canvas_id ? `Link salvato, non aperto: ${session.canvas_id}` : "Canvas non collegato.";
-  }
-  if (pronote) {
-    pronote.textContent = session?.pronote_id ? `Link salvato, non aperto: ${session.pronote_id}` : "Pronote non collegato.";
-  }
-}
-
-function renderFeedback() {
-  const select = document.getElementById("feedback-event");
-  if (select && state.events.length && select.options.length !== state.events.length + 1) {
-    const current = select.value;
-    select.replaceChildren(el("option", { value: "", text: "Scegli un evento" }));
-    for (const event of state.events) {
-      select.append(el("option", { value: event.id, text: event.title }));
-    }
-    if (current) select.value = current;
-  }
-  const node = document.getElementById("feedback-list");
-  if (!node) return;
-  node.replaceChildren();
-  for (const item of state.feedback) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: `${item.author_name} · ${item.rating}/5` }),
-      el("p", { text: item.body }),
-    ]));
-  }
-}
-
-function renderSettings() {
-  const node = document.getElementById("settings-summary");
-  if (!node || !state.session) return;
-  node.textContent = `Mi piace: ${(state.session.likes || []).join(", ") || "nessuno"}. Scarti: ${(state.session.dislikes || []).join(", ") || "nessuno"}.`;
-}
-
-function setAssistant(show) {
-  const panel = document.getElementById("ai-overlay");
-  const chip = document.getElementById("ai-chip");
-  const head = document.querySelector(".head-ai");
-  if (!panel) return;
-  panel.hidden = !show;
-  if (chip) chip.setAttribute("aria-expanded", show ? "true" : "false");
-  if (head) head.setAttribute("aria-expanded", show ? "true" : "false");
-}
-
-function toggleAssistant(open) {
-  const panel = document.getElementById("ai-overlay");
-  if (!panel) return;
-  setAssistant(open ? panel.hidden : false);
-}
-
-function renderChat() {
-  const log = document.getElementById("ai-log");
-  const mode = document.getElementById("assistant-mode");
-  if (mode && state.health) {
-    const last = [...state.chat].reverse().find((item) => item.role === "assistant" && item.assistant);
-    if (last?.model === "gemini" || last?.assistant === "gemma") mode.textContent = "Gemini ha ragionato solo sui passaggi recuperati.";
-    else if (last?.model === "fallback_after_gemini" || last?.assistant === "fallback_after_gemma") mode.textContent = "Gemini scartato: il ragionamento resta sui documenti citati.";
-    else if (state.health.gemma === "planned") mode.textContent = "Retrieval reale. Gemini è PLANNED, non collegato.";
-    else mode.textContent = "Gemini può ragionare solo sui passaggi recuperati.";
-  }
-  if (!log) return;
-  log.replaceChildren();
-  for (const message of state.chat) {
-    const bubble = el("div", { class: `bubble ${message.role === "student" ? "user" : "assistant"}` });
-    if (message.reasoning?.length) {
-      const trace = el("ol", { class: "trace" });
-      for (const step of message.reasoning) trace.append(el("li", { text: step }));
-      bubble.append(el("p", { class: "meta", text: "Retrieval → ragionamento → risposta" }), trace);
-    }
-    bubble.append(el("p", { text: message.text }));
-    if (message.source_ids) {
-      for (const sourceId of message.source_ids) {
-        bubble.append(el("button", { class: "ghost", type: "button", "data-action": "source", "data-id": sourceId, text: sourceId }));
-      }
-    }
-    const top = (message.recommendations || [])[0];
-    const pendingSame = state.proposal && top && state.proposal.event_id === top.event_id;
-    const already = top && state.agenda.some((row) => row.event_id === top.event_id);
-    if (top && message.latestRecommend && !pendingSame && !already) {
-      bubble.append(el("p", { class: "meta", text: `Brain · ${top.title} · ${top.source_id}` }));
-      bubble.append(el("button", {
-        class: "solid",
+        text: "Scopri ↗",
+        "data-action": "scopri",
+        "data-id": ev.id,
+      }),
+    ];
+    if (mapPlace) {
+      actions.unshift(el("button", {
         type: "button",
-        "data-action": "propose",
-        "data-id": top.event_id,
-        text: "Proponi iscrizione",
+        text: "Mappa",
+        title: place,
+        "data-action": "open-map",
+        "data-id": mapPlace.id,
       }));
     }
-    log.append(bubble);
+    actions.push(el("span", {
+      class: "ig-seats",
+      text: cancelled ? "Annullato" : (seatsLeft != null ? `${seatsLeft} posti` : "Aperto"),
+    }));
+    root.append(buildIgCard({
+      id: `feed-${ev.id}`,
+      src,
+      author,
+      caption: ev.title,
+      meta: metaBits,
+      visualStyle: posterStyle(ev.id, ev.title),
+      visualChild: posterInner,
+      actions,
+      extraClass: cancelled ? "cancelled" : "",
+    }));
   }
-  if (state.proposal) {
-    log.append(el("div", { class: "bubble assistant" }, [
-      el("p", { text: `Agent · proposta ${state.proposal.approval_id} per ${state.proposal.event_title}. Fonte ${state.proposal.source_id}. L'agenda è ancora vuota.` }),
-      el("button", { class: "solid", type: "button", "data-action": "approve-reg", text: "Approva" }),
-      el("button", { class: "ghost", type: "button", "data-action": "reject-reg", text: "Rifiuta" }),
-    ]));
-  }
-  if (state.agenda.length) {
-    const agenda = el("div", { class: "bubble assistant" });
-    agenda.append(el("p", { text: "Agenda" }));
-    for (const row of state.agenda) {
-      agenda.append(el("p", { text: `${row.title || row.event_id} · ${row.source_id} · ${row.status}` }));
-    }
-    log.append(agenda);
-  }
-  log.scrollTop = log.scrollHeight;
+  renderSceltoPerTe();
+  updateAgendaBadge();
 }
 
-async function askAssistant(text) {
-  const message = String(text || "").trim();
-  if (!message || !state.selectedId) return;
-  state.chat.push({ role: "student", text: message });
-  renderChat();
-  try {
-    const answer = await api("/assistant/ask", {
-      method: "POST",
-      body: JSON.stringify({ user_id: state.selectedId, message }),
-    });
-    const recommendations = answer.recommendations || [];
-    for (const item of state.chat) delete item.latestRecommend;
-    state.chat.push({
-      role: "assistant",
-      text: answer.text,
-      source_ids: answer.source_ids || [],
-      assistant: answer.assistant || "dataset",
-      model: answer.model || "deterministic",
-      reasoning: answer.reasoning || [],
-      recommendations,
-      latestRecommend: recommendations.length > 0,
-    });
-  } catch (error) {
-    state.chat.push({ role: "assistant", text: error.message || "Nessuna risposta.", source_ids: [] });
-  }
-  renderChat();
-}
 
-async function proposeRegistration(eventId) {
-  try {
-    const result = await api("/registrations/propose", {
-      method: "POST",
-      body: JSON.stringify({ user_id: state.selectedId, event_id: eventId }),
-    });
-    state.proposal = result.proposal;
-    state.agenda = [];
-    state.chat.push({
-      role: "assistant",
-      text: "Proposta registrata in attesa. Nessuna iscrizione in agenda finché non premi Approva.",
-      source_ids: result.proposal?.source_id ? [result.proposal.source_id] : [],
-    });
-    render();
-  } catch (error) {
-    state.error = error.message || "Proposta non creata.";
-    render();
-  }
-}
-
-async function approveRegistration() {
-  if (!state.proposal) return;
-  try {
-    const approved = await api("/registrations/approve", {
-      method: "POST",
-      body: JSON.stringify({ user_id: state.selectedId, approval_id: state.proposal.approval_id }),
-    });
-    const sourceId = approved.source_id || state.proposal.source_id;
-    state.proposal = null;
-    state.chat.push({
-      role: "assistant",
-      text: `Agenda aggiornata: ${approved.registration?.event_title || sourceId}. Fonte: ${sourceId}. Iscrizione simulata.`,
-      source_ids: sourceId ? [sourceId] : [],
-    });
-    await refreshStudent();
-    showView("calendario");
-    setAssistant(true);
-  } catch (error) {
-    state.error = error.message || "Iscrizione non registrata.";
-    render();
-  }
-}
-
-async function rejectRegistration() {
-  if (!state.proposal) return;
-  try {
-    await api("/registrations/reject", {
-      method: "POST",
-      body: JSON.stringify({ user_id: state.selectedId, approval_id: state.proposal.approval_id }),
-    });
-    state.proposal = null;
-    render();
-  } catch (error) {
-    state.error = error.message || "Rifiuto non registrato.";
-    render();
-  }
-}
-
-function feedbackSubject() {
-  const select = document.getElementById("feedback-event");
-  const date = document.getElementById("feedback-date").value;
-  const event = state.events.find((item) => item.id === select.value);
-  const subject = event && date ? `${event.title} · ${date}` : "";
-  const preview = document.getElementById("feedback-subject");
-  if (preview) preview.textContent = subject ? `Oggetto: ${subject}` : "Oggetto: evento · data";
-  return subject.slice(0, 160);
-}
-
-async function sendFeedback() {
-  const chips = [...document.querySelectorAll("#feedback-chips button[aria-pressed='true']")].map((button) => button.dataset.id);
-  const typed = document.getElementById("feedback-body").value.trim();
-  const body = [...chips, typed].filter(Boolean).join(". ");
-  const subject = feedbackSubject();
-  const rating = Number(document.getElementById("feedback-rating").value);
-  if (!subject || body.length < 8) {
-    state.error = "Servono un evento, una data e un commento di almeno 8 caratteri.";
-    render();
+function openPersonalizeModal(show) {
+  const dlg = document.getElementById("personalize-modal");
+  if (!dlg) {
+    if (show) showScreen("prefs");
     return;
   }
-  try {
-    await api("/feedback", {
-      method: "POST",
-      body: JSON.stringify({ user_id: state.selectedId, body, subject, rating }),
-    });
-    document.getElementById("feedback-body").value = "";
-    state.feedback = (await api("/feedback")).feedback;
-    renderFeedback();
-  } catch (error) {
-    state.error = error.message || "Feedback non pubblicato.";
-    render();
+  if (show) {
+    state.interestDraft = new Set();
+    const likes = new Set(state.session?.likes || []);
+    for (const g of INTEREST_GROUPS) {
+      if (g.tags.some((t) => likes.has(t))) state.interestDraft.add(g.id);
+    }
+    try { renderInterestGrid(); } catch (e) { console.warn(e); }
+    try {
+      if (typeof dlg.showModal === "function") {
+        if (!dlg.open) dlg.showModal();
+      } else {
+        dlg.setAttribute("open", "");
+      }
+    } catch (e) {
+      console.warn("showModal failed", e);
+      dlg.setAttribute("open", "");
+      showScreen("prefs");
+    }
+  } else {
+    try {
+      if (typeof dlg.close === "function" && dlg.open) dlg.close();
+      else dlg.removeAttribute("open");
+    } catch (_) {
+      dlg.removeAttribute("open");
+    }
   }
 }
+
+function renderInterestGrid() {
+  const grid = document.getElementById("interest-grid");
+  if (!grid) return;
+  grid.replaceChildren();
+  for (const g of INTEREST_GROUPS) {
+    const on = state.interestDraft.has(g.id);
+    grid.append(el("button", {
+      type: "button",
+      class: `interest-tile${on ? " on" : ""}`,
+      "data-action": "toggle-interest",
+      "data-id": g.id,
+    }, [
+      el("span", { class: "ico", text: g.icon }),
+      el("strong", { text: g.label }),
+      el("span", { text: on ? "Selezionato" : "Tocca per scegliere" }),
+    ]));
+  }
+}
+
+function toggleInterestDraft(id) {
+  if (state.interestDraft.has(id)) state.interestDraft.delete(id);
+  else state.interestDraft.add(id);
+  renderInterestGrid();
+}
+
+async function applyInterestDraft(requireSome) {
+  if (!state.session) return;
+  if (requireSome && !state.interestDraft.size) {
+    state.error = "Scegli almeno un interesse, oppure esplora senza preferenze.";
+    const err = document.getElementById("error");
+    if (err) { err.hidden = false; err.textContent = state.error; }
+    return;
+  }
+  const likes = [];
+  for (const g of INTEREST_GROUPS) {
+    if (state.interestDraft.has(g.id)) {
+      for (const t of g.tags) {
+        if (state.tags.includes(t) && !likes.includes(t)) likes.push(t);
+      }
+    }
+  }
+  state.session.likes = likes;
+  state.session.dislikes = (state.session.dislikes || []).filter((t) => !likes.includes(t));
+  saveSession(state.session);
+  openPersonalizeModal(false);
+  await enterDesk();
+}
+
+function wirePersonalize() {
+  if (wirePersonalize._done) return;
+  wirePersonalize._done = true;
+  document.getElementById("find-community-btn")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyInterestDraft(true);
+  });
+  document.getElementById("explore-no-prefs-btn")?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    if (state.session) {
+      state.session.likes = state.session.likes || [];
+      saveSession(state.session);
+    }
+    openPersonalizeModal(false);
+    if (state.session) {
+      try { await enterDesk(); } catch (_) { showScreen("desk"); focusSection("bacheca"); }
+    }
+  });
+  document.getElementById("bacheca-search")?.addEventListener("input", (event) => {
+    state.boardSearch = event.target.value || "";
+    renderIgFeed();
+  });
+  document.getElementById("board-status")?.addEventListener("change", (event) => {
+    state.boardStatus = event.target.value || "programmati";
+    renderIgFeed();
+  });
+  const dlg = document.getElementById("personalize-modal");
+  dlg?.addEventListener("click", (event) => {
+    if (event.target === dlg) openPersonalizeModal(false);
+  });
+}
+
+function renderBoardList() {
+  /* student chat channel list removed */
+}
+
+function renderChatThread() {
+  /* student chat thread removed */
+}
+
+const calUi = {
+  mode: "month",
+  cursor: null,
+  selected: null,
+};
+
+function calItemsByDate() {
+  const map = new Map();
+  for (const item of state.calendar?.items || []) {
+    if (!item.date) continue;
+    if (!map.has(item.date)) map.set(item.date, []);
+    map.get(item.date).push(item);
+  }
+  return map;
+}
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function startOfWeekMonday(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = (x.getDay() + 6) % 7;
+  x.setDate(x.getDate() - day);
+  return x;
+}
+
+function renderCalendar() {
+  const grid = document.getElementById("cal-grid");
+  const list = document.getElementById("calendar-list");
+  const label = document.getElementById("cal-month-label");
+  const heading = document.getElementById("cal-day-heading");
+  if (!grid || !list) return;
+
+  if (!calUi.cursor) {
+    const demo = state.calendar?.demo_now ? new Date(state.calendar.demo_now) : new Date();
+    calUi.cursor = new Date(demo.getFullYear(), demo.getMonth(), 1);
+    calUi.selected = ymd(demo);
+  }
+
+  const byDay = calItemsByDate();
+  const monthFmt = new Intl.DateTimeFormat("it-IT", { month: "long", year: "numeric" });
+  if (label) {
+    label.textContent = calUi.mode === "week"
+      ? ("Settimana · " + monthFmt.format(calUi.cursor))
+      : monthFmt.format(calUi.cursor).replace(/^./, (c) => c.toUpperCase());
+  }
+
+  document.querySelectorAll(".cal-mode").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.calMode === calUi.mode);
+  });
+
+  grid.replaceChildren();
+  let cells = [];
+  if (calUi.mode === "week") {
+    const start = startOfWeekMonday(new Date(calUi.selected + "T12:00:00"));
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      cells.push({ date: d, muted: false });
+    }
+  } else {
+    const year = calUi.cursor.getFullYear();
+    const month = calUi.cursor.getMonth();
+    const first = new Date(year, month, 1);
+    const startPad = (first.getDay() + 6) % 7;
+    const start = new Date(year, month, 1 - startPad);
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      cells.push({ date: d, muted: d.getMonth() !== month });
+    }
+  }
+
+  const today = ymd(state.calendar?.demo_now ? new Date(state.calendar.demo_now) : new Date());
+  for (const cell of cells) {
+    const key = ymd(cell.date);
+    const rows = byDay.get(key) || [];
+    const dots = el("span", { class: "cal-dots" }, rows.slice(0, 3).map((r) => el("span", { class: "dot" + (r.kind === "evento" ? " evento" : "") })));
+    const btn = el("button", {
+      type: "button",
+      class: "cal-cell" + (cell.muted ? " muted" : "") + (key === today ? " today" : "") + (key === calUi.selected ? " selected" : ""),
+      "data-cal-day": key,
+      "aria-label": key,
+    }, [
+      el("span", { text: String(cell.date.getDate()) }),
+      dots,
+    ]);
+    btn.addEventListener("click", () => {
+      calUi.selected = key;
+      if (calUi.mode === "month") calUi.cursor = new Date(cell.date.getFullYear(), cell.date.getMonth(), 1);
+      renderCalendar();
+    });
+    grid.append(btn);
+  }
+
+  list.replaceChildren();
+  const dayRows = (byDay.get(calUi.selected) || []).slice().sort((a, b) => String(a.start).localeCompare(String(b.start)));
+  const dayFmt = new Intl.DateTimeFormat("it-IT", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome" });
+  if (heading) {
+    heading.textContent = dayFmt.format(new Date(calUi.selected + "T12:00:00+02:00"));
+  }
+  if (!dayRows.length) {
+    list.append(el("p", { class: "meta", text: "Nessuna lezione o evento in questo giorno." }));
+  } else {
+    for (const row of dayRows) {
+      list.append(el("article", { class: "cal-item kind-" + row.kind + (row.past ? " past" : "") }, [
+        el("p", { class: "cal-when", text: row.start + "\u2013" + row.end }),
+        el("h4", { text: row.title }),
+        el("p", { class: "meta", text: (row.kind === "lezione" ? "Lezione" : "Evento") + " · " + (row.location || "Campus") + " · " + (row.series_id || row.id || "") }),
+        row.blurb ? el("p", { text: row.blurb }) : null,
+      ]));
+    }
+  }
+
+  const shell = document.getElementById("iphone-cal");
+  if (shell && !shell.dataset.wired) {
+    shell.dataset.wired = "1";
+    document.getElementById("cal-prev")?.addEventListener("click", () => {
+      if (calUi.mode === "week") {
+        const d = new Date(calUi.selected + "T12:00:00");
+        d.setDate(d.getDate() - 7);
+        calUi.selected = ymd(d);
+        calUi.cursor = new Date(d.getFullYear(), d.getMonth(), 1);
+      } else {
+        calUi.cursor = new Date(calUi.cursor.getFullYear(), calUi.cursor.getMonth() - 1, 1);
+      }
+      renderCalendar();
+    });
+    document.getElementById("cal-next")?.addEventListener("click", () => {
+      if (calUi.mode === "week") {
+        const d = new Date(calUi.selected + "T12:00:00");
+        d.setDate(d.getDate() + 7);
+        calUi.selected = ymd(d);
+        calUi.cursor = new Date(d.getFullYear(), d.getMonth(), 1);
+      } else {
+        calUi.cursor = new Date(calUi.cursor.getFullYear(), calUi.cursor.getMonth() + 1, 1);
+      }
+      renderCalendar();
+    });
+    document.querySelectorAll(".cal-mode").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        calUi.mode = btn.dataset.calMode || "month";
+        renderCalendar();
+      });
+    });
+  }
+}
+
+
+function renderHome() {
+  const lessonsRoot = document.getElementById("home-lessons");
+  const eventsRoot = document.getElementById("home-events");
+  const boardsRoot = document.getElementById("home-boards");
+  const recRoot = document.getElementById("home-recs");
+  if (!lessonsRoot || !eventsRoot || !boardsRoot) return;
+  const upcomingLessons = (state.calendar?.lessons || []).filter((row) => !row.past).slice(0, 4);
+  const upcomingEvents = (state.calendar?.events || []).filter((row) => !row.past).slice(0, 3);
+  lessonsRoot.replaceChildren();
+  if (!upcomingLessons.length) {
+    lessonsRoot.append(el("p", { class: "meta", text: "Nessuna lezione in agenda." }));
+  } else {
+    for (const row of upcomingLessons) {
+      lessonsRoot.append(el("div", { class: "home-row" }, [
+        el("strong", { text: row.title }),
+        el("span", { class: "meta", text: `${row.weekday || row.date} · ${row.start}–${row.end}` }),
+        el("span", { class: "meta", text: row.location || "" }),
+      ]));
+    }
+  }
+  eventsRoot.replaceChildren();
+  if (!upcomingEvents.length) {
+    eventsRoot.append(el("p", { class: "meta", text: "Nessun evento serale." }));
+  } else {
+    for (const row of upcomingEvents) {
+      eventsRoot.append(el("div", { class: "home-row" }, [
+        el("strong", { text: row.title }),
+        el("span", { class: "meta", text: `${row.date} · ${row.start}` }),
+        el("span", { class: "meta", text: row.location || "" }),
+      ]));
+    }
+  }
+  boardsRoot.replaceChildren();
+  const highlight = (state.events || []).filter((ev) => !ev.past).slice(0, 4);
+  if (!highlight.length) {
+    boardsRoot.append(el("p", { class: "meta", text: "Nessun evento in evidenza. Apri la bacheca per esplorare." }));
+  } else {
+    for (const ev of highlight) {
+      boardsRoot.append(el("button", {
+        class: "home-row linkish",
+        type: "button",
+        "data-action": "section",
+        "data-id": "bacheca",
+      }, [
+        el("strong", { text: ev.title || "Evento" }),
+        el("span", { class: "meta", text: [ev.when || ev.date, ev.place || ev.location].filter(Boolean).join(" · ") }),
+      ]));
+    }
+  }
+  if (recRoot) {
+    recRoot.replaceChildren();
+    const likes = state.session?.likes || [];
+    if (!state.matches.length) {
+      recRoot.append(el("p", { class: "meta", text: likes.length
+        ? "Sto calcolando i match dalle tue preferenze…"
+        : "Scegli almeno un interesse nelle preferenze per vedere i consigli." }));
+    } else {
+      for (const match of state.matches.slice(0, 4)) {
+        const pct = Math.round((Number(match.score) || 0) * 100);
+        recRoot.append(el("article", { class: "home-row rec-row" }, [
+          el("strong", { text: match.title }),
+          el("span", { class: "score-pill", text: `${pct}% match` }),
+          el("span", { class: "meta", text: match.why || match.display_text || "" }),
+          el("span", { class: "meta", text: `Fonte · ${match.event_id}` }),
+        ]));
+      }
+    }
+  }
+}
+
+function feedbackCatalog() {
+  const items = state.calendar?.items || [];
+  const seen = new Set();
+  const out = [];
+  for (const row of items) {
+    const key = row.title + "|" + row.date;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ id: row.series_id || row.id, title: row.title, date: row.date, kind: row.kind });
+  }
+  return out.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+}
+
+function selectedFeedbackChips() {
+  return [...document.querySelectorAll("#feedback-chips .fb-chip.selected")].map((n) => n.dataset.chip);
+}
+
+function buildFeedbackSubject() {
+  const sel = document.getElementById("feedback-event");
+  const opt = sel && sel.selectedOptions[0];
+  const title = (opt && opt.dataset.title) || "Evento";
+  const date = (opt && opt.dataset.date) || "";
+  return "Feedback: " + title + " \u2014 " + date;
+}
+
+function buildFeedbackBody() {
+  const chips = selectedFeedbackChips();
+  const extra = ((document.getElementById("feedback-text") || {}).value || "").trim();
+  const parts = [];
+  if (chips.length) parts.push(chips.join(" · "));
+  if (extra) parts.push(extra);
+  return parts.join("\n\n") || "(nessun commento)";
+}
+
+function refreshFeedbackSubject() {
+  const node = document.getElementById("feedback-subject");
+  if (node) node.textContent = "Oggetto: " + buildFeedbackSubject();
+}
+
+function populateFeedbackEvents() {
+  const sel = document.getElementById("feedback-event");
+  if (!sel) return;
+  const catalog = feedbackCatalog();
+  const prev = sel.value;
+  sel.replaceChildren();
+  if (!catalog.length) {
+    sel.append(el("option", { value: "", text: "Nessun evento in agenda" }));
+    refreshFeedbackSubject();
+    return;
+  }
+  for (const row of catalog) {
+    const opt = el("option", { value: row.id + "::" + row.date, text: row.date + " · " + row.title });
+    opt.dataset.title = row.title;
+    opt.dataset.date = row.date;
+    sel.append(opt);
+  }
+  if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+  refreshFeedbackSubject();
+}
+
+function wireFeedbackForm() {
+  const form = document.getElementById("feedback-form");
+  if (!form || form.dataset.wired) return;
+  form.dataset.wired = "1";
+
+  const chipsRoot = document.getElementById("feedback-chips");
+  if (chipsRoot) {
+    chipsRoot.replaceChildren();
+    for (const label of FEEDBACK_CHIPS) {
+      const chip = el("button", { type: "button", class: "fb-chip", "data-chip": label, text: label });
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("selected");
+        refreshFeedbackSubject();
+      });
+      chipsRoot.append(chip);
+    }
+  }
+
+  populateFeedbackEvents();
+  document.getElementById("feedback-event")?.addEventListener("change", refreshFeedbackSubject);
+  document.getElementById("feedback-text")?.addEventListener("input", refreshFeedbackSubject);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const status = document.getElementById("feedback-status");
+    const subject = buildFeedbackSubject();
+    const body = buildFeedbackBody();
+    if (body.length < 3) {
+      if (status) status.textContent = "Seleziona almeno un commento o scrivi un dettaglio.";
+      return;
+    }
+    window.location.href = "mailto:life@campus.demo?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    if (status) status.textContent = "Pronto: oggetto «" + subject + "».";
+  });
+
+  document.getElementById("feedback-mock")?.addEventListener("click", async () => {
+    const status = document.getElementById("feedback-status");
+    const subject = buildFeedbackSubject();
+    const body = buildFeedbackBody();
+    try {
+      await fetch("/feedback", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ subject, body, synthetic: true }),
+      });
+    } catch (_) {}
+    if (status) status.textContent = "Demo salvata · " + subject;
+  });
+
+  const overlay = document.getElementById("ai-overlay");
+  if (overlay && !overlay.dataset.wired) {
+    overlay.dataset.wired = "1";
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) openAiOverlay(false);
+    });
+  }
+}
+
+function findPlaceByName(name) {
+  const n = String(name || "").toLowerCase().trim();
+  if (!n) return null;
+  return (state.places || []).find((p) => {
+    const pn = String(p.name || "").toLowerCase();
+    return pn && (pn === n || pn.includes(n) || n.includes(pn)) && p.id;
+  }) || null;
+}
+
+function openMapAt(placeId) {
+  focusSection("mappa");
+  if (!placeId) return;
+  window.setTimeout(() => {
+    const place = (state.places || []).find((p) => p.id === placeId);
+    if (!place || !campusMap) return;
+    try { campusMap.setView(placeLatLng(place), 19, { animate: true }); } catch (e) {}
+  }, 140);
+}
+// Close settings/account panel on outside click or Esc
+(function () {
+  const close = () => { const p = document.getElementById("you-panel"); if (p && !p.hidden) p.hidden = true; };
+  document.addEventListener("pointerdown", (e) => {
+    const p = document.getElementById("you-panel");
+    if (!p || p.hidden) return;
+    if (p.contains(e.target) || e.target.closest?.('[data-action="you"]')) return;
+    close();
+  }, true);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+})();
+
+
+function routeChattaRecipient(text) {
+  const q = String(text || "").toLowerCase();
+  let best = CHATTA_RECIPIENTS[1]; // Student Office default
+  let score = 0;
+  for (const rec of CHATTA_RECIPIENTS) {
+    let s = 0;
+    for (const k of rec.keys) {
+      if (q.includes(k)) s += k.length;
+    }
+    if (s > score) { score = s; best = rec; }
+  }
+  return best;
+}
+
+function suggestChattaRecipient() {
+  const intent = document.getElementById("chatta-intent");
+  const text = (intent && intent.value) || "";
+  const rec = routeChattaRecipient(text);
+  const sel = document.getElementById("chatta-to");
+  if (sel) {
+    const val = `${rec.email}|${rec.name}`;
+    let found = false;
+    for (const opt of sel.options) {
+      if (opt.value === val) { sel.value = val; found = true; break; }
+    }
+    if (!found) sel.value = val;
+  }
+  const hint = document.getElementById("chatta-dest-hint");
+  if (hint) hint.textContent = `Destinatario suggerito: ${rec.name} · ${rec.email}`;
+  const sub = document.getElementById("chatta-subject");
+  if (sub && !sub.value.trim()) {
+    const snippet = text.trim().slice(0, 60) || "Richiesta studente H-ELP";
+    sub.value = `[H-ELP] ${snippet}`;
+  }
+  const body = document.getElementById("chatta-body");
+  if (body && !body.value.trim() && text.trim()) {
+    const nick = displayName(state.session) || "Studente";
+    body.value = `Ciao ${rec.name},\n\n${text.trim()}\n\nGrazie,\n${nick}`;
+  }
+  showHosToast(`Destinatario: ${rec.name}`);
+}
+
+function wireChattaForm() {
+  if (wireChattaForm._done) return;
+  wireChattaForm._done = true;
+  const form = document.getElementById("chatta-form");
+  if (!form) return;
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const to = document.getElementById("chatta-to")?.value || "";
+    const subject = (document.getElementById("chatta-subject")?.value || "").trim();
+    const body = (document.getElementById("chatta-body")?.value || "").trim();
+    const intent = (document.getElementById("chatta-intent")?.value || "").trim();
+    if (!to) {
+      suggestChattaRecipient();
+    }
+    const finalTo = document.getElementById("chatta-to")?.value || to;
+    if (!finalTo || !subject || !body) {
+      const st = document.getElementById("chatta-status");
+      if (st) st.textContent = "Compila destinatario, oggetto e messaggio.";
+      return;
+    }
+    const [email, name] = finalTo.split("|");
+    const payload = {
+      at: new Date().toISOString(),
+      to: email,
+      toName: name,
+      subject,
+      body,
+      intent,
+      from: state.session?.email || "studente@demo",
+    };
+    try {
+      const key = "hos.chatta.outbox.v1";
+      const box = JSON.parse(localStorage.getItem(key) || "[]");
+      box.unshift(payload);
+      localStorage.setItem(key, JSON.stringify(box.slice(0, 40)));
+    } catch (_) { /* ignore */ }
+    const st = document.getElementById("chatta-status");
+    if (st) st.textContent = `Email demo inviata a ${name} <${email}>. Nessun invio reale.`;
+    showHosToast(`Inviato (demo) a ${name}`);
+  });
+  document.getElementById("chatta-intent")?.addEventListener("blur", () => {
+    const to = document.getElementById("chatta-to");
+    if (to && !to.value) suggestChattaRecipient();
+  });
+}
+
+function loadSurveyStore() {
+  try { return JSON.parse(localStorage.getItem(SURVEY_KEY) || '{"responses":[],"totals":{}}'); }
+  catch (_) { return { responses: [], totals: {} }; }
+}
+
+function saveSurveyStore(store) {
+  try { localStorage.setItem(SURVEY_KEY, JSON.stringify(store)); } catch (_) {}
+}
+
+function formatSurveyWhen(iso) {
+  if (!iso) return "—";
+  try {
+    return new Intl.DateTimeFormat("it-IT", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Rome" }).format(new Date(iso));
+  } catch (_) { return iso; }
+}
+
+function wireSurveyUI() {
+  const interestRoot = document.getElementById("survey-interest-chips");
+  const wantRoot = document.getElementById("survey-want-chips");
+  const toRoot = document.getElementById("survey-to-chips");
+  if (interestRoot && !interestRoot.dataset.ready) {
+    interestRoot.dataset.ready = "1";
+    for (const label of SURVEY_INTERESTS) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "survey-chip";
+      btn.dataset.chip = label;
+      btn.textContent = label;
+      btn.addEventListener("click", () => btn.classList.toggle("selected"));
+      interestRoot.appendChild(btn);
+    }
+  }
+  if (wantRoot && !wantRoot.dataset.ready) {
+    wantRoot.dataset.ready = "1";
+    for (const label of SURVEY_WANTS) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "survey-chip";
+      btn.dataset.chip = label;
+      btn.textContent = label;
+      btn.addEventListener("click", () => {
+        wantRoot.querySelectorAll(".survey-chip").forEach((n) => n.classList.remove("selected"));
+        btn.classList.add("selected");
+      });
+      wantRoot.appendChild(btn);
+    }
+  }
+  if (toRoot && !toRoot.dataset.ready) {
+    toRoot.dataset.ready = "1";
+    for (const item of SURVEY_TO) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "survey-chip";
+      btn.dataset.chip = item.id;
+      btn.textContent = item.label;
+      if (item.id === "both") btn.classList.add("selected");
+      btn.addEventListener("click", () => {
+        toRoot.querySelectorAll(".survey-chip").forEach((n) => n.classList.remove("selected"));
+        btn.classList.add("selected");
+      });
+      toRoot.appendChild(btn);
+    }
+  }
+  const dialog = document.getElementById("survey-dialog");
+  dialog?.addEventListener("close", () => {
+    const st = document.getElementById("survey-status");
+    if (st) { st.hidden = true; st.textContent = ""; }
+  });
+  paintSurveyTopHint();
+}
+
+function paintSurveyTopHint() {
+  const btn = document.getElementById("survey-top-btn");
+  if (!btn) return;
+  const store = loadSurveyStore();
+  const last = (store.responses || []).slice(-1)[0];
+  if (last?.at) {
+    btn.title = "Ultimo sondaggio: " + formatSurveyWhen(last.at);
+    btn.classList.add("has-done");
+  } else {
+    btn.title = "Sondaggio veloce · interessi per Life & Office";
+    btn.classList.remove("has-done");
+  }
+}
+
+function openSurveyDialog(show) {
+  const dialog = document.getElementById("survey-dialog");
+  if (!dialog) return;
+  wireSurveyUI();
+  if (show) {
+    const st = document.getElementById("survey-status");
+    const report = document.getElementById("survey-report");
+    if (st) { st.hidden = true; st.textContent = ""; }
+    if (report) report.hidden = true;
+    if (!dialog.open) dialog.showModal();
+  } else if (dialog.open) {
+    dialog.close();
+  }
+}
+
+function selectedSurveyChips(rootId) {
+  return [...document.querySelectorAll("#" + rootId + " .survey-chip.selected")].map((n) => n.dataset.chip);
+}
+
+function submitInterestSurvey() {
+  const interests = selectedSurveyChips("survey-interest-chips");
+  const wants = selectedSurveyChips("survey-want-chips");
+  const to = selectedSurveyChips("survey-to-chips")[0] || "both";
+  const note = (document.getElementById("survey-note")?.value || "").trim();
+  const st = document.getElementById("survey-status");
+  if (!interests.length) {
+    if (st) {
+      st.hidden = false;
+      st.textContent = "Scegli almeno un interesse — ci vuole un attimo.";
+    }
+    return;
+  }
+  if (!wants.length) {
+    if (st) {
+      st.hidden = false;
+      st.textContent = "Dimmi cosa vorresti di più questa settimana.";
+    }
+    return;
+  }
+  const store = loadSurveyStore();
+  if (!Array.isArray(store.responses)) store.responses = [];
+  if (!store.totals || typeof store.totals !== "object") store.totals = {};
+  const entry = {
+    at: new Date().toISOString(),
+    interests,
+    want: wants[0],
+    to,
+    note,
+  };
+  store.responses.push(entry);
+  if (store.responses.length > 40) store.responses = store.responses.slice(-40);
+  for (const label of interests) {
+    store.totals[label] = (store.totals[label] || 0) + 1;
+  }
+  store.totals["__want__:" + wants[0]] = (store.totals["__want__:" + wants[0]] || 0) + 1;
+  store.totals["__to__:" + to] = (store.totals["__to__:" + to] || 0) + 1;
+  store.last = entry;
+  saveSurveyStore(store);
+  paintSurveyTopHint();
+  paintSurveyReport(store);
+  if (st) {
+    st.hidden = false;
+    const dest = to === "office" ? "Student Office" : to === "life" ? "Student Life" : "Student Life e Student Office";
+    st.textContent = "Grazie! I tuoi interessi aiutano " + dest + " a decidere cosa attivare. Salvato in locale (demo).";
+  }
+  showHosToast("Sondaggio inviato · report Life/Office aggiornato");
+}
+
+function paintSurveyReport(store) {
+  const box = document.getElementById("survey-report");
+  const bars = document.getElementById("survey-report-bars");
+  if (!box || !bars) return;
+  const totals = store.totals || {};
+  const rows = SURVEY_INTERESTS
+    .map((label) => ({ label, n: totals[label] || 0 }))
+    .filter((r) => r.n > 0)
+    .sort((a, b) => b.n - a.n);
+  bars.replaceChildren();
+  if (!rows.length) {
+    box.hidden = true;
+    return;
+  }
+  const max = Math.max(...rows.map((r) => r.n), 1);
+  for (const row of rows.slice(0, 6)) {
+    const line = document.createElement("div");
+    line.className = "survey-bar-row";
+    const name = document.createElement("span");
+    name.className = "survey-bar-label";
+    name.textContent = row.label;
+    const track = document.createElement("div");
+    track.className = "survey-bar-track";
+    const fill = document.createElement("div");
+    fill.className = "survey-bar-fill";
+    fill.style.width = Math.round((row.n / max) * 100) + "%";
+    track.appendChild(fill);
+    const count = document.createElement("span");
+    count.className = "survey-bar-count";
+    count.textContent = String(row.n);
+    line.append(name, track, count);
+    bars.appendChild(line);
+  }
+  box.hidden = false;
+}
+
+/** Legacy no-op kept for any old survey-save hooks */
+function saveSurvey(kind) {
+  openSurveyDialog(true);
+}
+
+function wireSurveyStatus() {
+  wireSurveyUI();
+}
+

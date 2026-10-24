@@ -84,25 +84,11 @@ def test_health_is_mit_and_students_only(client):
     repos = [item["repo"] for item in body["open_source"]["patterns"]]
     assert repos == [
         "https://github.com/garrytan/gbrain",
-        "https://github.com/topoteretes/cognee",
-        "https://github.com/run-llama/llama_index",
-        "https://github.com/huggingface/smolagents",
-        "https://github.com/deepset-ai/haystack",
-        "https://github.com/pydantic/pydantic-ai",
         "https://github.com/pipeshub-ai/pipeshub-ai",
-        "https://github.com/paperclipai/paperclip",
-        "https://github.com/langchain-ai/langgraph",
         "https://github.com/Merit-Systems/OpenInstinct",
     ]
-    assert all(item["installed"] is False for item in body["open_source"]["patterns"])
-    planned = {item["name"] for item in body["open_source"]["patterns"] if item["status"] == "planned"}
-    assert planned == {"cognee", "llamaindex", "paperclip", "langgraph"}
-    assert body["retrieval"] == "real"
-    assert body["reasoning"] == "deterministic"
-    assert body["llamaindex"] == "planned"
-    assert body["cognee"] == "planned"
     assert body["role_demo"] == "studenti"
-    assert body["dataset"] == "team"
+    assert body["dataset"] == "team+community-dense"
     assert body["default_formula"] == "jaccard"
     assert body["formulas"][:2] == ["jaccard", "overlap"]
     assert body["preference_space"]["theoretical_profiles"] == 245180
@@ -172,23 +158,23 @@ def test_match_cites_sources_and_ranks_jaccard(client):
             assert set(match["pref_ids"]) <= set(ids)
             assert match["event_id"] in ids
     alex = client.post("/match", json={"user_id": "usr-001", "limit": 1}).json()["matches"][0]
-    assert alex["event_id"] == "evt-058"
-    assert alex["score"] == 0.5
-    assert alex["building"] == "Building 3"
-    assert alex["location_id"] == "loc-library"
-    assert "pref-001-finanza" in alex["explanation"]
-    assert "pref-001-finanza" in alex["why"]
-    assert "finanza" in alex["why"]
-    assert "0.50" in alex["why"]
-    assert "loc-library" in alex["why"]
-    assert alex["company"] == []
+    assert alex["event_id"] == "evt-082"
+    assert alex["score"] == 0.75
+    assert alex["building"] == "Building 1"
+    assert alex["location_id"] == "loc-college"
+    assert "pref-001-cinema" in alex["explanation"]
+    assert "pref-001-cinema" in alex["why"]
+    assert "cinema" in alex["why"]
+    assert "0.75" in alex["why"]
+    assert "loc-college" in alex["why"]
+    assert {person["user_id"] for person in alex["company"]} == {"usr-012", "usr-023"}
     overlap = client.post("/match", json={"user_id": "usr-001", "limit": 1, "formula": "overlap"}).json()
     assert overlap["method"]["name"] == "overlap"
-    assert overlap["matches"][0]["event_id"] == "evt-058"
+    assert overlap["matches"][0]["event_id"] == "evt-082"
     assert overlap["matches"][0]["score"] == 1.0
     andrea = client.post("/match", json={"user_id": "usr-002", "limit": 1}).json()["matches"][0]
     assert andrea["event_id"] == "evt-011"
-    assert {person["user_id"] for person in andrea["company"]} == {"usr-022", "usr-023"}
+    assert {person["user_id"] for person in andrea["company"]} == {"usr-022", "usr-048"}
     refused = client.post("/match", json={"user_id": "usr-001", "formula": "weighted"})
     assert refused.status_code == 422
     assert client.post("/match", json={"user_id": "usr-001", "formula": "cosine"}).status_code == 422
@@ -201,9 +187,9 @@ def test_tick_does_not_notify_until_approve(client):
     assert body["status"] == "proposed"
     action = body["action"]
     assert action["status"] == "pending"
-    assert action["event_id"] == "evt-058"
-    assert action["score"] == 0.5
-    assert action["trace"]["event"]["signal"] == "preference_overlap"
+    assert action["event_id"] == "evt-082"
+    assert action["score"] == 0.75
+    assert action["trace"]["event"]["signal"] == "event_soon"
     for step in ("event", "context", "reasoning", "action"):
         summary = action["trace"][step]["summary"]
         for citation in action["trace"][step]["citations"]:
@@ -223,7 +209,7 @@ def test_tick_does_not_notify_until_approve(client):
     notice = approved.json()["notice"]
     assert notice["delivered_externally"] is False
     assert notice["channel"] == "bacheca"
-    assert notice["event_id"] == "evt-058"
+    assert notice["event_id"] == "evt-082"
     assert "Nessuna email è stata inviata" in notice["text"]
     assert client.get("/bacheca", params={"user_id": "usr-001"}).json()["notices"][0]["id"] == notice["id"]
 
@@ -235,7 +221,7 @@ def test_tick_does_not_notify_until_approve(client):
 
     nxt = client.post("/agent/tick", json={"user_id": "usr-001"}).json()
     assert nxt["status"] == "proposed"
-    assert nxt["action"]["event_id"] != "evt-058"
+    assert nxt["action"]["event_id"] != "evt-082"
     assert nxt["action"]["status"] == "pending"
 
 
@@ -274,24 +260,25 @@ def test_reset_clears_notices_only(client):
 def test_homepage_is_the_desk(client):
     page = client.get("/")
     assert page.status_code == 200
-    assert "H-OS" in page.text
+    assert "H-ELP" in page.text
+    assert "Chiedi ad H-ELP" in page.text
+    assert "Sondaggio" in page.text
     assert "bacheca" in page.text.lower()
+    assert 'id="ig-feed"' in page.text
     assert 'id="formula"' in page.text
     assert "Accetta i termini" in page.text
-    assert "DISLIKE" in page.text and "LIKE" in page.text
+    assert "Mappa eventi" in page.text
     assert "Prenotazioni" in page.text
-    assert "non collegato" in page.text
-    assert "Bacheca community" in page.text
-    assert 'data-map="satellite"' in page.text
-    assert "Esri" in page.text
-    assert "Mese" in page.text and "Settimana" in page.text
-    assert "SCELTO PER TE" in page.text
-    assert "Chiedi a H-OS" in page.text
-    assert "Iscriviti" in page.text
-    assert "Personalizza" in page.text
+    assert "Feedback" in page.text
+    assert "Chatta" in page.text
+    assert "non è una chat tra studenti" in page.text.lower()
+    assert "non sono collegati" in page.text
+    assert "Student Life" in page.text
+    assert "Student Office" in page.text
+    assert "docenti" in page.text
     assert ">Club<" in page.text
-    assert ">Agenda<" in page.text
-    assert ">Voci<" in page.text
+    assert "hos-fab" not in page.text
+    assert "dash-fab" not in page.text
 
 
 DESK = {
@@ -345,8 +332,8 @@ def test_email_local_part_names_the_desk_and_still_matches(client):
     assert body["pronote_link"] == "https://pronote.example/alex"
     assert "password" not in body
     top = client.post("/match", json={"user_id": "usr-desk", "limit": 1}).json()["matches"][0]
-    assert top["event_id"] == "evt-058"
-    assert top["score"] == 0.5
+    assert top["event_id"] == "evt-082"
+    assert top["score"] == 0.75
     dotted = client.post(
         "/desk/profile",
         json={"email": "alex.rossi@campus.example", "likes": ["cinema"]},
@@ -359,22 +346,22 @@ def test_local_likes_match_through_the_same_gate(client):
     match = client.post("/match", json={"user_id": "usr-desk", "limit": 1}).json()
     top = match["matches"][0]
     assert match["method"]["name"] == "jaccard"
-    assert top["event_id"] == "evt-058"
-    assert top["score"] == 0.5
-    assert "pref-desk-finanza" in top["explanation"]
-    source = client.get("/sources/pref-desk-finanza")
+    assert top["event_id"] == "evt-082"
+    assert top["score"] == 0.75
+    assert "pref-desk-cinema" in top["explanation"]
+    source = client.get("/sources/pref-desk-cinema")
     assert source.status_code == 200
     assert source.json()["synthetic"] is True
     assert source.json()["access"]["scope"] == "personal"
     cohort = client.post("/match", json={"user_id": "usr-001", "limit": 1}).json()["matches"][0]
-    assert cohort["event_id"] == "evt-058"
-    assert cohort["company"] == []
+    assert cohort["event_id"] == "evt-082"
+    assert {person["user_id"] for person in cohort["company"]} == {"usr-012", "usr-023"}
     proposed = client.post("/agent/tick", json={"user_id": "usr-desk"}).json()
     assert proposed["status"] == "proposed"
     action = proposed["action"]
-    assert action["event_id"] == "evt-058"
+    assert action["event_id"] == "evt-082"
     assert action["status"] == "pending"
-    assert action["trace"]["event"]["signal"] == "preference_overlap"
+    assert action["trace"]["event"]["signal"] == "event_soon"
     for step in ("event", "context", "reasoning", "action"):
         summary = action["trace"][step]["summary"]
         for citation in action["trace"][step]["citations"]:
@@ -416,7 +403,7 @@ def test_gemma_cannot_invent_sources(client, monkeypatch):
     assert match["display_by"] == "fallback_after_gemma"
     assert match["why"] == match["display_text"]
     assert match["display_text"] != match["explanation"]
-    assert "evt-058" in match["why"]
+    assert "evt-082" in match["why"]
     assert "evt-inventato" not in match["display_text"]
     assert "evt-inventato" not in [item["source_id"] for item in match["citations"]]
 
@@ -455,7 +442,7 @@ def test_gemma_http_failure_uses_the_template(client, monkeypatch):
     match = client.post("/match", json={"user_id": "usr-001", "limit": 1}).json()["matches"][0]
     assert match["display_by"] == "fallback_after_gemma"
     assert match["why"] == match["display_text"]
-    assert "evt-058" in match["why"]
+    assert "evt-082" in match["why"]
     assert "Approva" in match["why"]
 
 
