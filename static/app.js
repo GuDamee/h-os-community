@@ -34,6 +34,9 @@ const state = {
   feedback: [],
   proposal: null,
   chat: [],
+  calendarMode: "month",
+  calendarAnchor: null,
+  boardFilter: "",
 };
 
 const SESSION_KEY = "hos.session.v1";
@@ -294,7 +297,7 @@ function onClick(event) {
   if (!target) return;
   const action = target.dataset.action;
   const id = target.dataset.id;
-  if (state.busy && !["source", "prefs", "section", "ai", "ai-close", "ask-suggest"].includes(action)) return;
+  if (state.busy && !["source", "prefs", "section", "ai", "ai-close", "ask-suggest", "cal-mode", "cal-shift", "cal-today", "cal-day", "board-filter"].includes(action)) return;
   if (action === "match") refreshStudent();
   else if (action === "section") showView(id);
   else if (action === "prefs") showScreen("prefs");
@@ -326,6 +329,23 @@ function onClick(event) {
   else if (action === "feedback-chip") {
     const pressed = target.getAttribute("aria-pressed") === "true";
     target.setAttribute("aria-pressed", pressed ? "false" : "true");
+  }
+  else if (action === "cal-mode") {
+    state.calendarMode = target.dataset.mode === "week" ? "week" : "month";
+    renderCalendarView();
+  }
+  else if (action === "cal-shift") shiftCalendar(Number(id));
+  else if (action === "cal-today") {
+    state.calendarAnchor = demoDay();
+    renderCalendarView();
+  }
+  else if (action === "cal-day") {
+    state.calendarAnchor = id;
+    renderCalendarView();
+  }
+  else if (action === "board-filter") {
+    state.boardFilter = id || "";
+    renderCommunity();
   }
 }
 
@@ -1368,15 +1388,42 @@ function renderCommunity() {
     );
     stories.append(story);
   }
-  column.append(el("p", { class: "ig-kicker", text: `Per te · ${state.boards.length} bacheche` }), stories);
-  for (const post of state.posts.slice(0, 18)) {
+  const labels = el("div", { class: "board-labels", "aria-label": "Etichette della bacheca community" });
+  labels.append(el("button", {
+    type: "button",
+    class: "board-label",
+    "data-action": "board-filter",
+    "data-id": "",
+    "aria-pressed": state.boardFilter ? "false" : "true",
+    text: "Tutte",
+  }));
+  for (const board of state.boards) {
+    labels.append(el("button", {
+      type: "button",
+      class: "board-label",
+      "data-action": "board-filter",
+      "data-id": board.id,
+      "aria-pressed": state.boardFilter === board.id ? "true" : "false",
+      text: board.title,
+    }));
+  }
+  column.append(el("p", { class: "ig-kicker", text: `Community · ${state.boards.length} bacheche` }), labels, stories);
+  const visiblePosts = state.posts.filter((post) => !state.boardFilter || post.board_id === state.boardFilter || post.thread_id === state.boardFilter);
+  for (const post of visiblePosts.slice(0, 18)) {
     const name = post.author_name || "Campus";
     const card = el("article", { class: "ig-post" });
     const who = el("div", { class: "ig-who" });
-    who.append(el("strong", { text: name }), el("p", { class: "ig-meta", text: post.thread_title || "" }));
+    who.append(
+      el("strong", { text: name }),
+      el("p", { class: "ig-meta", text: post.thread_title || "Community" }),
+    );
     const head = el("header", { class: "ig-post-head" });
-    head.append(el("span", { class: "ig-avatar", text: name.trim().slice(0, 1).toUpperCase() }), who);
+    head.append(
+      el("span", { class: "ig-avatar", text: name.trim().slice(0, 1).toUpperCase() }),
+      who,
+    );
     if (post.score) head.append(el("span", { class: "ig-score", text: `${post.score}%` }));
+    head.append(el("span", { class: "board-pill", text: post.thread_title || "Community" }));
     const tone = ["a", "b", "c", "d"][(post.source_id || "").length % 4];
     const visual = el("div", { class: `ig-visual tone-${tone}` });
     visual.append(el("p", { text: post.title || "" }));
@@ -1396,28 +1443,191 @@ function renderCommunity() {
   feed.append(column);
 }
 
+const CAL_MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+const CAL_WEEKDAYS = ["L", "M", "M", "G", "V", "S", "D"];
+
+function campusDay(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
+}
+
+function campusClock(value) {
+  const match = String(value || "").match(/T(\d{2}:\d{2})/);
+  return match ? match[1] : "";
+}
+
+function parseDay(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return { y, m, d };
+}
+
+function dayKey(y, m, d) {
+  return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+function addDays(key, count) {
+  const { y, m, d } = parseDay(key);
+  const utc = new Date(Date.UTC(y, m - 1, d + count));
+  return dayKey(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate());
+}
+
+function addMonths(key, count) {
+  const { y, m, d } = parseDay(key);
+  const utc = new Date(Date.UTC(y, m - 1 + count, 1));
+  const last = new Date(Date.UTC(utc.getUTCFullYear(), utc.getUTCMonth() + 1, 0)).getUTCDate();
+  return dayKey(utc.getUTCFullYear(), utc.getUTCMonth() + 1, Math.min(d, last));
+}
+
+function weekdayMon0(key) {
+  const { y, m, d } = parseDay(key);
+  return (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+}
+
+function demoDay() {
+  return campusDay(state.health?.demo_now) || "2026-10-24";
+}
+
+function shiftCalendar(direction) {
+  const anchor = state.calendarAnchor || demoDay();
+  state.calendarAnchor = state.calendarMode === "week" ? addDays(anchor, direction * 7) : addMonths(anchor, direction);
+  renderCalendarView();
+}
+
+function calendarEntries() {
+  const rows = [];
+  for (const lesson of state.calendar?.lessons || []) {
+    rows.push({
+      day: campusDay(lesson.start),
+      title: lesson.title,
+      time: `${campusClock(lesson.start)}–${campusClock(lesson.end)}`.replace(/–$/, ""),
+      where: lesson.location || "",
+      kind: "Lezione",
+      tone: "lesson",
+      source_id: lesson.source_id,
+    });
+  }
+  for (const event of state.calendar?.evening_events || []) {
+    rows.push({
+      day: campusDay(event.start),
+      title: event.title,
+      time: campusClock(event.start),
+      where: event.location || "",
+      kind: "Serata",
+      tone: "evening",
+      source_id: event.source_id,
+    });
+  }
+  for (const item of state.calendar?.agenda || []) {
+    rows.push({
+      day: campusDay(item.start),
+      title: item.title || item.event_id,
+      time: campusClock(item.start),
+      where: item.location || "",
+      kind: "Agenda",
+      tone: "agenda",
+      source_id: item.source_id,
+    });
+  }
+  return rows.filter((row) => row.day);
+}
+
+function longDay(key) {
+  const { y, m, d } = parseDay(key);
+  return new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m - 1, d, 12)));
+}
+
 function renderCalendarView() {
   const node = document.getElementById("calendar-body");
+  const detail = document.getElementById("calendar-day");
+  const heading = document.getElementById("cal-heading");
   if (!node || !state.calendar) return;
+  if (!state.calendarAnchor) state.calendarAnchor = demoDay();
+  const anchor = state.calendarAnchor;
+  const mode = state.calendarMode === "week" ? "week" : "month";
+  const monthBtn = document.getElementById("cal-mode-month");
+  const weekBtn = document.getElementById("cal-mode-week");
+  if (monthBtn) monthBtn.setAttribute("aria-pressed", mode === "month" ? "true" : "false");
+  if (weekBtn) weekBtn.setAttribute("aria-pressed", mode === "week" ? "true" : "false");
+  const { y, m } = parseDay(anchor);
+  if (heading) {
+    if (mode === "week") {
+      const start = addDays(anchor, -weekdayMon0(anchor));
+      const end = addDays(start, 6);
+      const startParts = parseDay(start);
+      const endParts = parseDay(end);
+      heading.textContent = start.slice(0, 7) === end.slice(0, 7)
+        ? `${startParts.d}–${endParts.d} ${CAL_MONTHS[endParts.m - 1]} ${endParts.y}`
+        : `${startParts.d} ${CAL_MONTHS[startParts.m - 1]} – ${endParts.d} ${CAL_MONTHS[endParts.m - 1]} ${endParts.y}`;
+    } else {
+      heading.textContent = `${CAL_MONTHS[m - 1].charAt(0).toUpperCase()}${CAL_MONTHS[m - 1].slice(1)} ${y}`;
+    }
+  }
+  const entries = calendarEntries();
+  const byDay = new Map();
+  for (const row of entries) {
+    const list = byDay.get(row.day) || [];
+    list.push(row);
+    byDay.set(row.day, list);
+  }
+  const today = demoDay();
   node.replaceChildren();
-  for (const lesson of state.calendar.lessons || []) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: lesson.title }),
-      el("p", { text: `${lesson.start} – ${lesson.end} · ${lesson.location}` }),
-      el("p", { class: "meta", text: `Lezione · ${lesson.source_id} · non è un'iscrizione` }),
-    ]));
+  const grid = el("div", { class: `iphone-cal ${mode}`, role: "grid", "aria-label": mode === "week" ? "Settimana" : "Mese" });
+  for (const label of CAL_WEEKDAYS) {
+    grid.append(el("div", { class: "cal-dow", text: label }));
   }
-  for (const event of state.calendar.evening_events || []) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: event.title }),
-      el("p", { text: `${event.start} · ${event.location}` }),
-      el("p", { class: "meta", text: `Serata in Library · ${event.source_id} · non iscritto` }),
-    ]));
+  const { y: ay, m: am } = parseDay(anchor);
+  const first = dayKey(ay, am, 1);
+  const origin = mode === "week" ? addDays(anchor, -weekdayMon0(anchor)) : addDays(first, -weekdayMon0(first));
+  const count = mode === "week" ? 7 : 42;
+  for (let index = 0; index < count; index += 1) {
+    const key = addDays(origin, index);
+    const inMonth = parseDay(key).m === am;
+    const selected = key === anchor;
+    const dayEntries = byDay.get(key) || [];
+    const button = el("button", {
+      type: "button",
+      class: `cal-day${inMonth || mode === "week" ? "" : " outside"}${selected ? " selected" : ""}${key === today ? " today" : ""}`,
+      "data-action": "cal-day",
+      "data-id": key,
+      "aria-pressed": selected ? "true" : "false",
+      "aria-label": `${longDay(key)}${dayEntries.length ? `, ${dayEntries.length} voci` : ""}`,
+    });
+    button.append(el("span", { class: "cal-num", text: String(Number(key.slice(8))) }));
+    if (mode === "week") {
+      const stack = el("div", { class: "cal-pills" });
+      for (const row of dayEntries.slice(0, 3)) {
+        stack.append(el("span", { class: `cal-pill tone-${row.tone}`, text: row.title }));
+      }
+      if (dayEntries.length > 3) stack.append(el("span", { class: "cal-more", text: `+${dayEntries.length - 3}` }));
+      button.append(stack);
+    } else {
+      const dots = el("span", { class: "cal-dots" });
+      for (const tone of [...new Set(dayEntries.map((row) => row.tone))].slice(0, 3)) {
+        dots.append(el("i", { class: `dot tone-${tone}` }));
+      }
+      button.append(dots);
+    }
+    grid.append(button);
   }
-  for (const item of state.calendar.agenda || []) {
-    node.append(el("article", { class: "mini-card" }, [
-      el("h3", { text: item.title }),
-      el("p", { class: "meta", text: `${item.mode} · ${item.status} · ${item.source_id}` }),
+  node.append(grid);
+  if (!detail) return;
+  const chosen = byDay.get(anchor) || [];
+  detail.replaceChildren(el("h3", { text: longDay(anchor) }));
+  if (!chosen.length) {
+    detail.append(el("p", { class: "meta", text: "Niente in questo giorno. Tocca un giorno con il puntino per le lezioni, la serata o l'agenda." }));
+    return;
+  }
+  for (const row of chosen) {
+    detail.append(el("article", { class: "mini-card cal-item" }, [
+      el("p", { class: `board-pill tone-${row.tone}`, text: row.kind }),
+      el("h3", { text: row.title }),
+      el("p", { text: [row.time, row.where].filter(Boolean).join(" · ") }),
+      el("p", { class: "meta", text: row.source_id || "" }),
     ]));
   }
 }

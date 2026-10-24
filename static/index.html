@@ -156,7 +156,7 @@
         <section class="view board-column" id="bacheca" data-view="community">
           <div class="column-head">
             <div>
-              <p class="eyebrow">Bacheca</p>
+              <p class="eyebrow">Bacheca community</p>
               <h2 id="board-title">In attesa di una persona</h2>
             </div>
             <div class="actions">
@@ -196,9 +196,23 @@
           </ul>
         </section>
         <section class="view pad-view" id="calendario" data-view="calendar" hidden>
-          <p class="eyebrow">Calendario</p>
-          <h2>Lezioni e sera</h2>
+          <div class="cal-toolbar">
+            <div>
+              <p class="eyebrow">Calendario</p>
+              <h2 id="cal-heading">Ottobre 2026</h2>
+            </div>
+            <div class="cal-switch" role="group" aria-label="Vista calendario">
+              <button type="button" data-action="cal-mode" data-mode="month" id="cal-mode-month" aria-pressed="true">Mese</button>
+              <button type="button" data-action="cal-mode" data-mode="week" id="cal-mode-week" aria-pressed="false">Settimana</button>
+            </div>
+            <div class="cal-nav">
+              <button type="button" class="ghost" data-action="cal-shift" data-id="-1" aria-label="Periodo precedente">‹</button>
+              <button type="button" class="ghost" data-action="cal-today">Oggi</button>
+              <button type="button" class="ghost" data-action="cal-shift" data-id="1" aria-label="Periodo successivo">›</button>
+            </div>
+          </div>
           <div id="calendar-body"></div>
+          <div id="calendar-day" aria-live="polite"></div>
         </section>
         <section class="view pad-view" id="prenotazioni" data-view="bookings" hidden aria-labelledby="book-title">
           <p class="eyebrow">Prenotazioni</p>

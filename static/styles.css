@@ -756,6 +756,62 @@ blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--leaf); 
 .comment-chips button[aria-pressed="true"] { background: var(--hf-blue, #0a4f9c); color: #fff; border-color: var(--hf-blue, #0a4f9c); }
 #feedback-form textarea, #feedback-form input, #feedback-form select { font: inherit; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
 .leaflet-container { background: #1c2420; }
+.ig-kicker { margin: 10px 14px 6px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ig-stories { display: flex; gap: 10px; overflow-x: auto; padding: 0 14px 8px; }
+.ig-story { width: 78px; border: 0; background: transparent; text-align: center; }
+.ig-story-name { display: block; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 600; flex: none; }
+.ig-post { margin: 0 14px 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.ig-post-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+.ig-who { min-width: 0; }
+.ig-who p { margin: 0; }
+.ig-visual { min-height: 92px; display: grid; place-items: center; padding: 16px; background: var(--plaster); }
+.ig-caption { padding: 8px 12px 12px; }
+.board-labels { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 8px; }
+.board-label, .board-pill {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.board-label[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.ig-post-head .board-pill { margin-left: auto; background: var(--rail-wash); border-color: transparent; color: var(--rail); }
+.cal-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
+.cal-toolbar h2 { text-transform: capitalize; }
+.cal-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: #e7e7ea; }
+.cal-switch button { border: 0; background: transparent; border-radius: 999px; min-height: 32px; padding: 4px 14px; color: var(--muted); }
+.cal-switch button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(32, 32, 32, 0.12); }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav .ghost { min-width: 40px; min-height: 36px; }
+.iphone-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 10px; }
+.cal-dow { text-align: center; font-size: 11px; color: var(--muted); font-weight: 600; padding-bottom: 4px; }
+.cal-day { border: 0; background: transparent; border-radius: 12px; min-height: 46px; padding: 4px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink); }
+.iphone-cal.week .cal-day { align-items: stretch; min-height: 148px; padding: 6px; }
+.cal-day.outside { color: #b5b5b5; }
+.cal-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; }
+.cal-day.today .cal-num { box-shadow: inset 0 0 0 1.5px var(--signal); }
+.cal-day.selected .cal-num { background: var(--ink); color: #fff; }
+.cal-day.selected.today .cal-num { background: var(--signal); }
+.cal-dots { display: flex; gap: 3px; min-height: 6px; }
+.cal-dots .dot { width: 5px; height: 5px; border-radius: 50%; display: block; }
+.dot.tone-lesson, .board-pill.tone-lesson { background: var(--moss); }
+.board-pill.tone-lesson { color: #fff; border-color: var(--moss); }
+.dot.tone-evening { background: var(--rail); }
+.board-pill.tone-evening { background: var(--rail-wash); color: var(--rail); border-color: transparent; }
+.dot.tone-agenda, .board-pill.tone-agenda { background: var(--signal); }
+.board-pill.tone-agenda { color: #fff; border-color: var(--signal); }
+.cal-pills { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.cal-pill { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 6px; padding: 2px 4px; font-size: 11px; text-align: left; }
+.cal-pill.tone-lesson { background: #e7f3ea; color: var(--moss-deep); }
+.cal-pill.tone-evening { background: var(--rail-wash); color: var(--rail); }
+.cal-pill.tone-agenda { background: #fdeceb; color: var(--signal-text); }
+.cal-more { font-size: 11px; color: var(--muted); }
+#calendar-day { margin-top: 12px; }
+#calendar-day h3 { margin: 8px 14px; text-transform: capitalize; }
+.cal-item { margin-left: 0; margin-right: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }

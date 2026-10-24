@@ -281,6 +281,10 @@ def test_homepage_is_the_desk(client):
     assert "DISLIKE" in page.text and "LIKE" in page.text
     assert "Prenotazioni" in page.text
     assert "non collegato" in page.text
+    assert "Bacheca community" in page.text
+    assert 'data-map="satellite"' in page.text
+    assert "Esri" in page.text
+    assert "Mese" in page.text and "Settimana" in page.text
 
 
 DESK = {
