@@ -91,6 +91,7 @@
       <div id="pref-preview" class="pref-preview" aria-live="polite"></div>
       <div class="actions center">
         <button id="enter-map" class="leaf" type="button" disabled>Apri la community</button>
+        <button class="ghost" type="button" data-open="personalize">Personalizza</button>
         <button id="demo-likes" class="ghost" type="button">Profilo demo: cinema, finanza, gaming, programmazione</button>
       </div>
     </div>
@@ -109,6 +110,8 @@
           <span id="date-m">—</span>
           <span id="date-y">—</span>
         </button>
+        <button class="ghost" type="button" data-open="personalize">Personalizza</button>
+        <button class="ghost" type="button" data-action="cohort">Coorte</button>
         <button class="head-ai" type="button" data-action="ai" aria-expanded="false" aria-controls="ai-overlay">AI Data Science</button>
         <button class="head-gear" type="button" data-action="section" data-id="personalizzazioni" aria-label="Personalizzazioni" aria-pressed="false">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -171,10 +174,21 @@
               <button id="tick-btn" class="solid" type="button" data-action="tick">Tic dell'agente</button>
             </div>
           </div>
-          <div id="per-te"></div>
+          <section id="scelto" class="scelto" aria-labelledby="scelto-title">
+            <h2 id="scelto-title">SCELTO PER TE</h2>
+            <div id="per-te"></div>
+            <div id="scelto-list"></div>
+          </section>
           <div id="feed"></div>
           <div id="tray"></div>
           <div id="cork" aria-live="polite"></div>
+        </section>
+        <section class="view pad-view" id="club" data-view="club" hidden>
+          <p class="eyebrow">Club</p>
+          <h2>Club del campus</h2>
+          <p class="meta">Post della bacheca Club. La mappa resta il satellite Esri di H-FARM.</p>
+          <div id="club-feed"></div>
+          <button class="leaf" type="button" data-action="section" data-id="mappa">Apri la mappa satellite</button>
         </section>
         <section class="view map-column" id="mappa" data-view="map" hidden>
           <div class="column-head">
@@ -198,8 +212,8 @@
         <section class="view pad-view" id="calendario" data-view="calendar" hidden>
           <div class="cal-toolbar">
             <div>
-              <p class="eyebrow">Calendario</p>
-              <h2 id="cal-heading">Ottobre 2026</h2>
+          <p class="eyebrow">Agenda</p>
+          <h2 id="cal-heading">Ottobre 2026</h2>
             </div>
             <div class="cal-switch" role="group" aria-label="Vista calendario">
               <button type="button" data-action="cal-mode" data-mode="month" id="cal-mode-month" aria-pressed="true">Mese</button>
@@ -213,6 +227,7 @@
           </div>
           <div id="calendar-body"></div>
           <div id="calendar-day" aria-live="polite"></div>
+          <div id="agenda-strip"></div>
         </section>
         <section class="view pad-view" id="prenotazioni" data-view="bookings" hidden aria-labelledby="book-title">
           <p class="eyebrow">Prenotazioni</p>
@@ -223,8 +238,8 @@
           <div id="agenda-list"></div>
         </section>
         <section class="view pad-view" id="feedback" data-view="feedback" hidden>
-          <p class="eyebrow">Feedback</p>
-          <h2>Note pubbliche</h2>
+          <p class="eyebrow">Voci</p>
+          <h2>Feedback</h2>
           <form id="feedback-form">
             <label>Evento
               <select id="feedback-event" required>
@@ -279,7 +294,13 @@
       </div>
     </div>
     <footer class="dock" id="dock"></footer>
-    <button id="ai-chip" class="ai-chip" type="button" data-action="ai" aria-expanded="false" aria-controls="ai-overlay">H-OS AI</button>
+    <nav class="help-nav" aria-label="H-ELP">
+      <button type="button" data-action="section" data-id="bacheca" aria-current="true">Bacheca</button>
+      <button type="button" data-action="section" data-id="club">Club</button>
+      <button type="button" data-action="section" data-id="agenda">Agenda</button>
+      <button type="button" data-action="section" data-id="voci">Voci</button>
+    </nav>
+    <button id="ai-chip" class="ai-chip fab" type="button" data-action="ai" aria-expanded="false" aria-controls="ai-overlay">Chiedi a H-OS</button>
     <section id="ai-overlay" class="ai-overlay" hidden>
       <div class="ai-head">
         <div>
@@ -304,6 +325,31 @@
     </section>
   </div>
 
+  <dialog id="personalize-modal" aria-labelledby="personalize-title">
+    <form method="dialog"><button class="ghost" value="close">Chiudi</button></form>
+    <p class="eyebrow">Personalizza</p>
+    <h3 id="personalize-title">I tuoi interessi</h3>
+    <p class="meta">Chip del dataset. Dopo l'accesso restano cliccabili: un tap aggiunge o toglie il tag.</p>
+    <div id="personalize-chips" class="chip-grid"></div>
+    <p id="personalize-status" class="meta" role="status"></p>
+    <div class="actions">
+      <button class="solid" type="button" data-personalize="save">Salva</button>
+    </div>
+  </dialog>
+  <dialog id="event-modal" aria-labelledby="event-modal-title">
+    <form method="dialog"><button class="ghost" value="close">Chiudi</button></form>
+    <p class="eyebrow">Evento</p>
+    <h3 id="event-modal-title">Evento</h3>
+    <p id="event-modal-body"></p>
+    <p class="eyebrow">Fonti</p>
+    <div id="event-sources"></div>
+    <div class="actions">
+      <button id="event-enroll" class="solid" type="button" data-action="event-enroll">Iscriviti</button>
+      <button id="event-approve" class="solid" type="button" data-action="approve-reg" hidden>Approva</button>
+      <button id="event-reject" class="ghost" type="button" data-action="reject-reg" hidden>Rifiuta</button>
+      <button id="event-ask" class="ghost" type="button" data-action="event-ask">Assistente</button>
+    </div>
+  </dialog>
   <dialog id="source-dialog" aria-labelledby="source-title">
     <form method="dialog"><button class="ghost" value="close">Chiudi</button></form>
     <div id="source-body"></div>

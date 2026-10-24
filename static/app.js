@@ -37,6 +37,7 @@ const state = {
   calendarMode: "month",
   calendarAnchor: null,
   boardFilter: "",
+  eventModalId: null,
 };
 
 const SESSION_KEY = "hos.session.v1";
@@ -111,9 +112,106 @@ document.getElementById("formula").addEventListener("change", (event) => {
   if (state.selectedId) refreshStudent();
 });
 
+wirePersonalize();
 boot();
 
+function wirePersonalize() {
+  const dialog = document.getElementById("personalize-modal");
+  if (dialog && dialog.dataset.wired !== "1") {
+    dialog.dataset.wired = "1";
+    dialog.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-chip]");
+      if (chip) {
+        event.preventDefault();
+        togglePersonalChip(chip.dataset.chip);
+        return;
+      }
+      if (event.target.closest("[data-personalize='save']")) {
+        event.preventDefault();
+        savePersonalize();
+      }
+    });
+  }
+  for (const button of document.querySelectorAll("[data-open='personalize']")) {
+    if (button.dataset.wired === "1") continue;
+    button.dataset.wired = "1";
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      openPersonalize();
+    });
+  }
+}
+
+function openPersonalize() {
+  renderPersonalizeChips();
+  const dialog = document.getElementById("personalize-modal");
+  const status = document.getElementById("personalize-status");
+  if (status) status.textContent = state.session ? "Tocca un chip per tenerlo o lasciarlo." : "Entra prima, poi i chip restano attivi.";
+  if (dialog && !dialog.open) dialog.showModal();
+}
+
+function renderPersonalizeChips() {
+  const box = document.getElementById("personalize-chips");
+  if (!box) return;
+  const likes = new Set(state.session?.likes || []);
+  box.replaceChildren();
+  const tags = state.tags.length ? state.tags : Object.keys(TAG_NOTES);
+  for (const tag of tags) {
+    box.append(el("button", {
+      type: "button",
+      class: "pref-chip",
+      "data-chip": tag,
+      "aria-pressed": likes.has(tag) ? "true" : "false",
+      text: tag,
+    }));
+  }
+}
+
+function togglePersonalChip(tag) {
+  const status = document.getElementById("personalize-status");
+  if (!state.session) {
+    if (status) status.textContent = "Entra con email e password, poi Personalizza risponde al tap.";
+    return;
+  }
+  const likes = new Set(state.session.likes || []);
+  if (likes.has(tag)) likes.delete(tag);
+  else likes.add(tag);
+  state.session.likes = [...likes];
+  state.session.dislikes = (state.session.dislikes || []).filter((item) => !likes.has(item));
+  state.session.skipped = (state.session.skipped || []).filter((item) => !likes.has(item));
+  saveSession(state.session);
+  renderPersonalizeChips();
+  if (status) status.textContent = likes.has(tag) ? `${tag} scelto.` : `${tag} tolto.`;
+}
+
+async function savePersonalize() {
+  const dialog = document.getElementById("personalize-modal");
+  if (!state.session) return;
+  if (!state.session.likes.length) {
+    const status = document.getElementById("personalize-status");
+    if (status) status.textContent = "Tieni almeno un interesse.";
+    return;
+  }
+  state.session.prefsConfirmed = true;
+  saveSession(state.session);
+  if (dialog?.open) dialog.close();
+  state.deskUser = deskUserFromSession();
+  state.selectedId = state.selectedId || "usr-desk";
+  if (state.screen !== "desk") {
+    showScreen("desk");
+    showView("community");
+  }
+  try {
+    await api("/desk/profile", { method: "POST", body: JSON.stringify(profileBody()) });
+    await refreshStudent();
+  } catch (error) {
+    state.error = error.message || "Preferenze non salvate.";
+    render();
+  }
+}
+
 async function boot() {
+  wirePersonalize();
   try {
     const [health, users, events, places, tags] = await Promise.all([
       api("/health"),
@@ -128,6 +226,7 @@ async function boot() {
     state.places = places.places;
     state.tags = tags.tags;
     state.session = loadSession();
+    renderPersonalizeChips();
     paintDate();
     const gate = document.getElementById("gate-status");
     if (gate) gate.textContent = "";
@@ -297,7 +396,7 @@ function onClick(event) {
   if (!target) return;
   const action = target.dataset.action;
   const id = target.dataset.id;
-  if (state.busy && !["source", "prefs", "section", "ai", "ai-close", "ask-suggest", "cal-mode", "cal-shift", "cal-today", "cal-day", "board-filter"].includes(action)) return;
+  if (state.busy && !["source", "prefs", "section", "ai", "ai-close", "ask-suggest", "cal-mode", "cal-shift", "cal-today", "cal-day", "board-filter", "event-open", "event-ask"].includes(action)) return;
   if (action === "match") refreshStudent();
   else if (action === "section") showView(id);
   else if (action === "prefs") showScreen("prefs");
@@ -347,6 +446,9 @@ function onClick(event) {
     state.boardFilter = id || "";
     renderCommunity();
   }
+  else if (action === "event-open") openEventModal(id);
+  else if (action === "event-enroll") enrollFromModal();
+  else if (action === "event-ask") askFromModal();
 }
 
 function render() {
@@ -374,7 +476,10 @@ function render() {
   renderCork();
   renderDock();
   renderCommunity();
+  renderScelto();
+  renderClub();
   renderCalendarView();
+  if (document.getElementById("event-modal")?.open) paintEventModal();
   renderBookings();
   renderShelf();
   renderContacts();
@@ -1205,14 +1310,15 @@ function signOut() {
 }
 
 function showView(id) {
-  const alias = { bacheca: "community", community: "community", mappa: "map", map: "map", calendario: "calendar", calendar: "calendar", prenotazioni: "bookings", bookings: "bookings", feedback: "feedback", contatti: "contacts", contacts: "contacts", canvas: "canvas", pronote: "pronote", shelf: "shelf", personalizzazioni: "settings", settings: "settings" };
+  const alias = { bacheca: "community", community: "community", mappa: "map", map: "map", calendario: "calendar", calendar: "calendar", agenda: "calendar", prenotazioni: "bookings", bookings: "bookings", feedback: "feedback", voci: "feedback", contatti: "contacts", contacts: "contacts", canvas: "canvas", pronote: "pronote", shelf: "shelf", personalizzazioni: "settings", settings: "settings", club: "club" };
   const view = alias[id] || "community";
   state.view = view;
   for (const section of document.querySelectorAll(".stage .view")) {
     section.hidden = section.dataset.view !== view;
   }
-  for (const button of document.querySelectorAll(".rail button[data-action='section']")) {
-    if (button.dataset.id === id || alias[button.dataset.id] === view) button.setAttribute("aria-current", "true");
+  for (const button of document.querySelectorAll(".help-nav button, .rail button[data-action='section']")) {
+    const target = alias[button.dataset.id] || button.dataset.id;
+    if (target === view) button.setAttribute("aria-current", "true");
     else button.removeAttribute("aria-current");
   }
   const dateBtn = document.getElementById("demo-date");
@@ -1350,6 +1456,102 @@ function renderPrefPreview() {
   for (const row of ranked) {
     node.append(el("p", { text: `${row.event.title} · ${row.event.id} · tag in comune ${row.shared}` }));
   }
+}
+
+function renderScelto() {
+  const node = document.getElementById("scelto-list");
+  if (!node) return;
+  node.replaceChildren();
+  if (!state.recommendations.length) {
+    node.append(el("p", { class: "meta", text: "I consigli compaiono dopo l'accesso, dalle tue preferenze." }));
+    return;
+  }
+  for (const row of state.recommendations) {
+    const card = el("button", {
+      type: "button",
+      class: "scelto-card",
+      "data-action": "event-open",
+      "data-id": row.event_id,
+    });
+    card.append(
+      el("strong", { text: row.title }),
+      el("span", { text: row.reason || row.source_id || "" }),
+    );
+    node.append(card);
+  }
+}
+
+function renderClub() {
+  const node = document.getElementById("club-feed");
+  if (!node) return;
+  node.replaceChildren();
+  const posts = state.posts.filter((post) => post.board_id === "board-club" || /club/i.test(post.thread_title || ""));
+  if (!posts.length) {
+    node.append(el("p", { class: "meta", text: "Nessun post Club caricato. La mappa satellite resta sul pulsante qui sotto." }));
+    return;
+  }
+  for (const post of posts.slice(0, 8)) {
+    node.append(el("article", { class: "mini-card" }, [
+      el("p", { class: "board-pill", text: post.thread_title || "Club" }),
+      el("h3", { text: post.title || "Club" }),
+      el("p", { text: post.body || "" }),
+    ]));
+  }
+}
+
+function findListedEvent(eventId) {
+  return state.events.find((item) => item.id === eventId)
+    || state.recommendations.find((item) => item.event_id === eventId)
+    || null;
+}
+
+function openEventModal(eventId) {
+  state.eventModalId = eventId;
+  paintEventModal();
+  const dialog = document.getElementById("event-modal");
+  if (dialog && !dialog.open) dialog.showModal();
+}
+
+function paintEventModal() {
+  const title = document.getElementById("event-modal-title");
+  if (!title) return;
+  const record = findListedEvent(state.eventModalId);
+  title.textContent = record?.title || state.eventModalId || "Evento";
+  const body = document.getElementById("event-modal-body");
+  if (body) body.textContent = record?.description || record?.blurb || record?.reason || "";
+  const sources = document.getElementById("event-sources");
+  if (sources) {
+    sources.replaceChildren();
+    const ids = [...new Set([record?.source_id, record?.id, state.eventModalId].filter(Boolean))];
+    for (const sourceId of ids) {
+      sources.append(el("button", {
+        type: "button",
+        class: "ghost",
+        "data-action": "source",
+        "data-id": sourceId,
+        text: sourceId,
+      }));
+    }
+  }
+  const pending = Boolean(state.proposal && state.proposal.event_id === state.eventModalId);
+  const enroll = document.getElementById("event-enroll");
+  const approve = document.getElementById("event-approve");
+  const reject = document.getElementById("event-reject");
+  if (enroll) enroll.hidden = pending;
+  if (approve) approve.hidden = !pending;
+  if (reject) reject.hidden = !pending;
+}
+
+async function enrollFromModal() {
+  if (!state.eventModalId) return;
+  await proposeRegistration(state.eventModalId);
+  paintEventModal();
+}
+
+function askFromModal() {
+  const record = findListedEvent(state.eventModalId);
+  setAssistant(true);
+  askAssistant(record?.title || "Recommend an event");
 }
 
 function renderCommunity() {
@@ -1652,6 +1854,22 @@ function renderBookings() {
       agenda.append(el("article", { class: "mini-card" }, [
         el("h3", { text: row.title || row.event_id }),
         el("p", { class: "meta", text: `${row.status} · ${row.mode} · ${row.source_id}` }),
+      ]));
+    }
+  }
+  const strip = document.getElementById("agenda-strip");
+  if (strip) {
+    strip.replaceChildren(el("h3", { text: "In agenda" }));
+    if (!state.agenda.length) strip.append(el("p", { class: "meta", text: "Vuota finché Approva non registra l'iscrizione simulata." }));
+    for (const row of state.agenda) {
+      strip.append(el("button", {
+        type: "button",
+        class: "scelto-card",
+        "data-action": "event-open",
+        "data-id": row.event_id,
+      }, [
+        el("strong", { text: row.title || row.event_id }),
+        el("span", { text: `${row.status} · ${row.source_id}` }),
       ]));
     }
   }

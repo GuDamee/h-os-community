@@ -285,6 +285,13 @@ def test_homepage_is_the_desk(client):
     assert 'data-map="satellite"' in page.text
     assert "Esri" in page.text
     assert "Mese" in page.text and "Settimana" in page.text
+    assert "SCELTO PER TE" in page.text
+    assert "Chiedi a H-OS" in page.text
+    assert "Iscriviti" in page.text
+    assert "Personalizza" in page.text
+    assert ">Club<" in page.text
+    assert ">Agenda<" in page.text
+    assert ">Voci<" in page.text
 
 
 DESK = {
